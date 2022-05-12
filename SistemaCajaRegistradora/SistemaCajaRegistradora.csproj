@@ -136,7 +136,7 @@
     </Compile>
     <Compile Include="Models\Categoria.cs" />
     <Compile Include="Models\MetodoPago.cs" />
-    <Compile Include="Models\ModelData.cs" />
+    <Compile Include="Models\ModelDatabase.cs" />
     <Compile Include="Models\Prioridad.cs" />
     <Compile Include="Models\Producto.cs" />
     <Compile Include="Models\Rol.cs" />
@@ -146,8 +146,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\icons\three-dots-vertical.svg" />
     <Content Include="Assets\images\blank-profile.png" />
-    <Content Include="Assets\images\img-product-test.jpg" />
+    <Content Include="Assets\images\productos\default-product-image.png" />
     <Content Include="Assets\logo\logo-web-carew.jpg" />
     <Content Include="Content\css\sb-admin-2.css" />
     <Content Include="Content\css\sb-admin-2.min.css" />
@@ -168,6 +169,8 @@
     <Content Include="Scripts\js\demo\chart-bar-demo.js" />
     <Content Include="Scripts\js\demo\chart-pie-demo.js" />
     <Content Include="Scripts\js\demo\datatables-demo.js" />
+    <Content Include="Scripts\js\scanner.js" />
+    <Content Include="Scripts\js\scriptsProductos.js" />
     <Content Include="Scripts\js\sb-admin-2.js" />
     <Content Include="Scripts\js\sb-admin-2.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
@@ -1999,6 +2002,8 @@
     <Content Include="Scripts\vendor\jquery\jquery.slim.min.map" />
     <Content Include="Views\Producto\Listar.cshtml" />
     <Content Include="Views\Producto\_formsProducto.cshtml" />
+    <Content Include="Views\Producto\_formsImagen.cshtml" />
+    <Content Include="Views\Producto\_formsEliminar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

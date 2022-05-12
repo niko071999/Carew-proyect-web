@@ -21,7 +21,7 @@ namespace SistemaCajaRegistradora.Models
         [StringLength(20)]
         public string nombre { get; set; }
 
-        [StringLength(100)]
+        [StringLength(255)]
         public string descripcion { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

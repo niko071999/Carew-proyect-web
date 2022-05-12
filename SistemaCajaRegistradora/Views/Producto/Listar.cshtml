@@ -1,9 +1,8 @@
-﻿
+﻿@model IEnumerable<SistemaCajaRegistradora.Models.Producto>
 @{
     ViewBag.Title = "Listado de productos";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
 <!-- Topbar -->
 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
@@ -43,54 +42,109 @@
         <div class="col-4">
             <h1 class="h3 mb-4 text-gray-800">@ViewBag.Title</h1>
         </div>
-        <div class="col-4">
-            <button class="btn btn-primary float-right" onclick="AgregarForms()" role="button">Agregar producto</button>
-        </div>
+        @if (Model.Count() > 0)
+        {
+            <div class="col-4">
+                <button class="btn btn-primary float-right" onclick="AgregarForms('@Url.Action("AgregarForms","Producto")')" role="button">Agregar producto</button>
+            </div>
+        }
     </div>
+    @if (Model.Count() > 0)
+    {
+        <div class="card mb-2">
+            <div class="card-body">
+                FILTROS
+            </div>
+        </div>
 
-    <div class="card mb-2">
-        <div class="card-body">
-            FILTROS
-        </div>
-    </div>
+        <div class="row">
+            <div class="col-12 table-responsive">
+                <table class="table table-sm table-striped table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Codigo barra</th>
+                            <th scope="col">Imagen</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Categoria</th>
+                            <th scope="col">Precio</th>
+                            <th scope="col">Stock</th>
+                            <th scope="col">Stock Min.</th>
+                            <th scope="col">Stock Max.</th>
+                            <th scope="col">Prioridad</th>
+                            <th scope="col">Fecha creacion</th>
+                            <th scope="col">Eliminado</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model)
+                        {
+                        <tr>
+                            <th class="align-middle" scope="row">@p.codigo_barra</th>
+                            <td>
+                                <a href="javascript:void(0);" onclick="formsImage('@Url.Action("formsImagen","Producto")',@p.id)">
+                                    <img class="rounded mx-auto d-block" src="@p.rutaImg" alt="Imagen del producto"
+                                         style="width: 100px; min-width: 100px; min-height: 50px; height: 80px;" />
+                                </a>
+                            </td>
+                            <td class="align-middle">@p.nombre</td>
+                            <td class="align-middle">@p.Categoria.nombre</td>
+                            <td class="align-middle"><span class="float-right">$@p.precio</span> </td>
+                            <td class="align-middle">@p.stock</td>
+                            <td class="align-middle">@p.stockmin</td>
+                            <td class="align-middle">@p.stockmax</td>
+                            <td class="align-middle">@p.Prioridad.prioridad1</td>
+                            <td class="align-middle">@string.Format("{0:yyyy-MM-dd}", p.fecha_creacion) </td>
+                            @if (p.eliminado == true)
+                            {
+                                <td class="align-middle">Si</td>
+                            }
+                            else
+                            {
+                                <td class="align-middle">No</td>
+                            }
+                            <td class="align-middle">
+                                <div class="btn-group" role="group">
+                                    <button id="btnGroupDrop1" type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="~/Assets/icons/three-dots-vertical.svg" />
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                        @if (p.eliminado == true)
+                                        {
+                                            <li><a class="dropdown-item disabled">Editar</a></li>
+                                            <li><a class="dropdown-item disabled">Eliminar</a></li>
+                                        }
+                                        else
+                                        {
+                                            <li><a class="dropdown-item" href="javascript:void(0);" onclick="">Editar</a></li>
+                                            <li><a class="dropdown-item" href="javascript:void(0);" onclick="formsEliminar('@Url.Action("formsEliminar","Producto")', @p.id)">Eliminar</a></li>
+                                        }
 
-    <div class="row">
-        <div class="col-12 table-responsive">
-            <table class="table table-sm table-striped table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th scope="col">Codigo barra</th>
-                        <th scope="col">Imagen</th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Categoria</th>
-                        <th scope="col">Precio</th>
-                        <th scope="col">Stock</th>
-                        <th scope="col">Stock Min.</th>
-                        <th scope="col">Stock Max.</th>
-                        <th scope="col">Prioridad</th>
-                        <th scope="col">Fecha creacion</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th class="align-middle" scope="row">11231414</th>
-                        <td>
-                            <img class="rounded mx-auto d-block" src="~/Assets/images/img-product-test.jpg"
-                                 style="width: 100px; min-width: 100px; min-height: 50px; height: 80px;"/>
-                        </td>
-                        <td class="align-middle">Producto 1</td>
-                        <td class="align-middle">Categoria 1</td>
-                        <td class="align-middle">$ 4500</td>
-                        <td class="align-middle">5</td>
-                        <td class="align-middle">0</td>
-                        <td class="align-middle">6</td>
-                        <td class="align-middle">Alta</td>
-                        <td class="align-middle">12/02/2022</td>
-                    </tr>
-                </tbody>
-            </table>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-8">
+                        <h5>Aqui no hay productos, intente agregando uno.</h5>
+                    </div>
+                    <div class="col-4">
+                        <button class="btn btn-primary float-right" onclick="AgregarForms('@Url.Action("AgregarForms","Producto")')" role="button">Agregar producto</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
 <!-- /.container-fluid -->
 <!-- Modal core base-->
@@ -99,90 +153,5 @@
 
 </div>
 
-<script src="~/Scripts/jquery-3.4.1.min.js"></script>
-<script type="text/javascript">
-    function AgregarForms() {
-        $.get('@Url.Action("AgregarForms","Producto")/', function (data) {
-            $('#coreModal').html(data);
-            $('#coreModal').modal('show');
-        })
-    }
-    function AgregarProducto() {
-        var idproducto = $('#id').val();
-        var codigo_barra = $('#codigo_barra').val();
-        var nombre = $('#nombre').val();
-        var precio = $('#precio').val();
-        var stock = $('#stock').val();
-        var stockmin = $('#stockmin').val();
-        var stockmax = $('#stockmax').val();
-        var fecha_creacion = "";
-        var prioridadid = $('#prioridadId').val();
-        var categoriaid = $('#categoriaId').val();
-        var rutaImg = $('#rutaImg').val();
-
-        console.log("codigo: "+codigo_barra,
-            "nombre: "+nombre,
-            "precio " +precio,
-            "stock " +stock,
-            "stockmin: " +stockmin,
-            "stockmax: " +stockmax,
-            "fecha_creacion: " +fecha_creacion,
-            "prioridadid: " +prioridadid,
-            "categoriaid: " +categoriaid,
-            "rutaImg: " +rutaImg
-        )
-
-        $('#codigo_barra').css('border-color', '');
-        $('#nombre').css('border-color', '');
-        $('#prioridadid').css('border-color', '');
-        $('#categoriaid').css('border-color', '');
-
-        //Validaciones campos vacios
-        var isValid = true;
-        if (codigo_barra.trim() == "") {
-            $('#codigo_barra').css('border-color', 'red');
-            isValid = false;
-        }
-        if (nombre.trim() == "") {
-            $('#nombre').css('border-color', 'red');
-            isValid = false;
-        }
-        if (prioridadid.trim() == "") {
-            $('#prioridadid').css('border-color', 'red');
-            isValid = false;
-        }
-        if (categoriaid.trim() == "") {
-            $('#categoriaid').css('border-color', 'red');
-            isValid = false;
-        }
-        //Campos vacios precio,stock,stockmin y max cambiar a 0
-        if (precio.trim() == "") {
-            precio = 0;
-        }
-        if (stock.trim() == "") {
-            stock = 0;
-        }
-
-        var producto = {
-            "id": idproducto,
-            "codigo": codigo_barra,
-            "nombre": nombre,
-            "precio": precio,
-            "stock": stock,
-            "stockmin": stockmin,
-            "stockmax": stockmax,
-            "fecha_creacion": fecha_creacion,
-            "prioridadid": prioridadid,
-            "categoriaid": categoriaid,
-            "rutaImg": rutaImg,
-        };
-
-        $.post('@Url.Action("AgregarProducto","Producto")/', producto, function (data) {
-            if (data > 0) {
-                location = location.href;
-            } else {
-                alert("Error");
-            }
-        });
-    }
-</script>
+<script src="~/Scripts/js/scriptsProductos.js"></script>
+<script src="~/Scripts/js/scanner.js"></script>

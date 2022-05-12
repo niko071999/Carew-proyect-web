@@ -23,7 +23,7 @@ namespace SistemaCajaRegistradora.Models
         [StringLength(100)]
         public string nombre { get; set; }
 
-        public int precio { get; set; }
+        public int? precio { get; set; }
 
         public int? stock { get; set; }
 
@@ -40,6 +40,8 @@ namespace SistemaCajaRegistradora.Models
 
         [StringLength(100)]
         public string rutaImg { get; set; }
+
+        public bool? eliminado { get; set; }
 
         public virtual Categoria Categoria { get; set; }
 

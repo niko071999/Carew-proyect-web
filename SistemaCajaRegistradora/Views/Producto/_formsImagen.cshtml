@@ -1,0 +1,18 @@
+﻿<div class="modal-dialog">
+    <div class="modal-content">
+        <form enctype="multipart/form-data">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Subir/Cambiar Imagen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label for="idArchivo" class="form-label">Seleccione imagen. (Formato JPG o PNG)</label>
+                <input class="form-control form-control-sm" accept=".jpg,.png" id="idArchivo" type="file" onchange="validar()">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button id="btnSubir" type="button" class="btn btn-success" onclick="subirImagen('@Url.Action("subirImagen","Producto")')">Subir imagen</button>
+            </div>
+        </form>
+    </div>
+</div>

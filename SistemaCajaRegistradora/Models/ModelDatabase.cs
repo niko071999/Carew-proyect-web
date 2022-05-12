@@ -5,10 +5,10 @@ using System.Linq;
 
 namespace SistemaCajaRegistradora.Models
 {
-    public partial class ModelData : DbContext
+    public partial class ModelDatabase : DbContext
     {
-        public ModelData()
-            : base("name=ModelData")
+        public ModelDatabase()
+            : base("name=ModelDatabase")
         {
         }
 
