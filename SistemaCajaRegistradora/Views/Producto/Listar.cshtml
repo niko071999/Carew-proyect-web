@@ -1,0 +1,188 @@
+﻿
+@{
+    ViewBag.Title = "Listado de productos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Topbar -->
+<nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+    <!-- Sidebar Toggle (Topbar) -->
+    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+        <i class="fa fa-bars"></i>
+    </button>
+
+    <!-- Topbar Navbar -->
+    <ul class="navbar-nav ml-auto">
+
+        <!-- Nav Item - User Information -->
+        <li class="nav-item dropdown no-arrow">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">NOMBRE DE USUARIO</span>
+                <img class="img-profile rounded-circle"
+                     src="~/Assets/images/blank-profile.png">
+            </a>
+            <!-- Dropdown - User Information -->
+            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                 aria-labelledby="userDropdown">
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Salir del sistema
+                </a>
+            </div>
+        </li>
+    </ul>
+</nav>
+<!-- End of Topbar -->
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="row justify-content-between">
+        <div class="col-4">
+            <h1 class="h3 mb-4 text-gray-800">@ViewBag.Title</h1>
+        </div>
+        <div class="col-4">
+            <button class="btn btn-primary float-right" onclick="AgregarForms()" role="button">Agregar producto</button>
+        </div>
+    </div>
+
+    <div class="card mb-2">
+        <div class="card-body">
+            FILTROS
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 table-responsive">
+            <table class="table table-sm table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Codigo barra</th>
+                        <th scope="col">Imagen</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Categoria</th>
+                        <th scope="col">Precio</th>
+                        <th scope="col">Stock</th>
+                        <th scope="col">Stock Min.</th>
+                        <th scope="col">Stock Max.</th>
+                        <th scope="col">Prioridad</th>
+                        <th scope="col">Fecha creacion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th class="align-middle" scope="row">11231414</th>
+                        <td>
+                            <img class="rounded mx-auto d-block" src="~/Assets/images/img-product-test.jpg"
+                                 style="width: 100px; min-width: 100px; min-height: 50px; height: 80px;"/>
+                        </td>
+                        <td class="align-middle">Producto 1</td>
+                        <td class="align-middle">Categoria 1</td>
+                        <td class="align-middle">$ 4500</td>
+                        <td class="align-middle">5</td>
+                        <td class="align-middle">0</td>
+                        <td class="align-middle">6</td>
+                        <td class="align-middle">Alta</td>
+                        <td class="align-middle">12/02/2022</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- /.container-fluid -->
+<!-- Modal core base-->
+<div class="modal fade" id="coreModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+
+</div>
+
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script type="text/javascript">
+    function AgregarForms() {
+        $.get('@Url.Action("AgregarForms","Producto")/', function (data) {
+            $('#coreModal').html(data);
+            $('#coreModal').modal('show');
+        })
+    }
+    function AgregarProducto() {
+        var idproducto = $('#id').val();
+        var codigo_barra = $('#codigo_barra').val();
+        var nombre = $('#nombre').val();
+        var precio = $('#precio').val();
+        var stock = $('#stock').val();
+        var stockmin = $('#stockmin').val();
+        var stockmax = $('#stockmax').val();
+        var fecha_creacion = "";
+        var prioridadid = $('#prioridadId').val();
+        var categoriaid = $('#categoriaId').val();
+        var rutaImg = $('#rutaImg').val();
+
+        console.log("codigo: "+codigo_barra,
+            "nombre: "+nombre,
+            "precio " +precio,
+            "stock " +stock,
+            "stockmin: " +stockmin,
+            "stockmax: " +stockmax,
+            "fecha_creacion: " +fecha_creacion,
+            "prioridadid: " +prioridadid,
+            "categoriaid: " +categoriaid,
+            "rutaImg: " +rutaImg
+        )
+
+        $('#codigo_barra').css('border-color', '');
+        $('#nombre').css('border-color', '');
+        $('#prioridadid').css('border-color', '');
+        $('#categoriaid').css('border-color', '');
+
+        //Validaciones campos vacios
+        var isValid = true;
+        if (codigo_barra.trim() == "") {
+            $('#codigo_barra').css('border-color', 'red');
+            isValid = false;
+        }
+        if (nombre.trim() == "") {
+            $('#nombre').css('border-color', 'red');
+            isValid = false;
+        }
+        if (prioridadid.trim() == "") {
+            $('#prioridadid').css('border-color', 'red');
+            isValid = false;
+        }
+        if (categoriaid.trim() == "") {
+            $('#categoriaid').css('border-color', 'red');
+            isValid = false;
+        }
+        //Campos vacios precio,stock,stockmin y max cambiar a 0
+        if (precio.trim() == "") {
+            precio = 0;
+        }
+        if (stock.trim() == "") {
+            stock = 0;
+        }
+
+        var producto = {
+            "id": idproducto,
+            "codigo": codigo_barra,
+            "nombre": nombre,
+            "precio": precio,
+            "stock": stock,
+            "stockmin": stockmin,
+            "stockmax": stockmax,
+            "fecha_creacion": fecha_creacion,
+            "prioridadid": prioridadid,
+            "categoriaid": categoriaid,
+            "rutaImg": rutaImg,
+        };
+
+        $.post('@Url.Action("AgregarProducto","Producto")/', producto, function (data) {
+            if (data > 0) {
+                location = location.href;
+            } else {
+                alert("Error");
+            }
+        });
+    }
+</script>

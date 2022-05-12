@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32414.318
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaCajaRegistradora", "SistemaCajaRegistradora\SistemaCajaRegistradora.csproj", "{D7760F95-8073-4520-86A5-E5D2660D1D5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SistemaCajaRegistradora.Tests", "SistemaCajaRegistradora.Tests\SistemaCajaRegistradora.Tests.csproj", "{6110EBF3-1FA0-43D9-B260-D937A4C47217}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D7760F95-8073-4520-86A5-E5D2660D1D5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7760F95-8073-4520-86A5-E5D2660D1D5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7760F95-8073-4520-86A5-E5D2660D1D5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7760F95-8073-4520-86A5-E5D2660D1D5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6110EBF3-1FA0-43D9-B260-D937A4C47217}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6110EBF3-1FA0-43D9-B260-D937A4C47217}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6110EBF3-1FA0-43D9-B260-D937A4C47217}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6110EBF3-1FA0-43D9-B260-D937A4C47217}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D766F042-C47F-4382-9473-3098C683D00B}
+	EndGlobalSection
+EndGlobal

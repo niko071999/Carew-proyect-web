@@ -1,0 +1,104 @@
+﻿@model SistemaCajaRegistradora.Models.Producto
+
+<div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            @* Condicion que verifica si esta editando o agregando *@
+            @if (Model==null)
+            {
+                <h5 class="modal-title" id="exampleModalLabel">Agregar Producto</h5>
+            }
+            else
+            {
+                <h5 class="modal-title" id="exampleModalLabel">Editar Producto</h5>
+            }
+            <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            @Html.AntiForgeryToken()
+            <div class="row g-2">
+                <div class="col-12">
+                    @Html.HiddenFor(model => model.id)
+                    @Html.HiddenFor(model => model.rutaImg)
+                    <label class="form-label">Codigo de barra</label>
+                    @Html.TextBoxFor(model => model.codigo_barra, new
+                    {
+                        @class = "form-control",
+                        @placeholder = "Ingrese codigo de barra",
+                        @autofocus = "autofocus"
+                    })
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Nombre</label>
+                    @Html.TextBoxFor(model => model.nombre, new
+                    {
+                        @class = "form-control",
+                        @placeholder = "Ingrese nombre del producto"
+                    })
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Categoria</label>
+                    @Html.DropDownList("categoriaId", null, "Seleccione categoria",
+                    htmlAttributes: new { @class = "form-control" })
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Precio</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">$</span>
+                        @Html.TextBoxFor(model => model.precio, new
+                    {
+                        @type = "number",
+                        @class = "form-control",
+                        @placeholder = "Ingrese precio del producto"
+                    })
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Stock</label>
+                    @Html.TextBoxFor(model => model.stock, new
+                    {
+                        @type = "number",
+                        @class = "form-control",
+                        @placeholder = "Ingrese stock del producto"
+                    })
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Prioridad</label>
+                    @Html.DropDownList("prioridadId", null, "Seleccione la prioridad",
+                    htmlAttributes: new { @class = "form-control" })
+                </div>
+                <div class="col-6">
+                    <label class="form-label">Stock minimo/maximo</label>
+                    <div class="input-group mb-3">
+                        @Html.TextBoxFor(model => model.stockmin, new
+                        {
+                            @type = "number",
+                            @class = "form-control",
+                            @placeholder = "Ingrese stock min."
+                        })
+                        <span class="input-group-text">-</span>
+                        @Html.TextBoxFor(model => model.stockmax, new
+                        {
+                            @type = "number",
+                            @class = "form-control",
+                            @placeholder = "Ingrese stock max."
+                        })
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
+                @if (Model==null)
+                {
+                    <button class="btn btn-primary" onclick="AgregarProducto()">Agregar</button>
+                }
+                else
+                {
+                    <button class="btn btn-primary" onclick="EditarProducto()">Editar</button>
+                }
+
+            </div>
+        </div>
+    </div>
