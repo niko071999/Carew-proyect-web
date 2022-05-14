@@ -41,8 +41,6 @@ namespace SistemaCajaRegistradora.Models
         [StringLength(100)]
         public string rutaImg { get; set; }
 
-        public bool? eliminado { get; set; }
-
         public virtual Categoria Categoria { get; set; }
 
         public virtual Prioridad Prioridad { get; set; }

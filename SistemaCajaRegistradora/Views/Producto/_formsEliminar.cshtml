@@ -6,12 +6,14 @@
             <h5 class="modal-title" id="exampleModalLabel">Eliminar producto</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body bg-danger">
-            <p class="text-light">¿Esta seguro de eliminar el producto "@Model.nombre"?</p>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="button" class="btn btn-danger" onclick="eliminarProducto('@Url.Action("eliminarProducto", "Producto")', @Model.id)">Eliminar</button>
-        </div>
+        <form method="post">
+            <div class="modal-body bg-danger">
+                <p class="text-light">¿Esta seguro de eliminar el producto "@Model.nombre"?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" onclick="eliminarProducto('@Url.Action("eliminarProducto", "Producto")', @Model.id)">Eliminar</button>
+            </div>
+        </form>
     </div>
 </div>

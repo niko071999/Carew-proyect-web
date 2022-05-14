@@ -45,18 +45,63 @@
         @if (Model.Count() > 0)
         {
             <div class="col-4">
-                <button class="btn btn-primary float-right" onclick="AgregarForms('@Url.Action("AgregarForms","Producto")')" role="button">Agregar producto</button>
+                <div class="d-grid gap-2 mb-2">
+                    <button class="btn btn-primary" onclick="AgregarForms('@Url.Action("AgregarForms","Producto")')" type="button">Agregar producto</button>
+                </div>
             </div>
         }
     </div>
     @if (Model.Count() > 0)
     {
-        <div class="card mb-2">
-            <div class="card-body">
-                FILTROS
+        //Acordion
+        <div class="accordion" id="accordionPanelsStayOpenExample">
+            @* Acordion Agregar existencias *@
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#addExistenciasPanel" aria-controls="addExistenciasPanel">
+                        Agregar existencias
+                    </button>
+                </h2>
+                <div id="addExistenciasPanel" class="accordion-collapse collapse" aria-labelledby="addExistenciasPanelVista">
+                    <div class="accordion-body">
+                        <div class="card mb-2">
+                            <h5 class="card-header">Agregar existencias</h5>
+                            <div class="card-body">
+                                <h4>Escanea el producto</h4>
+                                <label class="form-label">Codigo de barra</label>
+                                <input id="codigoAdd" type="number" class="form-control mb-1" placeholder="Ingrese codigo de barra" />
+                                <ul id="listProductos" class="list-group list-group-horizontal">
+
+                                </ul>
+                            </div>
+                            <div class="card-footer">
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button id="btnAplicar" class="btn btn-success me-md-2" onclick="aplicarExistencias()" type="button">Aplicar las existencias</button>
+                                    <button class="btn btn-secondary" type="button" onclick="cancelar()">Cancelar operacion</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @* Acordion de filtros *@
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#filtroPanel" aria-controls="filtroPanel">
+                        Filtros
+                    </button>
+                </h2>
+                <div id="filtroPanel" class="accordion-collapse collapse" aria-labelledby="filtroPanelVista">
+                    <div class="accordion-body">
+                        <div class="card">
+                            <div class="card-body">
+                                FILTROS
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
         <div class="row">
             <div class="col-12 table-responsive">
                 <table class="table table-sm table-striped table-bordered table-hover">
@@ -68,62 +113,107 @@
                             <th scope="col">Categoria</th>
                             <th scope="col">Precio</th>
                             <th scope="col">Stock</th>
-                            <th scope="col">Stock Min.</th>
-                            <th scope="col">Stock Max.</th>
                             <th scope="col">Prioridad</th>
                             <th scope="col">Fecha creacion</th>
-                            <th scope="col">Eliminado</th>
                             <th scope="col">Acciones</th>
+                            <th scope="col">Avisos</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var p in Model)
                         {
-                        <tr>
-                            <th class="align-middle" scope="row">@p.codigo_barra</th>
-                            <td>
-                                <a href="javascript:void(0);" onclick="formsImage('@Url.Action("formsImagen","Producto")',@p.id)">
-                                    <img class="rounded mx-auto d-block" src="@p.rutaImg" alt="Imagen del producto"
-                                         style="width: 100px; min-width: 100px; min-height: 50px; height: 80px;" />
-                                </a>
-                            </td>
-                            <td class="align-middle">@p.nombre</td>
-                            <td class="align-middle">@p.Categoria.nombre</td>
-                            <td class="align-middle"><span class="float-right">$@p.precio</span> </td>
-                            <td class="align-middle">@p.stock</td>
-                            <td class="align-middle">@p.stockmin</td>
-                            <td class="align-middle">@p.stockmax</td>
-                            <td class="align-middle">@p.Prioridad.prioridad1</td>
-                            <td class="align-middle">@string.Format("{0:yyyy-MM-dd}", p.fecha_creacion) </td>
-                            @if (p.eliminado == true)
-                            {
-                                <td class="align-middle">Si</td>
-                            }
-                            else
-                            {
-                                <td class="align-middle">No</td>
-                            }
-                            <td class="align-middle">
-                                <div class="btn-group" role="group">
-                                    <button id="btnGroupDrop1" type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <img src="~/Assets/icons/three-dots-vertical.svg" />
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                        @if (p.eliminado == true)
+                            <tr>
+                                <th class="align-middle" scope="row">@p.codigo_barra</th>
+                                <td>
+                                    <a href="javascript:void(0);" onclick="formsImage('@Url.Action("formsImagen", "Producto")',@p.id)">
+                                        <img class="rounded mx-auto d-block" src="@p.rutaImg" alt="Imagen del producto"
+                                             style="width: 100px; min-width: 100px; min-height: 50px; height: 80px;" />
+                                    </a>
+                                </td>
+                                <td class="align-middle">@p.nombre</td>
+                                <td class="align-middle">@p.Categoria.nombre</td>
+                                <td class="align-middle">
+                                    <span class="float-right">$@p.precio</span>
+                                </td>
+                                <td class="align-middle">@p.stock</td>
+                                <td class="align-middle">@p.Prioridad.prioridad1</td>
+                                <td class="align-middle">@string.Format("{0:yyyy-MM-dd}", p.fecha_creacion)</td>
+                                <td class="align-middle">
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-warning" type="button" onclick="formsEditar('@Url.Action("formsEditar", "Producto")',@p.id)">Editar</button>
+                                        <button class="btn btn-danger" type="button" onclick="formsEliminar('@Url.Action("formsEliminar", "Producto")', @p.id)">Eliminar</button>
+                                    </div>
+                                </td>
+                                <td class="align-middle">
+                                    @if (p.stock > 0 && p.stock > p.stockmin && p.stock <= p.stockmax)
+                                    {
+                                        <h4 class="text-center"><span class="badge bg-secondary">Producto dentro del rango stock minimo y maximo</span></h4>
+                                    }
+                                    else if (p.stock > 0 && p.stock > p.stockmax)
+                                    {
+                                        int result = (int)p.stock - (int)p.stockmax;
+                                        if (p.Prioridad.prioridad1.Contains("Baja"))
                                         {
-                                            <li><a class="dropdown-item disabled">Editar</a></li>
-                                            <li><a class="dropdown-item disabled">Eliminar</a></li>
+                                            <h4 class="text-center"><span class="badge bg-secondary">Producto sobrepasado en @result existencias</span></h4>
+                                        }
+                                        else if (p.Prioridad.prioridad1.Contains("Medio") || p.Prioridad.prioridad1.Contains("Alta"))
+                                        {
+                                            <h4 class="text-center"><span class="badge bg-secondary">Stock correcto</span></h4>
+
+                                        }
+                                    }
+                                    else if (p.stock > 0 && p.stock <= p.stockmin)
+                                    {
+                                        int result = (int)p.stockmin - (int)p.stock;
+                                        if (result == 0)
+                                        {
+                                            if (p.Prioridad.prioridad1.Contains("Baja"))
+                                            {
+                                                <h4 class="text-center"><span class="badge bg-gradient-primary">Producto en su existencia minima</span></h4>
+                                            }
+                                            else if (p.Prioridad.prioridad1.Contains("Medio"))
+                                            {
+                                                <h4 class="text-center"><span class="badge bg-gradient-warning">Producto en su existencia minima</span></h4>
+                                            }
+                                            else
+                                            {
+                                                <h4 class="text-center"><span class="badge bg-gradient-danger">Producto en su existencia minima</span></h4>
+                                            }
                                         }
                                         else
                                         {
-                                            <li><a class="dropdown-item" href="javascript:void(0);" onclick="">Editar</a></li>
-                                            <li><a class="dropdown-item" href="javascript:void(0);" onclick="formsEliminar('@Url.Action("formsEliminar","Producto")', @p.id)">Eliminar</a></li>
+                                            if (p.Prioridad.prioridad1.Contains("Baja"))
+                                            {
+                                                <h4 class="text-center"><span class="badge bg-gradient-primary">Producto por debajo de @result existencia del stock minimo</span></h4>
+                                            }
+                                            else if (p.Prioridad.prioridad1.Contains("Medio"))
+                                            {
+                                                <h4 class="text-center"><span class="badge bg-gradient-warning">Producto por debajo de @result existencia del stock minimo</span></h4>
+                                            }
+                                            else
+                                            {
+                                                <h4 class="text-center"><span class="badge bg-gradient-danger">Producto por debajo de @result existencia del stock minimo</span></h4>
+                                            }
                                         }
+                                    }
+                                    else if (p.stock == 0)
+                                    {
+                                        if (p.Prioridad.prioridad1.Contains("Baja"))
+                                        {
+                                            <h4 class="text-center"><span class="badge bg-gradient-primary">Producto sin existencia minima</span></h4>
 
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
+                                        }
+                                        else if (p.Prioridad.prioridad1.Contains("Medio"))
+                                        {
+                                            <h4 class="text-center"><span class="badge bg-gradient-warning">Producto sin existencia minima</span></h4>
+                                        }
+                                        else
+                                        {
+                                            <h4 class="text-center"><span class="badge bg-gradient-danger">Producto sin existencia minima</span></h4>
+                                        }
+                                    }
+                                </td>
+                            </tr>
                         }
                     </tbody>
                 </table>
@@ -149,9 +239,99 @@
 <!-- /.container-fluid -->
 <!-- Modal core base-->
 <div class="modal fade" id="coreModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
+     aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
 
 </div>
 
 <script src="~/Scripts/js/scriptsProductos.js"></script>
 <script src="~/Scripts/js/scanner.js"></script>
+<script type="text/javascript">
+    var lista = [];
+    $('#btnAplicar').attr('disabled', true);
+
+    $('#codigoAdd').bind('keyup', function (e) {
+        var key = e.keyCode || e.which;
+        var codigo = $('#codigoAdd').val();
+        var producto = {
+            "id": 0,
+            "codigo_barra": codigo,
+            "nombre": 'test',
+            "precio": 0,
+            "stock": 1,
+            "stockmin": 0,
+            "stockmax": 0,
+            "fecha_creacion": null,
+            "prioridadid": 0,
+            "categoriaid": 0,
+            "rutaImg": 'test'
+        };
+        if (key === 13) {
+            $.post('@Url.Action("addExistencias","Producto")', producto, function (data) {
+                let diferencia = 0;
+                console.log("1: ", lista);
+                if (data.codigobarra != "") {
+                    let exist = false;
+                    console.log(jQuery.inArray(data.codigobarra, lista));
+                    $('#listProductos').empty();
+                    if (lista.length > 0) {
+                        for (let i = 0; i < lista.length; i++) {
+                            exist = lista[i].codigobarra == data.codigobarra ? true : false;
+                            if (lista[i].codigobarra == data.codigobarra) {
+                                lista[i].newstock++;
+                            }
+                        }
+                        if (!exist) {
+                            lista.push(data);
+                        }
+                    } else {
+                        lista.push(data);
+                    }
+                    $('#btnAplicar').attr('disabled', false);
+                    for (let i = 0; i < lista.length; i++) {
+                        diferencia = lista[i].newstock - lista[i].oldStock;
+                        $('#listProductos').append(`<li class="list-group-item">${lista[i].codigobarra}<span class="badge bg-primary rounded-pill">${diferencia}</span></li>`);
+                    }
+                } else {
+                    console.log('error');
+                    alert("No existe ningun producto asociado a este codigo de barra");
+                }
+            }, 'json');
+        };
+    });
+
+    function aplicarExistencias() {
+        for (let i = 0; i < lista.length; i++) {
+            var producto = {
+                "id": 0,
+                "codigo_barra": lista[i].codigobarra,
+                "nombre": 'test',
+                "precio": 0,
+                "stock": lista[i].newstock,
+                "stockmin": 0,
+                "stockmax": 0,
+                "fecha_creacion": null,
+                "prioridadid": 0,
+                "categoriaid": 0,
+                "rutaImg": 'test'
+            };
+            $.post('@Url.Action("aplicarExistencias","Producto")', producto, function (data) {
+                if (data > 0) {
+                    location = location.href
+                } else {
+                    alert("El producto no fue editado")
+                }
+            });
+        }
+    }
+    function cancelar() {
+        lista = [];
+        $('#codigoAdd').val('')
+        $('#listProductos').empty();
+        var myCollapse = document.getElementById('addExistenciasPanel')
+        var bsCollapse = new bootstrap.Collapse(myCollapse, {
+            hide: true
+        })
+        $('#btnAplicar').attr('disabled', false);
+    }
+
+</script>

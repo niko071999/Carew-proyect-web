@@ -41,10 +41,33 @@ namespace SistemaCajaRegistradora.Controllers
             //Se define una imagen por defecto
             producto.rutaImg = "./../Assets/images/productos/default-product-image.png";
             producto.fecha_creacion = DateTime.Now;
-            producto.eliminado = false;
             db.Producto.Add(producto);
             int n = db.SaveChanges();
             return Json(n,JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        [ActionName("formsEditar")]
+        public PartialViewResult formsEditar(int? id)
+        {   
+            var producto = db.Producto.Include(p => p.Categoria)
+                .Include(p => p.Prioridad).Where(p => p.id == id).FirstOrDefault();
+            var categorias = db.Categoria.ToList();
+            var prioridades = db.Prioridad.ToList();
+            ViewBag.categoriaId = new SelectList(categorias, "id", "nombre",producto.categoriaid);
+            ViewBag.prioridadId = new SelectList(prioridades, "id", "prioridad1",producto.prioridadid);
+
+            return PartialView("_formsProducto",producto);
+        }
+
+        [HttpPost]
+        [ActionName("editarProducto")]
+        public JsonResult editarProducto(Producto producto)
+        {
+            validarValoresNull(producto);
+            db.Entry(producto).State = EntityState.Modified;
+            int n = db.SaveChanges();
+            return Json(n, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
@@ -69,10 +92,9 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult eliminarProducto(int? id)
         {
             var producto = db.Producto.Find(id);
-            producto.eliminado = true;
-            db.Entry(producto).State = EntityState.Modified;
-            int n = db.SaveChanges();
-            return Json(n, JsonRequestBehavior.AllowGet);
+            db.Producto.Remove(producto);
+            db.SaveChanges();
+            return Json(producto, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -107,6 +129,59 @@ namespace SistemaCajaRegistradora.Controllers
                     new { mensaje = "Error de subida de archivo" }, JsonRequestBehavior.AllowGet);
             }
         }
+
+        [HttpPost]
+        [ActionName("addExistencias")]
+        public JsonResult addExistencias(Producto producto)
+        {   
+            if (producto != null)
+            {
+                int codigo = producto.codigo_barra;
+                var prod = db.Producto.Where(p => p.codigo_barra == codigo).FirstOrDefault();
+                if (prod != null)
+                {
+                    prod.stock++;
+                    return Json(new
+                    {
+                        id = prod.id,
+                        codigobarra = prod.codigo_barra,
+                        nombre = prod.nombre.Trim(),
+                        newstock = prod.stock,
+                        oldStock = prod.stock - 1,
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        codigobarra = "",
+                        nombre = "",
+                        stock = "",
+                        increment = "",
+                    }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            return null;
+        }
+
+        public JsonResult aplicarExistencias(Producto producto)
+        {
+            int n = 0;
+            var resulProducto = db.Producto.Include(p => p.Categoria).Include(p => p.Prioridad)
+                .Where(p => p.codigo_barra == producto.codigo_barra).FirstOrDefault();
+            if (resulProducto!=null)
+            {
+                resulProducto.stock = producto.stock;
+                db.Entry(resulProducto).State = EntityState.Modified;
+                n = db.SaveChanges();
+                return Json(n,JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(n, JsonRequestBehavior.AllowGet); ;
+            }
+        }
+
         private void validarValoresNull(Producto producto)
         {
             if (producto.precio == null)
@@ -126,5 +201,7 @@ namespace SistemaCajaRegistradora.Controllers
                 producto.stockmax = 0;
             }
         }
+
+
     }
 }

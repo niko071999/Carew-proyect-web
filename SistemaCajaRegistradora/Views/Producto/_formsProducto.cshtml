@@ -22,11 +22,12 @@
                 <div class="col-12">
                     @Html.HiddenFor(model => model.id)
                     @Html.HiddenFor(model => model.rutaImg)
-                    @Html.HiddenFor(model => model.eliminado)
+                    @Html.HiddenFor(model => model.fecha_creacion)
                     <label class="form-label">Codigo de barra</label>
                     @Html.TextBoxFor(model => model.codigo_barra, new
                     {
                         @type = "number",
+                        @min = "0",
                         @class = "form-control",
                         @placeholder = "Ingrese codigo de barra"
                     })
@@ -35,6 +36,7 @@
                     <label class="form-label">Nombre</label>
                     @Html.TextBoxFor(model => model.nombre, new
                     {
+                        @type = "text",
                         @class = "form-control",
                         @placeholder = "Ingrese nombre del producto"
                     })
@@ -51,20 +53,29 @@
                         @Html.TextBoxFor(model => model.precio, new
                     {
                         @type = "number",
+                        @min = "0",
                         @class = "form-control",
                         @placeholder = "Ingrese precio del producto"
                     })
                     </div>
                 </div>
-                <div class="col-6">
-                    <label class="form-label">Stock</label>
-                    @Html.TextBoxFor(model => model.stock, new
-                    {
-                        @type = "number",
-                        @class = "form-control",
-                        @placeholder = "Ingrese stock del producto"
-                    })
-                </div>
+                @if (Model == null)
+                {
+                    <div class="col-6">
+                        <label class="form-label">Stock</label>
+                        @Html.TextBoxFor(model => model.stock, new
+                   {
+                       @type = "number",
+                       @min = "0",
+                       @class = "form-control",
+                       @placeholder = "Ingrese stock del producto"
+                   })
+                    </div>
+                }
+                else
+                {
+                    @Html.HiddenFor(model => model.stock)
+                }
                 <div class="col-6">
                     <label class="form-label">Prioridad</label>
                     @Html.DropDownList("prioridadId", null, "Seleccione la prioridad",
@@ -74,18 +85,20 @@
                     <label class="form-label">Stock minimo/maximo</label>
                     <div class="input-group mb-3">
                         @Html.TextBoxFor(model => model.stockmin, new
-                        {
-                            @type = "number",
-                            @class = "form-control",
-                            @placeholder = "Ingrese stock min."
-                        })
+                       {
+                           @min = "0",
+                           @type = "number",
+                           @class = "form-control",
+                           @placeholder = "Ingrese stock min."
+                       })
                         <span class="input-group-text">-</span>
                         @Html.TextBoxFor(model => model.stockmax, new
-                        {
-                            @type = "number",
-                            @class = "form-control",
-                            @placeholder = "Ingrese stock max."
-                        })
+                       {
+                           @min = "0",
+                           @type = "number",
+                           @class = "form-control",
+                           @placeholder = "Ingrese stock max."
+                       })
                     </div>
                 </div>
             </div>
@@ -97,7 +110,7 @@
                 }
                 else
                 {
-                    <button class="btn btn-warning" onclick="EditarProducto()">Editar</button>
+                    <button class="btn btn-warning" onclick="editarProducto('@Url.Action("editarProducto","Producto")')">Editar</button>
                 }
 
             </div>
