@@ -3,8 +3,8 @@
     ViewBag.Title = "Listado de productos";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<!-- Topbar -->
-<nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+<!-- Topbar  -->
+<nav class="navbar navbar-expand navbar-light bg-white mb-4 topbar shadow">
 
     <!-- Sidebar Toggle (Topbar) -->
     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
@@ -46,7 +46,10 @@
         {
             <div class="col-4">
                 <div class="d-grid gap-2 mb-2">
-                    <button class="btn btn-primary" onclick="AgregarForms('@Url.Action("AgregarForms","Producto")')" type="button">Agregar producto</button>
+                    <button class="btn btn-primary" onclick="AgregarForms('@Url.Action("AgregarForms","Producto")')" type="button">
+                        <i class="fas fa-plus"></i>
+                        Agregar producto
+                    </button>
                 </div>
             </div>
         }
@@ -54,11 +57,11 @@
     @if (Model.Count() > 0)
     {
         //Acordion
-        <div class="accordion" id="accordionPanelsStayOpenExample">
-            @* Acordion Agregar existencias *@
+        <div class="accordion accordion-flush" id="accordionPanelsStayOpenExample">
             <div class="accordion-item">
-                <h2 class="accordion-header" id="panelsStayOpen-headingOne">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#addExistenciasPanel" aria-controls="addExistenciasPanel">
+                @* Acordion Agregar existencias *@
+                <h2 class="accordion-header" id="flush-headingOne">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#addExistenciasPanel" aria-controls="addExistenciasPanel" aria-expanded="false">
                         Agregar existencias
                     </button>
                 </h2>
@@ -69,9 +72,11 @@
                             <div class="card-body">
                                 <h4>Escanea el producto</h4>
                                 <label class="form-label">Codigo de barra</label>
-                                <input id="codigoAdd" type="number" class="form-control mb-1" placeholder="Ingrese codigo de barra" />
-                                <ul id="listProductos" class="list-group list-group-horizontal">
-
+                                <div class="input-group mb-3">
+                                    <button id="btnBorrar" class="btn btn-close btn-circle btn-sm" type="button" aria-label="Close" onclick="borrarCodigo()"></button>
+                                    <input id="codigoAdd" type="text" class="form-control" placeholder="Ingrese codigo de barra" aria-describedby="btnBorrar">
+                                </div>
+                                <ul id="listProductos" class="list-group list-group-horizontal overflow-auto">
                                 </ul>
                             </div>
                             <div class="card-footer">
@@ -84,10 +89,10 @@
                     </div>
                 </div>
             </div>
-            @* Acordion de filtros *@
             <div class="accordion-item">
-                <h2 class="accordion-header" id="panelsStayOpen-headingOne">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#filtroPanel" aria-controls="filtroPanel">
+                @* Acordion de filtros *@
+                <h2 class="accordion-header" id="flush-headingOne">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filtroPanel" aria-controls="filtroPanel" aria-expanded="false">
                         Filtros
                     </button>
                 </h2>
@@ -104,7 +109,7 @@
         </div>
         <div class="row">
             <div class="col-12 table-responsive">
-                <table class="table table-sm table-striped table-bordered table-hover">
+                <table class="table table-sm table-bordered table-hover">
                     <thead>
                         <tr>
                             <th scope="col">Codigo barra</th>
@@ -229,7 +234,10 @@
                         <h5>Aqui no hay productos, intente agregando uno.</h5>
                     </div>
                     <div class="col-4">
-                        <button class="btn btn-primary float-right" onclick="AgregarForms('@Url.Action("AgregarForms","Producto")')" role="button">Agregar producto</button>
+                        <button class="btn btn-primary float-right" onclick="AgregarForms('@Url.Action("AgregarForms","Producto")')" role="button">
+                            <i class="fas fa-plus"></i>
+                            Agregar producto
+                        </button>
                     </div>
                 </div>
             </div>
@@ -242,7 +250,7 @@
      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
 
 </div>
-
+<script src="~/Scripts/js/alertmenssages.js"></script>
 <script src="~/Scripts/js/scriptsProductos.js"></script>
 <script src="~/Scripts/js/scanner.js"></script>
 <script type="text/javascript">
@@ -289,17 +297,21 @@
                     $('#btnAplicar').attr('disabled', false);
                     for (let i = 0; i < lista.length; i++) {
                         diferencia = lista[i].newstock - lista[i].oldStock;
-                        $('#listProductos').append(`<li class="list-group-item">${lista[i].codigobarra}<span class="badge bg-primary rounded-pill">${diferencia}</span></li>`);
+                        $('#listProductos').append(`<li id="${lista[i].codigobarra}" class="list-group-item m-2">${lista[i].codigobarra}<span class="badge bg-primary rounded-pill">${diferencia}</span></li>`);
+                        $('#codigoAdd').val('');
                     }
+                    mensaje = 'Codigo de barra ' + producto.codigo_barra + ' añadido';
+                    showMenssage('success', mensaje, true);
                 } else {
-                    console.log('error');
-                    alert("No existe ningun producto asociado a este codigo de barra");
+                    mensaje = "No existe ningun producto asociado a este codigo de barra";
+                    showMenssage('error', mensaje, true);
+                    $('#codigoAdd').val('');
                 }
             }, 'json');
         };
     });
-
     function aplicarExistencias() {
+        let error = false;
         for (let i = 0; i < lista.length; i++) {
             var producto = {
                 "id": 0,
@@ -316,11 +328,19 @@
             };
             $.post('@Url.Action("aplicarExistencias","Producto")', producto, function (data) {
                 if (data > 0) {
-                    location = location.href
+                    error = false;
                 } else {
-                    alert("El producto no fue editado")
+                    error = true;
                 }
             });
+        }
+        if (error) {
+            mensaje = "No se actualizo ningun producto";
+            showMenssage('error', mensaje, true);
+        } else {
+            sessionStorage.clear();
+            sessionStorage.mensaje = 'Se actualizo las existencia/s de los producto/s';
+            location = location.href
         }
     }
     function cancelar() {
@@ -329,9 +349,12 @@
         $('#listProductos').empty();
         var myCollapse = document.getElementById('addExistenciasPanel')
         var bsCollapse = new bootstrap.Collapse(myCollapse, {
-            hide: true
+            hide: true,
         })
         $('#btnAplicar').attr('disabled', false);
+        sessionStorage.clear();
     }
-
+    function borrarCodigo() {
+        $('#codigoAdd').val('');
+    }
 </script>

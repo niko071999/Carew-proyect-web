@@ -12,7 +12,7 @@
             {
                 <h5 class="modal-title" id="exampleModalLabel">Editar Producto</h5>
             }
-            <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close">
+            <button class="btn-close" type="button" data-bs-dismiss="modal">
                 <span aria-hidden="true">×</span>
             </button>
         </div>
@@ -23,26 +23,25 @@
                     @Html.HiddenFor(model => model.id)
                     @Html.HiddenFor(model => model.rutaImg)
                     @Html.HiddenFor(model => model.fecha_creacion)
-                    <label class="form-label">Codigo de barra</label>
+                    <label id="text_codigo" class="form-label">Codigo de barra</label>
                     @Html.TextBoxFor(model => model.codigo_barra, new
-                    {
-                        @type = "number",
-                        @min = "0",
-                        @class = "form-control",
-                        @placeholder = "Ingrese codigo de barra"
-                    })
+                       {
+                           @class = "form-control",
+                           @placeholder = "Ingrese codigo de barra",
+                           maxlength = 15
+                       })
                 </div>
                 <div class="col-6">
-                    <label class="form-label">Nombre</label>
+                    <label id="text_nombre" class="form-label">Nombre</label>
                     @Html.TextBoxFor(model => model.nombre, new
-                    {
-                        @type = "text",
-                        @class = "form-control",
-                        @placeholder = "Ingrese nombre del producto"
-                    })
+                       {
+                           @type = "text",
+                           @class = "form-control",
+                           @placeholder = "Ingrese nombre del producto",
+                       })
                 </div>
                 <div class="col-6">
-                    <label class="form-label">Categoria</label>
+                    <label id="text_categoria" class="form-label">Categoria</label>
                     @Html.DropDownList("categoriaId", null, "Seleccione categoria",
                     htmlAttributes: new { @class = "form-select" })
                 </div>
@@ -52,8 +51,6 @@
                         <span class="input-group-text">$</span>
                         @Html.TextBoxFor(model => model.precio, new
                     {
-                        @type = "number",
-                        @min = "0",
                         @class = "form-control",
                         @placeholder = "Ingrese precio del producto"
                     })
@@ -65,10 +62,8 @@
                         <label class="form-label">Stock</label>
                         @Html.TextBoxFor(model => model.stock, new
                    {
-                       @type = "number",
-                       @min = "0",
                        @class = "form-control",
-                       @placeholder = "Ingrese stock del producto"
+                       @placeholder = "Ingrese stock del producto",
                    })
                     </div>
                 }
@@ -77,27 +72,23 @@
                     @Html.HiddenFor(model => model.stock)
                 }
                 <div class="col-6">
-                    <label class="form-label">Prioridad</label>
+                    <label id="text_prioridad" class="form-label">Prioridad</label>
                     @Html.DropDownList("prioridadId", null, "Seleccione la prioridad",
                     htmlAttributes: new { @class = "form-select" })
                 </div>
                 <div class="col-6">
-                    <label class="form-label">Stock minimo/maximo</label>
+                    <label class="form-label">Stock minimo - maximo</label>
                     <div class="input-group mb-3">
                         @Html.TextBoxFor(model => model.stockmin, new
-                       {
-                           @min = "0",
-                           @type = "number",
-                           @class = "form-control",
-                           @placeholder = "Ingrese stock min."
-                       })
-                        <span class="input-group-text">-</span>
+                           {
+                               @class = "form-control",
+                               @placeholder = "Ingrese stock min.",
+                           })
+                        <span class="input-group-text"> - </span>
                         @Html.TextBoxFor(model => model.stockmax, new
                        {
-                           @min = "0",
-                           @type = "number",
                            @class = "form-control",
-                           @placeholder = "Ingrese stock max."
+                           @placeholder = "Ingrese stock max.",
                        })
                     </div>
                 </div>

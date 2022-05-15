@@ -52,6 +52,8 @@ namespace SistemaCajaRegistradora.Controllers
         {   
             var producto = db.Producto.Include(p => p.Categoria)
                 .Include(p => p.Prioridad).Where(p => p.id == id).FirstOrDefault();
+            producto.codigo_barra.Trim();
+            producto.nombre.Trim();
             var categorias = db.Categoria.ToList();
             var prioridades = db.Prioridad.ToList();
             ViewBag.categoriaId = new SelectList(categorias, "id", "nombre",producto.categoriaid);
@@ -84,6 +86,7 @@ namespace SistemaCajaRegistradora.Controllers
         {
             var producto = db.Producto.Include(p=>p.Categoria)
                 .Include(p=>p.Prioridad).Where(p=>p.id == id).FirstOrDefault();
+            producto.nombre.Trim();
             return PartialView("_formsEliminar",producto);
         }
 
@@ -136,15 +139,15 @@ namespace SistemaCajaRegistradora.Controllers
         {   
             if (producto != null)
             {
-                int codigo = producto.codigo_barra;
-                var prod = db.Producto.Where(p => p.codigo_barra == codigo).FirstOrDefault();
+                string codigo = producto.codigo_barra;
+                var prod = db.Producto.Where(p => p.codigo_barra.Equals(codigo)).FirstOrDefault();
                 if (prod != null)
                 {
                     prod.stock++;
                     return Json(new
                     {
                         id = prod.id,
-                        codigobarra = prod.codigo_barra,
+                        codigobarra = prod.codigo_barra.Trim(),
                         nombre = prod.nombre.Trim(),
                         newstock = prod.stock,
                         oldStock = prod.stock - 1,
@@ -164,6 +167,8 @@ namespace SistemaCajaRegistradora.Controllers
             return null;
         }
 
+        [HttpPost]
+        [ActionName("aplicarExistencias")]
         public JsonResult aplicarExistencias(Producto producto)
         {
             int n = 0;

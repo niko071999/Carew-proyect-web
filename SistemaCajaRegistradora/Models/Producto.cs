@@ -17,10 +17,10 @@ namespace SistemaCajaRegistradora.Models
 
         public int id { get; set; }
 
-        public int codigo_barra { get; set; }
+        [Required]
+        public string codigo_barra { get; set; }
 
         [Required]
-        [StringLength(100)]
         public string nombre { get; set; }
 
         public int? precio { get; set; }
@@ -38,7 +38,6 @@ namespace SistemaCajaRegistradora.Models
 
         public int categoriaid { get; set; }
 
-        [StringLength(100)]
         public string rutaImg { get; set; }
 
         public virtual Categoria Categoria { get; set; }
