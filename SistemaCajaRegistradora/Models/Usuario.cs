@@ -6,41 +6,41 @@ namespace SistemaCajaRegistradora.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("Usuario")]
     public partial class Usuario
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Usuario()
         {
-            Venta = new HashSet<Venta>();
+            Ventas = new HashSet<Venta>();
         }
 
         public int id { get; set; }
 
         [Required]
-        [StringLength(20)]
+        [StringLength(50)]
         public string nombreUsuario { get; set; }
 
         [Required]
-        [StringLength(12)]
-        public string nombreCajero { get; set; }
+        [StringLength(50)]
+        public string clave { get; set; }
 
         [Required]
-        [StringLength(24)]
-        public string apellidoCajero { get; set; }
+        [StringLength(30)]
+        public string nombre { get; set; }
 
-        [StringLength(100)]
+        [Required]
+        [StringLength(30)]
+        public string apellido { get; set; }
+
+        [Required]
+        [StringLength(255)]
         public string rutaImg { get; set; }
-
-        [Required]
-        [StringLength(100)]
-        public string contraseña { get; set; }
 
         public int rolid { get; set; }
 
-        public virtual Rol Rol { get; set; }
+        public virtual Role Role { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Venta> Venta { get; set; }
+        public virtual ICollection<Venta> Ventas { get; set; }
     }
 }

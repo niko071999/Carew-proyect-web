@@ -6,7 +6,6 @@ namespace SistemaCajaRegistradora.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("Venta")]
     public partial class Venta
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -19,14 +18,14 @@ namespace SistemaCajaRegistradora.Models
 
         public int total_venta { get; set; }
 
-        public int metodo_pagoid { get; set; }
-
         [Column(TypeName = "date")]
         public DateTime fecha_creacion { get; set; }
 
+        public int vuelto { get; set; }
+
         public int cajeroid { get; set; }
 
-        public int vuelto { get; set; }
+        public int metodo_pagoid { get; set; }
 
         public virtual MetodoPago MetodoPago { get; set; }
 

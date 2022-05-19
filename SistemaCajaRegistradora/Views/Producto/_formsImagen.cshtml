@@ -7,11 +7,11 @@
             </div>
             <div class="modal-body">
                 <label for="idArchivo" class="form-label">Seleccione imagen. (Formato JPG o PNG)</label>
-                <input class="form-control form-control-sm" accept=".jpg,.png" id="idArchivo" type="file" onchange="validar()">
+                <input class="form-control form-control-sm" onchange="desabilitar()" accept=".jpg,.png" id="idArchivo" type="file">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button id="btnSubir" type="button" class="btn btn-success" onclick="subirImagen('@Url.Action("subirImagen","Producto")')">Subir imagen</button>
+                <button id="btnSubir" type="button" class="btn btn-success" onclick="subirImagen('@Url.Action("subirImagen","Producto")')" disabled>Subir imagen</button>
             </div>
         </form>
     </div>

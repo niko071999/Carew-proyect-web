@@ -24,36 +24,78 @@
                     @Html.HiddenFor(model => model.rutaImg)
                     @Html.HiddenFor(model => model.fecha_creacion)
                     <label id="text_codigo" class="form-label">Codigo de barra</label>
-                    @Html.TextBoxFor(model => model.codigo_barra, new
+                    <div class="input-group mb-3">
+                        @Html.TextBoxFor(model => model.codigo_barra, new
                        {
                            @class = "form-control",
                            @placeholder = "Ingrese codigo de barra",
-                           maxlength = 15
+                           maxlength = 15,
+                           aria_describedby = "btnVerificar"
                        })
+                        <button class="btn btn-outline-success" type="button" id="btnVerificar">Verificar</button>
+                    </div>
+                    
                 </div>
                 <div class="col-6">
                     <label id="text_nombre" class="form-label">Nombre</label>
-                    @Html.TextBoxFor(model => model.nombre, new
-                       {
-                           @type = "text",
-                           @class = "form-control",
-                           @placeholder = "Ingrese nombre del producto",
-                       })
+                    @if (Model == null)
+                    {
+                        @Html.TextBoxFor(model => model.nombre, new
+                        {
+                            @type = "text",
+                            @class = "form-control",
+                            @placeholder = "Ingrese nombre del producto",
+                            maxlength = 100,
+                            disabled = "disabled"
+                        })
+                    }
+                    else
+                    {
+                        @Html.TextBoxFor(model => model.nombre, new
+                        {
+                            @type = "text",
+                            @class = "form-control",
+                            @placeholder = "Ingrese nombre del producto",
+                            maxlength = 100
+                        })
+                    }
                 </div>
                 <div class="col-6">
                     <label id="text_categoria" class="form-label">Categoria</label>
-                    @Html.DropDownList("categoriaId", null, "Seleccione categoria",
-                    htmlAttributes: new { @class = "form-select" })
+                    @if (Model == null)
+                    {
+                        @Html.DropDownList("categoriaId", null, "Seleccione categoria",
+                        htmlAttributes: new { @class = "form-select", disabled = "disabled" })
+                    }
+                    else
+                    {
+                        @Html.DropDownList("categoriaId", null, "Seleccione categoria",
+                        htmlAttributes: new { @class = "form-select" })
+                    }
                 </div>
                 <div class="col-6">
                     <label class="form-label">Precio</label>
                     <div class="input-group mb-3">
                         <span class="input-group-text">$</span>
-                        @Html.TextBoxFor(model => model.precio, new
-                    {
-                        @class = "form-control",
-                        @placeholder = "Ingrese precio del producto"
-                    })
+                        @if (Model == null)
+                        {
+                            @Html.TextBoxFor(model => model.precio, new
+                            {
+                                @class = "form-control",
+                                @placeholder = "Ingrese precio del producto",
+                                maxlenght = 9,
+                                disabled = "disabled"
+                            })
+                        }
+                        else
+                        {
+                            @Html.TextBoxFor(model => model.precio, new
+                            {
+                                @class = "form-control",
+                                @placeholder = "Ingrese precio del producto",
+                                maxlenght = 9
+                            })
+                        }
                     </div>
                 </div>
                 @if (Model == null)
@@ -61,10 +103,12 @@
                     <div class="col-6">
                         <label class="form-label">Stock</label>
                         @Html.TextBoxFor(model => model.stock, new
-                   {
-                       @class = "form-control",
-                       @placeholder = "Ingrese stock del producto",
-                   })
+                       {
+                           @class = "form-control",
+                           @placeholder = "Ingrese stock del producto",
+                           maxlenght = 9,
+                           disabled = "disabled"
+                       })
                     </div>
                 }
                 else
@@ -73,23 +117,54 @@
                 }
                 <div class="col-6">
                     <label id="text_prioridad" class="form-label">Prioridad</label>
-                    @Html.DropDownList("prioridadId", null, "Seleccione la prioridad",
-                    htmlAttributes: new { @class = "form-select" })
+                    @if (Model==null)
+                    {
+                        @Html.DropDownList("prioridadId", null, "Seleccione la prioridad",
+                        htmlAttributes: new { @class = "form-select", disabled = "disabled" })
+                    }
+                    else
+                    {
+                        @Html.DropDownList("prioridadId", null, "Seleccione la prioridad",
+                        htmlAttributes: new { @class = "form-select"})
+                    }
                 </div>
                 <div class="col-6">
                     <label class="form-label">Stock minimo - maximo</label>
                     <div class="input-group mb-3">
-                        @Html.TextBoxFor(model => model.stockmin, new
-                           {
-                               @class = "form-control",
-                               @placeholder = "Ingrese stock min.",
-                           })
-                        <span class="input-group-text"> - </span>
-                        @Html.TextBoxFor(model => model.stockmax, new
-                       {
-                           @class = "form-control",
-                           @placeholder = "Ingrese stock max.",
-                       })
+                        @if (Model == null)
+                        {
+                            @Html.TextBoxFor(model => model.stockmin, new
+                            {
+                                @class = "form-control",
+                                @placeholder = "Ingrese stock min.",
+                                maxlenght = 9,
+                                disabled = "disabled"
+                            })
+                            <span class="input-group-text"> - </span>
+                            @Html.TextBoxFor(model => model.stockmax, new
+                            {
+                                @class = "form-control",
+                                @placeholder = "Ingrese stock max.",
+                                maxlenght = 9,
+                                disabled = "disabled"
+                            })
+                        }
+                        else
+                        {
+                            @Html.TextBoxFor(model => model.stockmin, new
+                            {
+                                @class = "form-control",
+                                @placeholder = "Ingrese stock min.",
+                                maxlenght = 9
+                            })
+                            <span class="input-group-text"> - </span>
+                            @Html.TextBoxFor(model => model.stockmax, new
+                            {
+                                @class = "form-control",
+                                @placeholder = "Ingrese stock max.",
+                                maxlenght = 9
+                            })
+                        }
                     </div>
                 </div>
             </div>
@@ -97,14 +172,93 @@
                 <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
                 @if (Model == null)
                 {
-                    <button class="btn btn-success" onclick="AgregarProducto('@Url.Action("AgregarProducto","Producto")')">Agregar</button>
+                    <button id="btnAgregar" class="btn btn-success" onclick="AgregarProducto('@Url.Action("AgregarProducto","Producto")')">Agregar</button>
                 }
                 else
                 {
-                    <button class="btn btn-warning" onclick="editarProducto('@Url.Action("editarProducto","Producto")')">Editar</button>
+                    <button id="btnEditar" class="btn btn-warning" onclick="editarProducto('@Url.Action("editarProducto","Producto")')">Editar</button>
                 }
 
             </div>
         </div>
     </div>
 </div>
+
+<script type="text/javascript" title="scannerValidation">
+    $('#codigo_barra').bind('keyup', function (e) {
+        let key = e.keyCode || e.which;
+        let codigo = document.getElementById("codigo_barra").value;
+        console.log(codigo.lenght)
+        if (key === 13) {
+            if (codigo != '') {
+                verificar(codigo);
+            }
+        }
+    });
+
+    $('#btnVerificar').click(function () {
+        let codigo = document.getElementById("codigo_barra").value;
+        if (codigo != '') {
+            verificar(codigo);
+        }
+    });
+
+    function verificar(codigo) {
+        var codigo = document.getElementById("codigo_barra").value;
+        return getDataProduct(codigo);
+    }
+
+    function getDataProduct(codigo) {
+        var producto = {
+            "id": 0,
+            "codigo_barra": codigo,
+            "nombre": 'test',
+            "precio": 0,
+            "stock": 1,
+            "stockmin": 0,
+            "stockmax": 0,
+            "fecha_creacion": null,
+            "prioridadid": 0,
+            "categoriaid": 0,
+            "rutaImg": 'test'
+        };
+        $.post('@Url.Action("addExistencias", "Producto")', producto, function (data) {
+            if (data.codigobarra != '') {
+                console.log('data.codigobarra !=', data.codigobarra);
+                if (data.codigobarra === sessionStorage.codigobarrainit) {
+                    console.log('data.codigobarra == sessionStorage.codigobarrainit');
+                    return false;
+                } else {
+                    console.log('data.codigobarra == sessionStorage.codigobarrainit ELSE', data.codigobarra.length, sessionStorage.codigobarrainit.length);
+                    let mensaje = 'El codigo de barra esta siendo usado por otro producto, ¿Quieres abrir el agregador de existencias?'
+                    showMenssage('warning', mensaje, false);
+                    sessionStorage.codigo = data.codigobarra;
+                    return true;
+                }
+            } else {
+                console.log('data.codigobarra != ELSE');
+                let mensaje = 'El codigo no esta siendo utilizado por otro producto';
+                showMenssage('success', mensaje, true);
+                let inputs = [{ nombre: 'nombre' }, { nombre: 'categoriaId' }, { nombre: 'precio' },
+                { nombre: 'stock' }, { nombre: 'stockmin' }, { nombre: 'stockmax' }, { nombre: 'prioridadId' }]
+                for (let i = 0; i < inputs.length; i++) {
+                    let input = document.getElementById(inputs[i].nombre);
+                    input.disabled = false;
+                }
+                return false;
+            }
+        });
+    }
+
+    function verificarOpcion(opcion) {
+        if (opcion) {
+            $('#coreModal').modal('hide');
+            var myCollapse = document.getElementById('addExistenciasPanel');
+            var bsCollapse = new bootstrap.Collapse(myCollapse, {
+                hide: true,
+            });
+            $('#codigoAdd').val(sessionStorage.codigo);
+            sessionStorage.clear();
+        }
+    }
+</script>

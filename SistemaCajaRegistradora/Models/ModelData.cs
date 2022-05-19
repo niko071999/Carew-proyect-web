@@ -1,24 +1,24 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
 using System.Linq;
 
 namespace SistemaCajaRegistradora.Models
 {
-    public partial class ModelDatabase : DbContext
+    public partial class ModelData : DbContext
     {
-        public ModelDatabase()
-            : base("name=ModelDatabase")
+        public ModelData()
+            : base("name=ModelData")
         {
         }
 
-        public virtual DbSet<Categoria> Categoria { get; set; }
-        public virtual DbSet<MetodoPago> MetodoPago { get; set; }
-        public virtual DbSet<Prioridad> Prioridad { get; set; }
-        public virtual DbSet<Producto> Producto { get; set; }
-        public virtual DbSet<Rol> Rol { get; set; }
-        public virtual DbSet<Usuario> Usuario { get; set; }
-        public virtual DbSet<Venta> Venta { get; set; }
+        public virtual DbSet<Categoria> Categorias { get; set; }
+        public virtual DbSet<MetodoPago> MetodoPagos { get; set; }
+        public virtual DbSet<Prioridade> Prioridades { get; set; }
+        public virtual DbSet<Producto> Productos { get; set; }
+        public virtual DbSet<Role> Roles { get; set; }
+        public virtual DbSet<Usuario> Usuarios { get; set; }
+        public virtual DbSet<Venta> Ventas { get; set; }
         public virtual DbSet<venta_producto> venta_producto { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -32,7 +32,7 @@ namespace SistemaCajaRegistradora.Models
                 .IsFixedLength();
 
             modelBuilder.Entity<Categoria>()
-                .HasMany(e => e.Producto)
+                .HasMany(e => e.Productos)
                 .WithRequired(e => e.Categoria)
                 .WillCascadeOnDelete(false);
 
@@ -41,19 +41,24 @@ namespace SistemaCajaRegistradora.Models
                 .IsFixedLength();
 
             modelBuilder.Entity<MetodoPago>()
-                .HasMany(e => e.Venta)
+                .HasMany(e => e.Ventas)
                 .WithRequired(e => e.MetodoPago)
                 .HasForeignKey(e => e.metodo_pagoid)
                 .WillCascadeOnDelete(false);
 
-            modelBuilder.Entity<Prioridad>()
-                .Property(e => e.prioridad1)
+            modelBuilder.Entity<Prioridade>()
+                .Property(e => e.prioridad)
                 .IsFixedLength();
 
-            modelBuilder.Entity<Prioridad>()
-                .HasMany(e => e.Producto)
-                .WithRequired(e => e.Prioridad)
+            modelBuilder.Entity<Prioridade>()
+                .HasMany(e => e.Productos)
+                .WithRequired(e => e.Prioridade)
+                .HasForeignKey(e => e.prioridadid)
                 .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Producto>()
+                .Property(e => e.codigo_barra)
+                .IsFixedLength();
 
             modelBuilder.Entity<Producto>()
                 .Property(e => e.nombre)
@@ -63,18 +68,14 @@ namespace SistemaCajaRegistradora.Models
                 .Property(e => e.rutaImg)
                 .IsFixedLength();
 
-            modelBuilder.Entity<Producto>()
-                .HasMany(e => e.venta_producto)
-                .WithRequired(e => e.Producto)
-                .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<Rol>()
-                .Property(e => e.rol1)
+            modelBuilder.Entity<Role>()
+                .Property(e => e.rol)
                 .IsFixedLength();
 
-            modelBuilder.Entity<Rol>()
-                .HasMany(e => e.Usuario)
-                .WithRequired(e => e.Rol)
+            modelBuilder.Entity<Role>()
+                .HasMany(e => e.Usuarios)
+                .WithRequired(e => e.Role)
+                .HasForeignKey(e => e.rolid)
                 .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Usuario>()
@@ -82,11 +83,15 @@ namespace SistemaCajaRegistradora.Models
                 .IsFixedLength();
 
             modelBuilder.Entity<Usuario>()
-                .Property(e => e.nombreCajero)
+                .Property(e => e.clave)
                 .IsFixedLength();
 
             modelBuilder.Entity<Usuario>()
-                .Property(e => e.apellidoCajero)
+                .Property(e => e.nombre)
+                .IsFixedLength();
+
+            modelBuilder.Entity<Usuario>()
+                .Property(e => e.apellido)
                 .IsFixedLength();
 
             modelBuilder.Entity<Usuario>()
@@ -94,18 +99,9 @@ namespace SistemaCajaRegistradora.Models
                 .IsFixedLength();
 
             modelBuilder.Entity<Usuario>()
-                .Property(e => e.contraseña)
-                .IsFixedLength();
-
-            modelBuilder.Entity<Usuario>()
-                .HasMany(e => e.Venta)
+                .HasMany(e => e.Ventas)
                 .WithRequired(e => e.Usuario)
                 .HasForeignKey(e => e.cajeroid)
-                .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<Venta>()
-                .HasMany(e => e.venta_producto)
-                .WithRequired(e => e.Venta)
                 .WillCascadeOnDelete(false);
         }
     }

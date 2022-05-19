@@ -107,6 +107,7 @@
                 </div>
             </div>
         </div>
+        <!-- table -->
         <div class="row">
             <div class="col-12 table-responsive">
                 <table class="table table-sm table-bordered table-hover">
@@ -141,7 +142,7 @@
                                     <span class="float-right">$@p.precio</span>
                                 </td>
                                 <td class="align-middle">@p.stock</td>
-                                <td class="align-middle">@p.Prioridad.prioridad1</td>
+                                <td class="align-middle">@p.Prioridade.prioridad</td>
                                 <td class="align-middle">@string.Format("{0:yyyy-MM-dd}", p.fecha_creacion)</td>
                                 <td class="align-middle">
                                     <div class="d-grid gap-2">
@@ -150,72 +151,81 @@
                                     </div>
                                 </td>
                                 <td class="align-middle">
-                                    @if (p.stock > 0 && p.stock > p.stockmin && p.stock <= p.stockmax)
+                                    @if (p.stockmin != 0 && p.stockmax != 0)
                                     {
-                                        <h4 class="text-center"><span class="badge bg-secondary">Producto dentro del rango stock minimo y maximo</span></h4>
-                                    }
-                                    else if (p.stock > 0 && p.stock > p.stockmax)
-                                    {
-                                        int result = (int)p.stock - (int)p.stockmax;
-                                        if (p.Prioridad.prioridad1.Contains("Baja"))
+                                        if (p.stock > 0 && p.stock > p.stockmin && p.stock <= p.stockmax)
                                         {
-                                            <h4 class="text-center"><span class="badge bg-secondary">Producto sobrepasado en @result existencias</span></h4>
+                                            <h4 class="text-center"><span class="badge bg-secondary">Producto dentro del rango stock minimo y maximo</span></h4>
                                         }
-                                        else if (p.Prioridad.prioridad1.Contains("Medio") || p.Prioridad.prioridad1.Contains("Alta"))
+                                        else if (p.stock > 0 && p.stock > p.stockmax)
                                         {
-                                            <h4 class="text-center"><span class="badge bg-secondary">Stock correcto</span></h4>
-
-                                        }
-                                    }
-                                    else if (p.stock > 0 && p.stock <= p.stockmin)
-                                    {
-                                        int result = (int)p.stockmin - (int)p.stock;
-                                        if (result == 0)
-                                        {
-                                            if (p.Prioridad.prioridad1.Contains("Baja"))
+                                            int result = (int)p.stock - (int)p.stockmax;
+                                            if (p.Prioridade.prioridad.Contains("Baja"))
                                             {
-                                                <h4 class="text-center"><span class="badge bg-gradient-primary">Producto en su existencia minima</span></h4>
+                                                <h4 class="text-center"><span class="badge bg-secondary">Producto sobrepasado en @result existencias</span></h4>
                                             }
-                                            else if (p.Prioridad.prioridad1.Contains("Medio"))
+                                            else if (p.Prioridade.prioridad.Contains("Medio") || p.Prioridade.prioridad.Contains("Alta"))
                                             {
-                                                <h4 class="text-center"><span class="badge bg-gradient-warning">Producto en su existencia minima</span></h4>
+                                                <h4 class="text-center"><span class="badge bg-secondary">Stock correcto</span></h4>
+
+                                            }
+                                        }
+                                        else if (p.stock > 0 && p.stock <= p.stockmin)
+                                        {
+                                            int result = (int)p.stockmin - (int)p.stock;
+                                            if (result == 0)
+                                            {
+                                                if (p.Prioridade.prioridad.Contains("Baja"))
+                                                {
+                                                    <h4 class="text-center"><span class="badge bg-gradient-primary">Producto en su existencia minima</span></h4>
+                                                }
+                                                else if (p.Prioridade.prioridad.Contains("Medio"))
+                                                {
+                                                    <h4 class="text-center"><span class="badge bg-gradient-warning">Producto en su existencia minima</span></h4>
+                                                }
+                                                else
+                                                {
+                                                    <h4 class="text-center"><span class="badge bg-gradient-danger">Producto en su existencia minima</span></h4>
+                                                }
                                             }
                                             else
                                             {
-                                                <h4 class="text-center"><span class="badge bg-gradient-danger">Producto en su existencia minima</span></h4>
+                                                if (p.Prioridade.prioridad.Contains("Baja"))
+                                                {
+                                                    <h4 class="text-center"><span class="badge bg-gradient-primary">Producto por debajo de @result existencia del stock minimo</span></h4>
+                                                }
+                                                else if (p.Prioridade.prioridad.Contains("Medio"))
+                                                {
+                                                    <h4 class="text-center"><span class="badge bg-gradient-warning">Producto por debajo de @result existencia del stock minimo</span></h4>
+                                                }
+                                                else
+                                                {
+                                                    <h4 class="text-center"><span class="badge bg-gradient-danger">Producto por debajo de @result existencia del stock minimo</span></h4>
+                                                }
                                             }
                                         }
-                                        else
+                                        else if (p.stock == 0)
                                         {
-                                            if (p.Prioridad.prioridad1.Contains("Baja"))
+                                            if (p.Prioridade.prioridad.Contains("Baja"))
                                             {
-                                                <h4 class="text-center"><span class="badge bg-gradient-primary">Producto por debajo de @result existencia del stock minimo</span></h4>
+                                                <h4 class="text-center"><span class="badge bg-gradient-primary">Producto sin existencia minima</span></h4>
+
                                             }
-                                            else if (p.Prioridad.prioridad1.Contains("Medio"))
+                                            else if (p.Prioridade.prioridad.Contains("Medio"))
                                             {
-                                                <h4 class="text-center"><span class="badge bg-gradient-warning">Producto por debajo de @result existencia del stock minimo</span></h4>
+                                                <h4 class="text-center"><span class="badge bg-gradient-warning">Producto sin existencia minima</span></h4>
                                             }
                                             else
                                             {
-                                                <h4 class="text-center"><span class="badge bg-gradient-danger">Producto por debajo de @result existencia del stock minimo</span></h4>
+                                                <h4 class="text-center"><span class="badge bg-gradient-danger">Producto sin existencia minima</span></h4>
                                             }
                                         }
-                                    }
-                                    else if (p.stock == 0)
-                                    {
-                                        if (p.Prioridad.prioridad1.Contains("Baja"))
-                                        {
-                                            <h4 class="text-center"><span class="badge bg-gradient-primary">Producto sin existencia minima</span></h4>
 
-                                        }
-                                        else if (p.Prioridad.prioridad1.Contains("Medio"))
-                                        {
-                                            <h4 class="text-center"><span class="badge bg-gradient-warning">Producto sin existencia minima</span></h4>
-                                        }
-                                        else
-                                        {
-                                            <h4 class="text-center"><span class="badge bg-gradient-danger">Producto sin existencia minima</span></h4>
-                                        }
+
+                                    }
+                                    else
+                                    {
+                                        <h4 class="text-center"><span class="badge bg-gradient-primary">Stock minimo y maximo por defecto</span></h4>
                                     }
                                 </td>
                             </tr>
@@ -245,6 +255,7 @@
     }
 </div>
 <!-- /.container-fluid -->
+
 <!-- Modal core base-->
 <div class="modal fade" id="coreModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
@@ -252,8 +263,14 @@
 </div>
 <script src="~/Scripts/js/alertmenssages.js"></script>
 <script src="~/Scripts/js/scriptsProductos.js"></script>
-<script src="~/Scripts/js/scanner.js"></script>
 <script type="text/javascript">
+    var coreModal = document.getElementById('coreModal')
+    coreModal.addEventListener('shown.bs.modal', function () {
+        var codigo_barra = $('#codigo_barra').val().trim();
+        sessionStorage.codigobarrainit = codigo_barra;
+        console.log(sessionStorage.codigobarrainit);
+    })
+
     var lista = [];
     $('#btnAplicar').attr('disabled', true);
 
@@ -350,8 +367,8 @@
         var myCollapse = document.getElementById('addExistenciasPanel')
         var bsCollapse = new bootstrap.Collapse(myCollapse, {
             hide: true,
-        })
-        $('#btnAplicar').attr('disabled', false);
+        });
+        $('#btnAplicar').attr('disabled', true);
         sessionStorage.clear();
     }
     function borrarCodigo() {

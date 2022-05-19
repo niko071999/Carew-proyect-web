@@ -6,22 +6,22 @@ namespace SistemaCajaRegistradora.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("MetodoPago")]
+    [Table("MetodoPagos")]
     public partial class MetodoPago
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public MetodoPago()
         {
-            Venta = new HashSet<Venta>();
+            Ventas = new HashSet<Venta>();
         }
 
         public int id { get; set; }
 
         [Required]
-        [StringLength(10)]
+        [StringLength(20)]
         public string metodo_pago { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Venta> Venta { get; set; }
+        public virtual ICollection<Venta> Ventas { get; set; }
     }
 }

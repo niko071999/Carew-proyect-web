@@ -6,23 +6,21 @@ namespace SistemaCajaRegistradora.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("Prioridad")]
-    public partial class Prioridad
+    public partial class Prioridade
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Prioridad()
+        public Prioridade()
         {
-            Producto = new HashSet<Producto>();
+            Productos = new HashSet<Producto>();
         }
 
         public int id { get; set; }
 
-        [Column("prioridad")]
         [Required]
         [StringLength(10)]
-        public string prioridad1 { get; set; }
+        public string prioridad { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Producto> Producto { get; set; }
+        public virtual ICollection<Producto> Productos { get; set; }
     }
 }

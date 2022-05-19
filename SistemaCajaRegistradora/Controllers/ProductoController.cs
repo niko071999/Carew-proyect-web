@@ -10,13 +10,14 @@ namespace SistemaCajaRegistradora.Controllers
 {
     public class ProductoController : Controller
     {
-        private readonly ModelDatabase db = new ModelDatabase();
+        private readonly ModelData db = new ModelData();
 
         // GET: Producto
         [HttpGet]
+        [ActionName("Listar")]
         public ActionResult Listar()
         {
-            var producto = db.Producto.Include(p => p.Categoria).Include(p => p.Prioridad);
+            var producto = db.Productos.Include(p => p.Categoria).Include(p => p.Prioridade);  
             return View(producto.ToList());
         }
 
@@ -24,10 +25,10 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("AgregarForms")]
         public PartialViewResult AgregarForms()
         {
-            var categorias = db.Categoria.ToList();
-            var prioridades = db.Prioridad.ToList();
+            var categorias = db.Categorias.ToList();
+            var prioridades = db.Prioridades.ToList();
             ViewBag.categoriaId = new SelectList(categorias,"id","nombre");
-            ViewBag.prioridadId = new SelectList(prioridades, "id", "prioridad1");
+            ViewBag.prioridadId = new SelectList(prioridades, "id", "prioridad");
 
             return PartialView("_formsProducto");
         }
@@ -41,7 +42,7 @@ namespace SistemaCajaRegistradora.Controllers
             //Se define una imagen por defecto
             producto.rutaImg = "./../Assets/images/productos/default-product-image.png";
             producto.fecha_creacion = DateTime.Now;
-            db.Producto.Add(producto);
+            db.Productos.Add(producto);
             int n = db.SaveChanges();
             return Json(n,JsonRequestBehavior.AllowGet);
         }
@@ -50,14 +51,14 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("formsEditar")]
         public PartialViewResult formsEditar(int? id)
         {   
-            var producto = db.Producto.Include(p => p.Categoria)
-                .Include(p => p.Prioridad).Where(p => p.id == id).FirstOrDefault();
-            producto.codigo_barra.Trim();
-            producto.nombre.Trim();
-            var categorias = db.Categoria.ToList();
-            var prioridades = db.Prioridad.ToList();
+            var producto = db.Productos.Include(p => p.Categoria)
+                .Include(p => p.Prioridade).Where(p => p.id == id).FirstOrDefault();
+            producto.codigo_barra = producto.codigo_barra.Trim();
+            producto.nombre = producto.nombre.Trim();
+            var categorias = db.Categorias.ToList();
+            var prioridades = db.Prioridades.ToList();
             ViewBag.categoriaId = new SelectList(categorias, "id", "nombre",producto.categoriaid);
-            ViewBag.prioridadId = new SelectList(prioridades, "id", "prioridad1",producto.prioridadid);
+            ViewBag.prioridadId = new SelectList(prioridades, "id", "prioridad",producto.prioridadid);
 
             return PartialView("_formsProducto",producto);
         }
@@ -84,8 +85,8 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("formsEliminar")]
         public PartialViewResult formsEliminar (int? id)
         {
-            var producto = db.Producto.Include(p=>p.Categoria)
-                .Include(p=>p.Prioridad).Where(p=>p.id == id).FirstOrDefault();
+            var producto = db.Productos.Include(p=>p.Categoria)
+                .Include(p=>p.Prioridade).Where(p=>p.id == id).FirstOrDefault();
             producto.nombre.Trim();
             return PartialView("_formsEliminar",producto);
         }
@@ -94,8 +95,8 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("eliminarProducto")]
         public JsonResult eliminarProducto(int? id)
         {
-            var producto = db.Producto.Find(id);
-            db.Producto.Remove(producto);
+            var producto = db.Productos.Find(id);
+            db.Productos.Remove(producto);
             db.SaveChanges();
             return Json(producto, JsonRequestBehavior.AllowGet);
         }
@@ -115,7 +116,7 @@ namespace SistemaCajaRegistradora.Controllers
                     archivo.SaveAs(path + System.IO.Path.GetFileName(archivo.FileName));
                     
                     int idProducto = (int)Session["idProducto"];
-                    var producto = db.Producto.Find(idProducto);
+                    var producto = db.Productos.Find(idProducto);
                     producto.rutaImg = "./../Assets/images/productos/" + archivo.FileName;
                     db.Entry(producto).State = EntityState.Modified;
                     db.SaveChanges();
@@ -136,11 +137,11 @@ namespace SistemaCajaRegistradora.Controllers
         [HttpPost]
         [ActionName("addExistencias")]
         public JsonResult addExistencias(Producto producto)
-        {   
+        {
             if (producto != null)
             {
                 string codigo = producto.codigo_barra;
-                var prod = db.Producto.Where(p => p.codigo_barra.Equals(codigo)).FirstOrDefault();
+                var prod = db.Productos.Where(p => p.codigo_barra.Equals(codigo)).FirstOrDefault();
                 if (prod != null)
                 {
                     prod.stock++;
@@ -172,7 +173,7 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult aplicarExistencias(Producto producto)
         {
             int n = 0;
-            var resulProducto = db.Producto.Include(p => p.Categoria).Include(p => p.Prioridad)
+            var resulProducto = db.Productos.Include(p => p.Categoria).Include(p => p.Prioridade)
                 .Where(p => p.codigo_barra == producto.codigo_barra).FirstOrDefault();
             if (resulProducto!=null)
             {

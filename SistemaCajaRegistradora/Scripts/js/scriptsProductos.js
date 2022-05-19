@@ -18,15 +18,48 @@ function AgregarProducto(urlAgregar) {
     var rutaImg = $('#rutaImg').val();
     var fecha_creacion = "";
 
-    //Validaciones campos vacios
-    let isValidCampo = true;
-    let isValidNumber = true;
-    isValidCampo = validarCampos(codigo_barra, nombre, prioridadid, categoriaid);
-    isValidNumber = validarNumbero(precio, stock, stockmin, stockmax);
+    let validarCodigoExist = verificar(codigo_barra);
 
-    if (isValidCampo && isValidNumber) {
-        if ((stockmin != "" || stockmax != "") || (stockmin == '0' || stockmax == '0')) {
-            if (parseInt(stockmin) <= parseInt(stockmax) || parseInt(stockmax) >= parseInt(stockmin)) {
+    if (!validarCodigoExist) {
+        //Validaciones campos vacios
+        let isValidCampo = true;
+        let isValidNumber = true;
+        isValidCampo = validarCampos(codigo_barra, nombre, prioridadid, categoriaid);
+        isValidNumber = validarNumbero(precio, stock, stockmin, stockmax);
+
+        if (isValidCampo && isValidNumber) {
+            if ((stockmin != "" || stockmax != "") || (stockmin == '0' || stockmax == '0')) {
+                if (parseInt(stockmin) <= parseInt(stockmax) || parseInt(stockmax) >= parseInt(stockmin)) {
+                    var producto = {
+                        "id": idproducto,
+                        "codigo_barra": codigo_barra,
+                        "nombre": nombre,
+                        "precio": precio,
+                        "stock": stock,
+                        "stockmin": stockmin,
+                        "stockmax": stockmax,
+                        "fecha_creacion": fecha_creacion,
+                        "prioridadid": prioridadid,
+                        "categoriaid": categoriaid,
+                        "rutaImg": rutaImg
+                    };
+                    console.log(producto);
+                    $.post(urlAgregar + '/', producto, function (data) {
+                        if (data > 0) {
+                            sessionStorage.clear();
+                            sessionStorage.codigo_barra = producto.codigo_barra;
+                            sessionStorage.nombre = producto.nombre;
+                            sessionStorage.mensaje = 'Producto creado correctamente: ';
+                            location = location.href;
+                        } else {
+                            alert("Error");
+                        }
+                    });
+                } else {
+                    mensaje = "Error: Stock minimo mayor que el maximo o stock maximo menor que el stock minimo";
+                    showMenssage('error', mensaje, true);
+                }
+            } else {
                 var producto = {
                     "id": idproducto,
                     "codigo_barra": codigo_barra,
@@ -40,7 +73,6 @@ function AgregarProducto(urlAgregar) {
                     "categoriaid": categoriaid,
                     "rutaImg": rutaImg
                 };
-                console.log(producto);
                 $.post(urlAgregar + '/', producto, function (data) {
                     if (data > 0) {
                         sessionStorage.clear();
@@ -52,48 +84,20 @@ function AgregarProducto(urlAgregar) {
                         alert("Error");
                     }
                 });
-            } else {
-                mensaje = "Error: Stock minimo mayor que el maximo o stock maximo menor que el stock minimo";
-                showMenssage('error', mensaje, true);
+                console.log(producto);
             }
         } else {
-            var producto = {
-                "id": idproducto,
-                "codigo_barra": codigo_barra,
-                "nombre": nombre,
-                "precio": precio,
-                "stock": stock,
-                "stockmin": stockmin,
-                "stockmax": stockmax,
-                "fecha_creacion": fecha_creacion,
-                "prioridadid": prioridadid,
-                "categoriaid": categoriaid,
-                "rutaImg": rutaImg
-            };
-            $.post(urlAgregar + '/', producto, function (data) {
-                if (data > 0) {
-                    sessionStorage.clear();
-                    sessionStorage.codigo_barra = producto.codigo_barra;
-                    sessionStorage.nombre = producto.nombre;
-                    sessionStorage.mensaje = 'Producto creado correctamente: ';
-                    location = location.href;
-                } else {
-                    alert("Error");
-                }
-            });
-            console.log(producto);
-        }
-    } else {
-        console.log(isValidCampo, isValidNumber);
-        if (!isValidCampo && isValidNumber) {
-            mensaje = "Error: Campos vacios y datos incorrectos";
-            showMenssage('error', mensaje, true);
-        }else if (!isValidCampo) {
-            mensaje = "Error: Los campos estan vacios";
-            showMenssage('error', mensaje, true);
-        } else if (!isValidNumber) {
-            mensaje = "Error: Algunos datos son incorrectos (Precio, Stock, Stock Minimo o Maximo)";
-            showMenssage('error', mensaje, true);
+            console.log(isValidCampo, isValidNumber);
+            if (!isValidCampo && isValidNumber) {
+                mensaje = "Error: Campos vacios y datos incorrectos";
+                showMenssage('error', mensaje, true);
+            } else if (!isValidCampo) {
+                mensaje = "Error: Los campos estan vacios";
+                showMenssage('error', mensaje, true);
+            } else if (!isValidNumber) {
+                mensaje = "Error: Algunos datos son incorrectos (Precio, Stock, Stock Minimo o Maximo)";
+                showMenssage('error', mensaje, true);
+            }
         }
     }
 }
@@ -115,14 +119,46 @@ function editarProducto(urlEditar) {
     var rutaImg = $('#rutaImg').val();
     var fecha_creacion = $('#fecha_creacion').val();
 
-    var isValidCampo = true;
-    var isValidNumber = true;
-    isValidCampo = validarCampos(codigo_barra, nombre, prioridadid, categoriaid);
-    isValidNumber = validarNumbero(precio, stock, stockmin, stockmax);
+    let validarCodigoExist = verificar(codigo_barra);
 
-    if (isValidCampo && isValidNumber) {
-        if (stockmin != "" || stockmax != "" || stockmin == 0 || stockmax == 0) {
-            if (parseInt(stockmin) <= parseInt(stockmax) || parseInt(stockmax) >= parseInt(stockmin)) {
+    if (!validarCodigoExist) {
+        var isValidCampo = true;
+        var isValidNumber = true;
+        isValidCampo = validarCampos(codigo_barra, nombre, prioridadid, categoriaid);
+        isValidNumber = validarNumbero(precio, stock, stockmin, stockmax);
+
+        if (isValidCampo && isValidNumber) {
+            if (stockmin != "" || stockmax != "" || stockmin == 0 || stockmax == 0) {
+                if (parseInt(stockmin) <= parseInt(stockmax) || parseInt(stockmax) >= parseInt(stockmin)) {
+                    var producto = {
+                        "id": idproducto,
+                        "codigo_barra": codigo_barra,
+                        "nombre": nombre,
+                        "precio": precio,
+                        "stock": stock,
+                        "stockmin": stockmin,
+                        "stockmax": stockmax,
+                        "fecha_creacion": fecha_creacion,
+                        "prioridadid": prioridadid,
+                        "categoriaid": categoriaid,
+                        "rutaImg": rutaImg
+                    };
+                    $.post(urlEditar + '/', producto, function (data) {
+                        if (data > 0) {
+                            sessionStorage.clear();
+                            sessionStorage.codigo_barra = producto.codigo_barra;
+                            sessionStorage.nombre = producto.nombre;
+                            sessionStorage.mensaje = 'Producto modificado correctamente: ';
+                            location = location.href;
+                        } else {
+                            alert("Error");
+                        }
+                    });
+                } else {
+                    mensaje = "Error: Stock minimo mayor que el maximo o stock maximo menor que el stock minimo";
+                    showMenssage('error', mensaje, true);
+                }
+            } else {
                 var producto = {
                     "id": idproducto,
                     "codigo_barra": codigo_barra,
@@ -147,56 +183,25 @@ function editarProducto(urlEditar) {
                         alert("Error");
                     }
                 });
-            } else {
-                mensaje = "Error: Stock minimo mayor que el maximo o stock maximo menor que el stock minimo";
-                showMenssage('error', mensaje, true);
             }
         } else {
-            var producto = {
-                "id": idproducto,
-                "codigo_barra": codigo_barra,
-                "nombre": nombre,
-                "precio": precio,
-                "stock": stock,
-                "stockmin": stockmin,
-                "stockmax": stockmax,
-                "fecha_creacion": fecha_creacion,
-                "prioridadid": prioridadid,
-                "categoriaid": categoriaid,
-                "rutaImg": rutaImg
-            };
-            $.post(urlEditar + '/', producto, function (data) {
-                if (data > 0) {
-                    sessionStorage.clear();
-                    sessionStorage.codigo_barra = producto.codigo_barra;
-                    sessionStorage.nombre = producto.nombre;
-                    sessionStorage.mensaje = 'Producto modificado correctamente: ';
-                    location = location.href;
-                } else {
-                    alert("Error");
-                }
-            });
-        }
-    } else {
-        console.log(isValidCampo, isValidNumber);
-        if (!isValidCampo && isValidNumber) {
-            mensaje = "Error: Campos vacios y datos incorrectos";
-            showMenssage('error', mensaje, true);
-        } else if (!isValidCampo) {
-            mensaje = "Error: Los campos estan vacios";
-            showMenssage('error', mensaje, true);
-        } else if (!isValidNumber) {
-            mensaje = "Error: Algunos datos son incorrectos (Precio, Stock, Stock Minimo o Maximo)";
-            showMenssage('error', mensaje, true);
+            console.log(isValidCampo, isValidNumber);
+            if (!isValidCampo && isValidNumber) {
+                mensaje = "Error: Campos vacios y datos incorrectos";
+                showMenssage('error', mensaje, true);
+            } else if (!isValidCampo) {
+                mensaje = "Error: Los campos estan vacios";
+                showMenssage('error', mensaje, true);
+            } else if (!isValidNumber) {
+                mensaje = "Error: Algunos datos son incorrectos (Precio, Stock, Stock Minimo o Maximo)";
+                showMenssage('error', mensaje, true);
+            }
         }
     }
 }
 function formsImage(urlFormsImagen, id) {
     $.get(urlFormsImagen + '/' + id, function (data) {
         abrirModal(data);
-        if ($("#idArchivo").files.length==0) {
-            $("#btnSubir").prop("disabled");
-        }
     });
 }
 function subirImagen(url) {
@@ -213,9 +218,7 @@ function subirImagen(url) {
         processData: false,
         success: function (data) {
             sessionStorage.clear();
-            sessionStorage.codigo_barra = producto.codigo_barra;
-            sessionStorage.nombre = producto.nombre;
-            sessionStorage.mensaje = 'Imagen subida correctamente: ';
+            sessionStorage.mensaje = 'Imagen subida correctamente';
             location = location.href;
         },
         error: function (data) {
@@ -233,8 +236,8 @@ function eliminarProducto(urlEliminar, id) {
     $.post(urlEliminar + '/' + id, function (data) {
         if (data != null) {
             sessionStorage.clear();
-            sessionStorage.codigo_barra = producto.codigo_barra;
-            sessionStorage.nombre = producto.nombre;
+            sessionStorage.codigo_barra = data.codigo_barra;
+            sessionStorage.nombre = data.nombre;
             sessionStorage.mensaje = 'Producto eliminado correctamente: ';
             location = location.href;
         } else {
@@ -291,7 +294,7 @@ const validarCampos = (codigo_barra, nombre, prioridadid, categoriaid) => {
         $('#text_categoria').removeClass('text-danger');
         $('#categoriaId').css('border-color', '');
     }
-    return valid ? true : false;
+    return valid;
 }
 
 const validarNumbero = (precio, stock, stockmin, stockmax) => {
@@ -344,7 +347,7 @@ const showMenssage = (type, mensaje, toast) => {
     if (type == 'error') {
         Swal.fire({
             icon: 'error',
-            title: 'Error!!',
+            title: 'Error!',
             text: mensaje,
             toast: toast,
             position: 'top-end'
@@ -353,27 +356,47 @@ const showMenssage = (type, mensaje, toast) => {
     } else if (type == 'success') {
         Swal.fire({
             icon: 'success',
-            title: 'Bien!',
+            title: 'Exito!',
             text: mensaje,
             toast: toast,
             position: 'top-end',
-        }); 
+        });
         return;
+    } else if (type == 'warning') {
+        const swal = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+        });
+        swal.fire({
+            title: 'Informacion!',
+            text: mensaje,
+            icon: type,
+            showCancelButton: true,
+            confirmButtonText: 'Si',
+            cancelButtonText: 'No',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                verificarOpcion(true)
+            }
+            return;
+        })
     }
     console.log('Type not found')
 }
 
-function borrarCodigo() { $('#codigo_barra').val(''); }
+function desabilitar() {
+    var inputArchivoId = document.getElementById('idArchivo');
+    var btn = document.getElementById('btnSubir');
+    if (inputArchivoId.files[0] == undefined) {
+        btn.disabled = true;
+    } else {
+        btn.disabled = false;
+    }
+}
 
-//console.log("codigo: " + codigo_barra,
-    //    "nombre: " + nombre,
-    //    "precio " + precio,
-    //    "stock " + stock,
-    //    "stockmin: " + stockmin,
-    //    "stockmax: " + stockmax,
-    //    "fecha_creacion: " + fecha_creacion,
-    //    "prioridadid: " + prioridadid,
-    //    "categoriaid: " + categoriaid,
-    //    "rutaImg: " + rutaImg,
-    //)
+function borrarCodigo() { $('#codigo_barra').val(''); }
 

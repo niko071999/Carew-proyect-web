@@ -6,13 +6,12 @@ namespace SistemaCajaRegistradora.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("Categoria")]
     public partial class Categoria
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Categoria()
         {
-            Producto = new HashSet<Producto>();
+            Productos = new HashSet<Producto>();
         }
 
         public int id { get; set; }
@@ -25,6 +24,6 @@ namespace SistemaCajaRegistradora.Models
         public string descripcion { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Producto> Producto { get; set; }
+        public virtual ICollection<Producto> Productos { get; set; }
     }
 }

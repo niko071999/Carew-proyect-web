@@ -1,0 +1,56 @@
+﻿@model SistemaCajaRegistradora.Models.Categoria
+
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            @* Condicion que verifica si esta editando o agregando *@
+            @if (Model == null)
+            {
+                <h5 class="modal-title" id="exampleModalLabel">Agregar Categoria</h5>
+            }
+            else
+            {
+                <h5 class="modal-title" id="exampleModalLabel">Editar Categoria</h5>
+            }
+            <button class="btn-close" type="button" data-bs-dismiss="modal">
+                <span aria-hidden="true"></span>
+            </button>
+        </div>
+        <div class="modal-body">
+            @Html.AntiForgeryToken()
+            <div class="row g-2">
+                <div class="col-12">
+                    @Html.HiddenFor(model => model.id)
+                    <label id="text_nombre" class="form-label">Nombre</label>
+                    @Html.TextBoxFor(model => model.nombre, new
+                    {
+                        @class = "form-control",
+                        @placeholder = "Ingrese nombre de la categoria",
+                        maxlenght = 20
+                    })
+                </div>
+                <div class="col-12">
+                    @Html.HiddenFor(model => model.id)
+                    <label class="form-label">Descripcion</label>
+                    @Html.TextAreaFor(model => model.descripcion, new
+                    {
+                        @class = "form-control",
+                        @placeholder = "Ingrese descripcion de la categoria",
+                        maxlenght = 255
+                    })
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
+            @if (Model == null)
+            {
+                <button class="btn btn-success" onclick="AgregarCategoria('@Url.Action("AgregarCategoria","Categoria")')">Agregar</button>
+            }
+            else
+            {
+                <button class="btn btn-warning" onclick="editarCategoria('@Url.Action("editarCategoria","Categoria")')">Editar</button>
+            }
+        </div>
+    </div>
+</div>
