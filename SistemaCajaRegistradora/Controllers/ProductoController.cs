@@ -95,9 +95,18 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("eliminarProducto")]
         public JsonResult eliminarProducto(int? id)
         {
+            int n = 0;
+
             var producto = db.Productos.Find(id);
-            db.Productos.Remove(producto);
-            db.SaveChanges();
+            try
+            {
+                db.Productos.Remove(producto);
+                n = db.SaveChanges();
+            }
+            catch (Exception)
+            {
+
+            }
             return Json(producto, JsonRequestBehavior.AllowGet);
         }
 

@@ -234,17 +234,12 @@ function formsEliminar(urlFormsEliminar, id) {
 }
 function eliminarProducto(urlEliminar, id) {
     $.post(urlEliminar + '/' + id, function (data) {
-        if (data != null) {
+        if (data > 0 ) {
             sessionStorage.clear();
-            sessionStorage.codigo_barra = data.codigo_barra;
-            sessionStorage.nombre = data.nombre;
-            sessionStorage.mensaje = 'Producto eliminado correctamente: ';
+            sessionStorage.mensaje = 'Producto eliminado correctamente';
             location = location.href;
         } else {
-            sessionStorage.clear();
-            sessionStorage.codigo_barra = producto.codigo_barra;
-            sessionStorage.nombre = producto.nombre;
-            mensaje = "Error: El producto no se elimino ";
+            mensaje = "Error: El producto no se elimino, asegurese de que el producto no se ocupe en algun producto";
             showMenssage('error', mensaje, true);
         }
     },'json');

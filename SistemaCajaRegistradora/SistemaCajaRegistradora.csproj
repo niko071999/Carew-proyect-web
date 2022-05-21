@@ -1986,6 +1986,7 @@
     <Content Include="Scripts\vendor\fontawesome-free\webfonts\fa-solid-900.woff2" />
     <Content Include="Views\Categoria\Listar.cshtml" />
     <Content Include="Views\Categoria\_formsCategoria.cshtml" />
+    <Content Include="Views\Categoria\_formsEliminar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
