@@ -89,23 +89,6 @@
                     </div>
                 </div>
             </div>
-            <div class="accordion-item">
-                @* Acordion de filtros *@
-                <h2 class="accordion-header" id="flush-headingOne">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#filtroPanel" aria-controls="filtroPanel" aria-expanded="false">
-                        Filtros
-                    </button>
-                </h2>
-                <div id="filtroPanel" class="accordion-collapse collapse" aria-labelledby="filtroPanelVista">
-                    <div class="accordion-body">
-                        <div class="card">
-                            <div class="card-body">
-                                FILTROS
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
         <!-- table -->
         <div class="row">
@@ -263,7 +246,7 @@
 </div>
 <script src="~/Scripts/js/alertmenssages.js"></script>
 <script src="~/Scripts/js/scriptsProductos.js"></script>
-<script type="text/javascript">
+<script type="text/javascript" title="main">
     var coreModal = document.getElementById('coreModal')
     coreModal.addEventListener('shown.bs.modal', function () {
         var codigo_barra = $('#codigo_barra').val().trim();

@@ -18,16 +18,17 @@ function AgregarProducto(urlAgregar) {
     var rutaImg = $('#rutaImg').val();
     var fecha_creacion = "";
 
-    let validarCodigoExist = verificar(codigo_barra);
+    precio = quitarPuntosNumber(precio);
+    stock = quitarPuntosNumber(stock);
+    stockmin = quitarPuntosNumber(stockmin);
+    stockmax = quitarPuntosNumber(stockmax);
 
     if (!validarCodigoExist) {
         //Validaciones campos vacios
         let isValidCampo = true;
-        let isValidNumber = true;
         isValidCampo = validarCampos(codigo_barra, nombre, prioridadid, categoriaid);
-        isValidNumber = validarNumbero(precio, stock, stockmin, stockmax);
 
-        if (isValidCampo && isValidNumber) {
+        if (isValidCampo) {
             if ((stockmin != "" || stockmax != "") || (stockmin == '0' || stockmax == '0')) {
                 if (parseInt(stockmin) <= parseInt(stockmax) || parseInt(stockmax) >= parseInt(stockmin)) {
                     var producto = {
@@ -43,7 +44,7 @@ function AgregarProducto(urlAgregar) {
                         "categoriaid": categoriaid,
                         "rutaImg": rutaImg
                     };
-                    console.log(producto);
+
                     $.post(urlAgregar + '/', producto, function (data) {
                         if (data > 0) {
                             sessionStorage.clear();
@@ -73,6 +74,7 @@ function AgregarProducto(urlAgregar) {
                     "categoriaid": categoriaid,
                     "rutaImg": rutaImg
                 };
+
                 $.post(urlAgregar + '/', producto, function (data) {
                     if (data > 0) {
                         sessionStorage.clear();
@@ -81,23 +83,14 @@ function AgregarProducto(urlAgregar) {
                         sessionStorage.mensaje = 'Producto creado correctamente: ';
                         location = location.href;
                     } else {
-                        alert("Error");
+                        mensaje = "Error: ocurrio un error en el servidor";
+                        showMenssage('error', mensaje, true);
                     }
                 });
-                console.log(producto);
             }
         } else {
-            console.log(isValidCampo, isValidNumber);
-            if (!isValidCampo && isValidNumber) {
-                mensaje = "Error: Campos vacios y datos incorrectos";
-                showMenssage('error', mensaje, true);
-            } else if (!isValidCampo) {
-                mensaje = "Error: Los campos estan vacios";
-                showMenssage('error', mensaje, true);
-            } else if (!isValidNumber) {
-                mensaje = "Error: Algunos datos son incorrectos (Precio, Stock, Stock Minimo o Maximo)";
-                showMenssage('error', mensaje, true);
-            }
+            mensaje = "Error: Los campos estan vacios";
+            showMenssage('error', mensaje, true);
         }
     }
 }
@@ -123,11 +116,9 @@ function editarProducto(urlEditar) {
 
     if (!validarCodigoExist) {
         var isValidCampo = true;
-        var isValidNumber = true;
         isValidCampo = validarCampos(codigo_barra, nombre, prioridadid, categoriaid);
-        isValidNumber = validarNumbero(precio, stock, stockmin, stockmax);
 
-        if (isValidCampo && isValidNumber) {
+        if (isValidCampo) {
             if (stockmin != "" || stockmax != "" || stockmin == 0 || stockmax == 0) {
                 if (parseInt(stockmin) <= parseInt(stockmax) || parseInt(stockmax) >= parseInt(stockmin)) {
                     var producto = {
@@ -151,7 +142,8 @@ function editarProducto(urlEditar) {
                             sessionStorage.mensaje = 'Producto modificado correctamente: ';
                             location = location.href;
                         } else {
-                            alert("Error");
+                            mensaje = "Error: ocurrio un error en el servidor";
+                            showMenssage('error', mensaje, true);
                         }
                     });
                 } else {
@@ -185,17 +177,8 @@ function editarProducto(urlEditar) {
                 });
             }
         } else {
-            console.log(isValidCampo, isValidNumber);
-            if (!isValidCampo && isValidNumber) {
-                mensaje = "Error: Campos vacios y datos incorrectos";
-                showMenssage('error', mensaje, true);
-            } else if (!isValidCampo) {
-                mensaje = "Error: Los campos estan vacios";
-                showMenssage('error', mensaje, true);
-            } else if (!isValidNumber) {
-                mensaje = "Error: Algunos datos son incorrectos (Precio, Stock, Stock Minimo o Maximo)";
-                showMenssage('error', mensaje, true);
-            }
+            mensaje = "Error: Los campos estan vacios";
+            showMenssage('error', mensaje, true);
         }
     }
 }
@@ -292,39 +275,6 @@ const validarCampos = (codigo_barra, nombre, prioridadid, categoriaid) => {
     return valid;
 }
 
-const validarNumbero = (precio, stock, stockmin, stockmax) => {
-    let valid = true;
-    if (precio.trim() != "") {
-        if (esNatural(precio)) {
-            valid = true;
-        } else {
-            return false;
-        }
-    }
-    if (stock.trim() != "") {
-        if (esNatural(stock)) {
-            valid = true;
-        } else {
-            return false;
-        };
-    }
-    if (stockmin.trim() != "") {
-        if (esNatural(stockmin)) {
-            valid = true;
-        } else {
-            return false;
-        };
-    }
-    if (stockmax.trim() != "") {
-        if (esNatural(stockmax)) {
-            valid = true;
-        } else {
-            return false;
-        };
-    }
-    return valid
-}
-
 const esNatural = (number) => {
     if (!isNaN(number)) {
         if (parseInt(number) % 1 == 0) {
@@ -392,6 +342,8 @@ function desabilitar() {
         btn.disabled = false;
     }
 }
+
+const quitarPuntoNumber = (number) => number.replace(',', '');
 
 function borrarCodigo() { $('#codigo_barra').val(''); }
 

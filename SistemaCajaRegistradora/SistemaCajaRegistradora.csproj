@@ -133,6 +133,7 @@
     <Compile Include="Controllers\CategoriaController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ProductoController.cs" />
+    <Compile Include="Controllers\UsuarioController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -1987,6 +1988,7 @@
     <Content Include="Views\Categoria\Listar.cshtml" />
     <Content Include="Views\Categoria\_formsCategoria.cshtml" />
     <Content Include="Views\Categoria\_formsEliminar.cshtml" />
+    <Content Include="Views\Usuario\Listar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

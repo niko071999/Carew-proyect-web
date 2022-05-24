@@ -81,7 +81,7 @@
                         {
                             @Html.TextBoxFor(model => model.precio, new
                             {
-                                @class = "form-control",
+                                @class = "form-control input-number",
                                 @placeholder = "Ingrese precio del producto",
                                 maxlenght = 9,
                                 disabled = "disabled"
@@ -91,7 +91,7 @@
                         {
                             @Html.TextBoxFor(model => model.precio, new
                             {
-                                @class = "form-control",
+                                @class = "form-control input-number",
                                 @placeholder = "Ingrese precio del producto",
                                 maxlenght = 9
                             })
@@ -104,7 +104,7 @@
                         <label class="form-label">Stock</label>
                         @Html.TextBoxFor(model => model.stock, new
                        {
-                           @class = "form-control",
+                           @class = "form-control input-number",
                            @placeholder = "Ingrese stock del producto",
                            maxlenght = 9,
                            disabled = "disabled"
@@ -129,21 +129,21 @@
                     }
                 </div>
                 <div class="col-6">
-                    <label class="form-label">Stock minimo - maximo</label>
+                    <label class="form-label">Stock minimo y maximo</label>
                     <div class="input-group mb-3">
                         @if (Model == null)
                         {
                             @Html.TextBoxFor(model => model.stockmin, new
                             {
-                                @class = "form-control",
+                                @class = "form-control input-number",
                                 @placeholder = "Ingrese stock min.",
                                 maxlenght = 9,
                                 disabled = "disabled"
                             })
-                            <span class="input-group-text"> - </span>
+                            <span class="input-group-text"> y </span>
                             @Html.TextBoxFor(model => model.stockmax, new
                             {
-                                @class = "form-control",
+                                @class = "form-control input-number",
                                 @placeholder = "Ingrese stock max.",
                                 maxlenght = 9,
                                 disabled = "disabled"
@@ -153,14 +153,14 @@
                         {
                             @Html.TextBoxFor(model => model.stockmin, new
                             {
-                                @class = "form-control",
+                                @class = "form-control input-number",
                                 @placeholder = "Ingrese stock min.",
                                 maxlenght = 9
                             })
                             <span class="input-group-text"> - </span>
                             @Html.TextBoxFor(model => model.stockmax, new
                             {
-                                @class = "form-control",
+                                @class = "form-control input-number",
                                 @placeholder = "Ingrese stock max.",
                                 maxlenght = 9
                             })
@@ -199,7 +199,12 @@
     $('#btnVerificar').click(function () {
         let codigo = document.getElementById("codigo_barra").value;
         if (codigo != '') {
-            verificar(codigo);
+            let existCodigo = true;
+            existCodigo = verificar(codigo);
+            if (!existCodigo) {
+                let mensaje = 'El codigo de barra es el mismo'
+                showMenssage('success', mensaje, true);
+            }
         }
     });
 
@@ -225,25 +230,30 @@
         $.post('@Url.Action("addExistencias", "Producto")', producto, function (data) {
             if (data.codigobarra != '') {
                 console.log('data.codigobarra !=', data.codigobarra);
-                if (data.codigobarra === sessionStorage.codigobarrainit) {
-                    console.log('data.codigobarra == sessionStorage.codigobarrainit');
-                    return false;
-                } else {
+                if (data.codigobarra !== sessionStorage.codigobarrainit) {
                     console.log('data.codigobarra == sessionStorage.codigobarrainit ELSE', data.codigobarra.length, sessionStorage.codigobarrainit.length);
                     let mensaje = 'El codigo de barra esta siendo usado por otro producto, ¿Quieres abrir el agregador de existencias?'
                     showMenssage('warning', mensaje, false);
                     sessionStorage.codigo = data.codigobarra;
                     return true;
+                } else {
+                    return false;
                 }
             } else {
                 console.log('data.codigobarra != ELSE');
                 let mensaje = 'El codigo no esta siendo utilizado por otro producto';
                 showMenssage('success', mensaje, true);
-                let inputs = [{ nombre: 'nombre' }, { nombre: 'categoriaId' }, { nombre: 'precio' },
-                { nombre: 'stock' }, { nombre: 'stockmin' }, { nombre: 'stockmax' }, { nombre: 'prioridadId' }]
+                let inputs = [{ nombre: 'codigo_barra' },{ nombre: 'nombre' }, { nombre: 'categoriaId' }, { nombre: 'precio' },
+                    { nombre: 'stock' }, { nombre: 'stockmin' }, { nombre: 'stockmax' }, { nombre: 'prioridadId' }]
                 for (let i = 0; i < inputs.length; i++) {
                     let input = document.getElementById(inputs[i].nombre);
-                    input.disabled = false;
+                    if (i != 0) {
+                        input.disabled = false;
+                    } else {
+                        let btn_verificar = document.getElementById('btnVerificar');
+                        btn_verificar.disabled = true;
+                        input.disabled = true;
+                    }                    
                 }
                 return false;
             }
@@ -261,4 +271,10 @@
             sessionStorage.clear();
         }
     }
+</script>
+<script type="text/javascript" title="cleave">
+    var cleave = new Cleave( '.input-number', {
+        numeral: true,
+        numeralThousandsGroupStyle: 'thousand'
+    });
 </script>

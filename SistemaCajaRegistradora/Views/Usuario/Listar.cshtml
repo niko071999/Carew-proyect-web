@@ -1,0 +1,62 @@
+﻿@model IEnumerable<SistemaCajaRegistradora.Models.Producto>
+@{
+    ViewBag.Title = "Listado de usuarios";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Topbar  -->
+<nav class="navbar navbar-expand navbar-light bg-white mb-4 topbar shadow">
+
+    <!-- Sidebar Toggle (Topbar) -->
+    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+        <i class="fa fa-bars"></i>
+    </button>
+
+    <!-- Topbar Navbar -->
+    <ul class="navbar-nav ml-auto">
+
+        <!-- Nav Item - User Information -->
+        <li class="nav-item dropdown no-arrow">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">NOMBRE DE USUARIO</span>
+                <img class="img-profile rounded-circle"
+                     src="~/Assets/images/blank-profile.png">
+            </a>
+            <!-- Dropdown - User Information -->
+            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                 aria-labelledby="userDropdown">
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Salir del sistema
+                </a>
+            </div>
+        </li>
+    </ul>
+</nav>
+<!-- End of Topbar -->
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="row justify-content-between">
+        <div class="col-4">
+            <h1 class="h3 mb-4 text-gray-800">@ViewBag.Title</h1>
+        </div>
+        @if (Model.Count() > 0)
+        {
+            <div class="col-4">
+                <div class="d-grid gap-2 mb-2">
+                    <button class="btn btn-primary" onclick="AgregarForms('@Url.Action("AgregarForms","Usuario")')" type="button">
+                        <i class="fas fa-plus"></i>
+                        Agregar usuario
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+    @if (Model.Count() > 0)
+    {
+
+    }
+</div>
