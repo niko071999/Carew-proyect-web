@@ -17,7 +17,7 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("Listar")]
         public ActionResult Listar()
         {
-            var producto = db.Productos.Include(p => p.Categoria).Include(p => p.Prioridade);  
+            var producto = db.Productos.Include(p => p.Categoria).Include(p => p.Prioridade);
             return View(producto.ToList());
         }
 
@@ -38,12 +38,12 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult AgregarProducto(Producto producto)
         {
             validarValoresNull(producto);
-
+            int n = 0;
             //Se define una imagen por defecto
             producto.rutaImg = "./../Assets/images/productos/default-product-image.png";
             producto.fecha_creacion = DateTime.Now;
             db.Productos.Add(producto);
-            int n = db.SaveChanges();
+            n = db.SaveChanges();
             return Json(n,JsonRequestBehavior.AllowGet);
         }
 

@@ -129,8 +129,12 @@
                                 <td class="align-middle">@string.Format("{0:yyyy-MM-dd}", p.fecha_creacion)</td>
                                 <td class="align-middle">
                                     <div class="d-grid gap-2">
-                                        <button class="btn btn-warning" type="button" onclick="formsEditar('@Url.Action("formsEditar", "Producto")',@p.id)">Editar</button>
-                                        <button class="btn btn-danger" type="button" onclick="formsEliminar('@Url.Action("formsEliminar", "Producto")', @p.id)">Eliminar</button>
+                                        <button class="btn btn-warning" type="button" onclick="formsEditar('@Url.Action("formsEditar", "Producto")',@p.id)">
+                                            <i class="fas fa-pen"></i>Editar
+                                        </button>
+                                        <button class="btn btn-danger" type="button" onclick="formsEliminar('@Url.Action("formsEliminar", "Producto")', @p.id)">
+                                            <i class="fas fa-trash"></i>Eliminar
+                                        </button>
                                     </div>
                                 </td>
                                 <td class="align-middle">

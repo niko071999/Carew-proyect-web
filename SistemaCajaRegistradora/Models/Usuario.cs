@@ -21,7 +21,7 @@ namespace SistemaCajaRegistradora.Models
         public string nombreUsuario { get; set; }
 
         [Required]
-        [StringLength(50)]
+        [StringLength(255)]
         public string clave { get; set; }
 
         [Required]

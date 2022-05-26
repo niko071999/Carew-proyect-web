@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SistemaCajaRegistradora.Models.Producto>
+﻿@model IEnumerable<SistemaCajaRegistradora.Models.Usuario>
 @{
     ViewBag.Title = "Listado de usuarios";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -43,20 +43,69 @@
         <div class="col-4">
             <h1 class="h3 mb-4 text-gray-800">@ViewBag.Title</h1>
         </div>
-        @if (Model.Count() > 0)
-        {
-            <div class="col-4">
-                <div class="d-grid gap-2 mb-2">
-                    <button class="btn btn-primary" onclick="AgregarForms('@Url.Action("AgregarForms","Usuario")')" type="button">
-                        <i class="fas fa-plus"></i>
-                        Agregar usuario
-                    </button>
-                </div>
+        <div class="col-4">
+            <div class="d-grid gap-2 mb-2">
+                <button class="btn btn-primary" onclick="AgregarForms('@Url.Action("AgregarForms","Usuario")')" type="button">
+                    <i class="fas fa-plus"></i>
+                    Agregar usuario
+                </button>
             </div>
-        }
+        </div>
     </div>
     @if (Model.Count() > 0)
     {
+        <div class="row">
+            <div class="col-12 table-responsive">
+                <table class="table table-sm table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Foto usuario</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Apellido</th>
+                            <th scope="col">Nombre de usuario</th>
+                            <th scope="col">Rol</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var u in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <a href="javascript:void(0);" onclick="formsImage('@Url.Action("formsImagen", "Usuario")',@u.id)">
+                                        <img class="rounded mx-auto d-block" src="@u.rutaImg" alt="Imagen del usuario"
+                                             style="width: 100px; min-width: 100px; min-height: 50px; height: 80px;" />
+                                    </a>
+                                </td>
+                                <td class="align-middle">@u.nombre</td>
+                                <td class="align-middle">@u.apellido</td>
+                                <td class="align-middle">@u.nombreUsuario</td>
+                                <td class="align-middle">@u.Role.rol</td>
+                                <td class="align-middle">
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-warning" type="button" onclick="formsEditar('@Url.Action("formsEditar", "Usuario")',@u.id)">
+                                            <i class="fas fa-pen float-left"></i>Editar
+                                        </button>
+                                        <button class="btn btn-danger" type="button" onclick="formsEliminar('@Url.Action("formsEliminar", "Usuario")', @u.id)">
+                                            <i class="fas fa-trash float-left"></i>Eliminar
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
 
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     }
 </div>
+
+<!-- Modal core base-->
+<div class="modal fade" id="coreModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+
+</div>
+
+<script src="~/Scripts/js/alertmenssages.js"></script>
+<script src="~/Scripts/js/scriptsUsuarios.js"></script>

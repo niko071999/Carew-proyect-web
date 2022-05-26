@@ -1,0 +1,158 @@
+﻿@model SistemaCajaRegistradora.Models.Usuario
+
+<div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            @* Condicion que verifica si esta editando o agregando *@
+            @if (Model == null)
+            {
+                <h5 class="modal-title" id="exampleModalLabel">Agregar Usuario</h5>
+            }
+            else
+            {
+                <h5 class="modal-title" id="exampleModalLabel">Editar Usuario</h5>
+            }
+            <button class="btn-close" type="button" data-bs-dismiss="modal">
+                <span aria-hidden="true"></span>
+            </button>
+        </div>
+        <div class="modal-body">
+            @Html.AntiForgeryToken()
+            <div class="row g-2">
+                @Html.HiddenFor(model => model.id)
+                @Html.HiddenFor(model => model.rutaImg)
+                <div class="col-6">
+                    <label id="text_nombre" class="form-label">Nombre</label>
+                    @Html.TextBoxFor(model => model.nombre, new
+                   {
+                       @id = "inputname",
+                       @class = "form-control",
+                       @placeholder = "Ingrese el nombre del cajero",
+                       maxlength = 30
+                   })
+                </div>
+                <div class="col-6">
+                    <label id="text_apellido" class="form-label">Apellido</label>
+                    @Html.TextBoxFor(model => model.apellido, new
+                   {
+                       @id = "inputapellido",
+                       @class = "form-control",
+                       @placeholder = "Ingrese el apellido del cajero",
+                       maxlength = 30
+                   })
+                </div>
+                <div class="col-6">
+                    @Html.HiddenFor(model => model.id)
+                    <label id="text_nombreUsuario" class="form-label">Nombre de usuario</label>
+                    @Html.TextBoxFor(model => model.nombreUsuario, new
+                   {
+                       @class = "form-control",
+                       @placeholder = "Ingrese nombre de usuario",
+                       maxlength = 50
+                   })
+                </div>
+                <div class="col-6">
+                    <label id="text_rol" class="form-label">Rol de usuario</label>
+                    @Html.DropDownList("rolesId", null, "Seleccione rol de usuario",
+                    htmlAttributes: new { @class = "form-select" })
+                </div>
+                <div class="col-6">
+                    <label id="text_clave" class="form-label">Clave de acceso</label>
+                    <div class="input-group mb-3">
+                        @Html.TextBoxFor(model => model.clave, new
+                       {
+                           @class = "form-control",
+                           @type = "password",
+                           @placeholder = "Ingrese la clave",
+                           @aria_describedby = "passwordInfo viewPass",
+                           maxlength = 12
+                       })
+                        <button class="btn btn-outline-secondary" type="button" id="viewPass"><i id="icon" class="fas fa-eye"></i></button>
+                        <div id="passwordInfo" class="form-text">Contraseña de a lo menos 6 caracteres y maximo 12 caracteres</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
+            @if (Model == null)
+            {
+                <button class="btn btn-success" onclick="agregarUsuario()">Agregar</button>
+            }
+            else
+            {
+                <button class="btn btn-warning" onclick="editarUsuario('@Url.Action("editarUsuario","Usuario")')">Editar</button>
+            }
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" title="main">
+    let view = false;
+    let nombreandapellido = '';
+    $("#inputname").change(generadorUserName);
+    $("#inputapellido").change(generadorUserName);
+    $("#viewPass").click(function () {
+        view = !view ? true : false;
+        console.log(view);
+        if (view) {
+            $("#clave").attr('type', 'text');
+            $("#icon").removeClass("fa-eye");
+            $("#icon").addClass("fa-eye-slash");
+        } else {
+            $("#clave").attr('type', 'password');
+            $("#icon").removeClass("fa-eye-slash");
+            $("#icon").addClass("fa-eye");
+        }
+    });
+
+    function generadorUserName() {
+        let nombre = $("#inputname").val().trim();
+        let apellido = $("#inputapellido").val().trim();
+        console.log(nombre, apellido);
+        if (nombre != '' && apellido != '') {
+            verificarNombreUser(nombre, apellido);
+        }
+    }
+
+    function verificarNombreUser(n = "", a = "") {
+        nombreandapellido = n[0].toLowerCase() + a.toLowerCase();
+        var usuario = {
+            "id": 0,
+            "nombre": 'n',
+            "apellido": 'a',
+            "nombreUsuario": nombreandapellido,
+            "clave": 'c',
+            "rutaImg": 'r',
+            "rolid": 0
+
+        }
+        $.post('@Url.Action("verificarNameUser", "Usuario")/', usuario, function (data) {
+            console.log(data.nombreUsuario);
+            if (data.nombreUsuario == "") {
+                $("#nombreUsuario").val(data.createNameUser);
+            }
+        });
+    }
+    function agregarUsuario() {
+        let nU = $("#nombreUsuario").val();
+        var usuario = {
+            "id": -1,
+            "nombre": 'n',
+            "apellido": 'a',
+            "nombreUsuario": nU,
+            "clave": 'c',
+            "rutaImg": 'r',
+            "rolid": 0
+        }
+        $.post('@Url.Action("verificarNameUser", "Usuario")/', usuario, function (data) {
+            console.log(data);
+            if (data.nombreUsuario == "") {
+                AgregarUsuario('@Url.Action("AgregarUsuario","Usuario")');
+            } else {
+                mensaje = "Error: El nombre de usuario esta ocupado";
+                showMenssage('error', mensaje, true);
+            }
+        });
+    }
+</script>

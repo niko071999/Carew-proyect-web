@@ -78,8 +78,12 @@
                                     </td>
                                     <td class="align-middle">
                                         <div class="d-grid gap-2">
-                                            <button class="btn btn-warning" type="button" onclick="formsEditar('@Url.Action("formsEditar", "Categoria")',@c.id)">Editar</button>
-                                            <button class="btn btn-outline-danger" type="button" onclick="formsEliminar('@Url.Action("formsEliminar", "Categoria")', @c.id)">Eliminar</button>
+                                            <button class="btn btn-warning" type="button" onclick="formsEditar('@Url.Action("formsEditar", "Categoria")',@c.id)">
+                                                <i class="fas fa-pen"></i>Editar
+                                            </button>
+                                            <button class="btn btn-outline-danger" type="button" onclick="formsEliminar('@Url.Action("formsEliminar", "Categoria")', @c.id)">
+                                                <i class="fas fa-trash"></i>Eliminar
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>

@@ -23,44 +23,13 @@ function AgregarProducto(urlAgregar) {
     stockmin = quitarPuntosNumber(stockmin);
     stockmax = quitarPuntosNumber(stockmax);
 
-    if (!validarCodigoExist) {
-        //Validaciones campos vacios
-        let isValidCampo = true;
-        isValidCampo = validarCampos(codigo_barra, nombre, prioridadid, categoriaid);
+    //Validaciones campos vacios
+    let isValidCampo = true;
+    isValidCampo = validarCampos(codigo_barra, nombre, prioridadid, categoriaid);
 
-        if (isValidCampo) {
-            if ((stockmin != "" || stockmax != "") || (stockmin == '0' || stockmax == '0')) {
-                if (parseInt(stockmin) <= parseInt(stockmax) || parseInt(stockmax) >= parseInt(stockmin)) {
-                    var producto = {
-                        "id": idproducto,
-                        "codigo_barra": codigo_barra,
-                        "nombre": nombre,
-                        "precio": precio,
-                        "stock": stock,
-                        "stockmin": stockmin,
-                        "stockmax": stockmax,
-                        "fecha_creacion": fecha_creacion,
-                        "prioridadid": prioridadid,
-                        "categoriaid": categoriaid,
-                        "rutaImg": rutaImg
-                    };
-
-                    $.post(urlAgregar + '/', producto, function (data) {
-                        if (data > 0) {
-                            sessionStorage.clear();
-                            sessionStorage.codigo_barra = producto.codigo_barra;
-                            sessionStorage.nombre = producto.nombre;
-                            sessionStorage.mensaje = 'Producto creado correctamente: ';
-                            location = location.href;
-                        } else {
-                            alert("Error");
-                        }
-                    });
-                } else {
-                    mensaje = "Error: Stock minimo mayor que el maximo o stock maximo menor que el stock minimo";
-                    showMenssage('error', mensaje, true);
-                }
-            } else {
+    if (isValidCampo) {
+        if ((stockmin != "" || stockmax != "") || (stockmin == '0' || stockmax == '0')) {
+            if (parseInt(stockmin) <= parseInt(stockmax) || parseInt(stockmax) >= parseInt(stockmin)) {
                 var producto = {
                     "id": idproducto,
                     "codigo_barra": codigo_barra,
@@ -83,15 +52,44 @@ function AgregarProducto(urlAgregar) {
                         sessionStorage.mensaje = 'Producto creado correctamente: ';
                         location = location.href;
                     } else {
-                        mensaje = "Error: ocurrio un error en el servidor";
-                        showMenssage('error', mensaje, true);
+                        alert("Error");
                     }
                 });
+            } else {
+                mensaje = "Error: Stock minimo mayor que el maximo o stock maximo menor que el stock minimo";
+                showMenssage('error', mensaje, true);
             }
         } else {
-            mensaje = "Error: Los campos estan vacios";
-            showMenssage('error', mensaje, true);
+            var producto = {
+                "id": idproducto,
+                "codigo_barra": codigo_barra,
+                "nombre": nombre,
+                "precio": precio,
+                "stock": stock,
+                "stockmin": stockmin,
+                "stockmax": stockmax,
+                "fecha_creacion": fecha_creacion,
+                "prioridadid": prioridadid,
+                "categoriaid": categoriaid,
+                "rutaImg": rutaImg
+            };
+
+            $.post(urlAgregar + '/', producto, function (data) {
+                if (data > 0) {
+                    sessionStorage.clear();
+                    sessionStorage.codigo_barra = producto.codigo_barra;
+                    sessionStorage.nombre = producto.nombre;
+                    sessionStorage.mensaje = 'Producto creado correctamente: ';
+                    location = location.href;
+                } else {
+                    mensaje = "Error: ocurrio un error en el servidor";
+                    showMenssage('error', mensaje, true);
+                }
+            });
         }
+    } else {
+        mensaje = "Error: Los campos estan vacios";
+        showMenssage('error', mensaje, true);
     }
 }
 function formsEditar(urlEditarForms, id) {
@@ -238,7 +236,7 @@ const validarCampos = (codigo_barra, nombre, prioridadid, categoriaid) => {
     let atr = '';
     if (codigo_barra.trim() == "") {
         atr = $('#text_codigo').attr('class');
-        $('#text_codigo').addClass(atr +' text-danger')
+        $('#text_codigo').addClass(atr + ' text-danger');
         $('#codigo_barra').css('border-color', 'red');
         valid = false;
     } else {

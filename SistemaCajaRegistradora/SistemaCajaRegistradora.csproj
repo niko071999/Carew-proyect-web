@@ -138,6 +138,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Categoria.cs" />
+    <Compile Include="Models\Encrypt.cs" />
     <Compile Include="Models\MetodoPago.cs" />
     <Compile Include="Models\ModelData.cs" />
     <Compile Include="Models\Prioridade.cs" />
@@ -168,6 +169,7 @@
     <Content Include="Scripts\js\scriptsProductos.js" />
     <Content Include="Scripts\js\sb-admin-2.js" />
     <Content Include="Scripts\js\sb-admin-2.min.js" />
+    <Content Include="Scripts\js\scriptsUsuarios.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\vendor\bootstrap\js\bootstrap.bundle.js" />
     <Content Include="Scripts\vendor\bootstrap\js\bootstrap.bundle.min.js" />
@@ -1989,6 +1991,7 @@
     <Content Include="Views\Categoria\_formsCategoria.cshtml" />
     <Content Include="Views\Categoria\_formsEliminar.cshtml" />
     <Content Include="Views\Usuario\Listar.cshtml" />
+    <Content Include="Views\Usuario\_formsUsuario.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
