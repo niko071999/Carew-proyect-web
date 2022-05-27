@@ -94,5 +94,24 @@ namespace SistemaCajaRegistradora.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
         }
+
+        [HttpGet]
+        [ActionName("getSesion")]
+        public JsonResult getSesion()
+        {
+            Usuario user = (Usuario)Session["User"];
+            if (user != null)
+            {
+                return Json(new
+                {
+                    nombreuser = user.nombre.Trim() + ' ' + user.apellido.Trim() + " (" + user.nombreUsuario.Trim() + ")",
+                    imgruta = user.rutaImg.Trim()
+                }, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(null, JsonRequestBehavior.AllowGet);
+            }
+        }
     }
 }

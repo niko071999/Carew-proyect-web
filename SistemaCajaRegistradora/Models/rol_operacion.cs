@@ -12,18 +12,13 @@ namespace SistemaCajaRegistradora.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class MetodoPago
+    public partial class rol_operacion
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public MetodoPago()
-        {
-            this.Ventas = new HashSet<Venta>();
-        }
-    
         public int id { get; set; }
-        public string metodo_pago { get; set; }
+        public int idrol { get; set; }
+        public int idoperacion { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Venta> Ventas { get; set; }
+        public virtual Operacione Operacione { get; set; }
+        public virtual Role Role { get; set; }
     }
 }

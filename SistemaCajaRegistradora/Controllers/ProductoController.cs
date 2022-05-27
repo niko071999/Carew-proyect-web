@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Data.Entity;
+using SistemaCajaRegistradora.Filters;
 
 namespace SistemaCajaRegistradora.Controllers
 {
@@ -15,6 +16,7 @@ namespace SistemaCajaRegistradora.Controllers
         // GET: Producto
         [HttpGet]
         [ActionName("Listar")]
+        [Autorizacion(idoperacion:1)]
         public ActionResult Listar()
         {
             var producto = db.Productos.Include(p => p.Categoria).Include(p => p.Prioridade);
@@ -23,6 +25,7 @@ namespace SistemaCajaRegistradora.Controllers
 
         [HttpGet]
         [ActionName("AgregarForms")]
+        [Autorizacion(idoperacion: 3)]
         public PartialViewResult AgregarForms()
         {
             var categorias = db.Categorias.ToList();
@@ -35,6 +38,7 @@ namespace SistemaCajaRegistradora.Controllers
 
         [HttpPost]
         [ActionName("AgregarProducto")]
+        [Autorizacion(idoperacion: 3)]
         public JsonResult AgregarProducto(Producto producto)
         {
             validarValoresNull(producto);
@@ -49,6 +53,7 @@ namespace SistemaCajaRegistradora.Controllers
 
         [HttpGet]
         [ActionName("formsEditar")]
+        [Autorizacion(idoperacion: 4)]
         public PartialViewResult formsEditar(int? id)
         {   
             var producto = db.Productos.Include(p => p.Categoria)
@@ -65,6 +70,7 @@ namespace SistemaCajaRegistradora.Controllers
 
         [HttpPost]
         [ActionName("editarProducto")]
+        [Autorizacion(idoperacion: 4)]
         public JsonResult editarProducto(Producto producto)
         {
             validarValoresNull(producto);
@@ -75,14 +81,53 @@ namespace SistemaCajaRegistradora.Controllers
 
         [HttpGet]
         [ActionName("formsImagen")]
+        [Autorizacion(idoperacion: 6)]
         public PartialViewResult formsImagen(int? id)
         {
             Session["idProducto"] = id;
             return PartialView("_formsImagen");
         }
 
+        [HttpPost]
+        [ActionName("subirImagen")]
+        [Autorizacion(idoperacion: 6)]
+        public JsonResult subirImagen(HttpPostedFileBase archivo)
+        {
+            try
+            {
+                if (archivo != null)
+                {
+                    string path = Server.MapPath("~/Assets/images/productos/");
+                    if (!System.IO.Directory.Exists(path))
+                    {
+                        System.IO.Directory.CreateDirectory(path);
+                    };
+                    archivo.SaveAs(path + System.IO.Path.GetFileName(archivo.FileName));
+
+                    int idProducto = (int)Session["idProducto"];
+                    var producto = db.Productos.Find(idProducto);
+                    producto.rutaImg = "./../Assets/images/productos/" + archivo.FileName;
+                    db.Entry(producto).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return Json(
+                    new { mensaje = "Archivo subido correctamente" }, JsonRequestBehavior.AllowGet); ;
+                }
+                else
+                {
+                    return Json(
+                    new { mensaje = "Error de subida de archivo" }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception)
+            {
+                return Json(
+                    new { mensaje = "Error de subida de archivo" }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
         [HttpGet]
         [ActionName("formsEliminar")]
+        [Autorizacion(idoperacion: 5)]
         public PartialViewResult formsEliminar (int? id)
         {
             var producto = db.Productos.Include(p=>p.Categoria)
@@ -93,6 +138,7 @@ namespace SistemaCajaRegistradora.Controllers
 
         [HttpPost]
         [ActionName("eliminarProducto")]
+        [Autorizacion(idoperacion: 5)]
         public JsonResult eliminarProducto(int? id)
         {
             int n = 0;
@@ -111,40 +157,8 @@ namespace SistemaCajaRegistradora.Controllers
         }
 
         [HttpPost]
-        [ActionName("subirImagen")]
-        public JsonResult subirImagen(HttpPostedFileBase archivo)
-        {
-            try
-            {
-                if(archivo != null)
-                {
-                    string path = Server.MapPath("~/Assets/images/productos/");
-                    if (!System.IO.Directory.Exists(path)){
-                        System.IO.Directory.CreateDirectory(path);
-                    };
-                    archivo.SaveAs(path + System.IO.Path.GetFileName(archivo.FileName));
-                    
-                    int idProducto = (int)Session["idProducto"];
-                    var producto = db.Productos.Find(idProducto);
-                    producto.rutaImg = "./../Assets/images/productos/" + archivo.FileName;
-                    db.Entry(producto).State = EntityState.Modified;
-                    db.SaveChanges();
-                    return Json(
-                    new { mensaje = "Archivo subido correctamente" }, JsonRequestBehavior.AllowGet); ;
-                }
-                else
-                {
-                    return Json(
-                    new { mensaje = "Error de subida de archivo" }, JsonRequestBehavior.AllowGet);
-                }
-            }catch (Exception){
-                return Json(
-                    new { mensaje = "Error de subida de archivo" }, JsonRequestBehavior.AllowGet);
-            }
-        }
-
-        [HttpPost]
         [ActionName("addExistencias")]
+        [Autorizacion(idoperacion: 7)]
         public JsonResult addExistencias(Producto producto)
         {
             if (producto != null)
@@ -179,6 +193,7 @@ namespace SistemaCajaRegistradora.Controllers
 
         [HttpPost]
         [ActionName("aplicarExistencias")]
+        [Autorizacion(idoperacion: 7)]
         public JsonResult aplicarExistencias(Producto producto)
         {
             int n = 0;

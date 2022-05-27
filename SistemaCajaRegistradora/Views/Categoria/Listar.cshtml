@@ -16,23 +16,19 @@
     <ul class="navbar-nav ml-auto">
 
         <!-- Nav Item - User Information -->
-        <li class="nav-item dropdown no-arrow">
-            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small">NOMBRE DE USUARIO</span>
-                <img class="img-profile rounded-circle"
+        <div class="dropdown">
+            <a class="nav-link dropdown-toggle" href="javascript:void(0);" id="userDropdown" role="button"
+               data-toggle="dropdown" aria-expanded="false">
+                <span id="text_nameuser" class="mr-2 d-none d-lg-inline text-gray-600 small">NOMBRE DE USUARIO</span>
+                <img id="img_user" class="img-profile rounded-circle"
                      src="~/Assets/images/blank-profile.png">
             </a>
-            <!-- Dropdown - User Information -->
-            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                 aria-labelledby="userDropdown">
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Salir del sistema
-                </a>
-            </div>
-        </li>
+            <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                <li><a class="dropdown-item" href="#">Action</a></li>
+                <li><a class="dropdown-item" href="#">Another action</a></li>
+                <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
+        </div>
     </ul>
 </nav>
 <!-- End of Topbar -->

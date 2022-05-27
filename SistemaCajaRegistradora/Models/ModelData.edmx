@@ -1,0 +1,750 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="CarewModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Categorias">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nombre" Type="nchar" MaxLength="20" Nullable="false" />
+          <Property Name="descripcion" Type="nchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="MetodoPagos">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="metodo_pago" Type="nchar" MaxLength="20" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Modulos">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nombre" Type="nchar" MaxLength="30" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Operaciones">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nombre" Type="nchar" MaxLength="30" Nullable="false" />
+          <Property Name="idmodulo" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Prioridades">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="prioridad" Type="nchar" MaxLength="10" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Productos">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="codigo_barra" Type="nchar" MaxLength="15" Nullable="false" />
+          <Property Name="nombre" Type="nchar" MaxLength="100" Nullable="false" />
+          <Property Name="precio" Type="int" />
+          <Property Name="stock" Type="int" />
+          <Property Name="stockmin" Type="int" />
+          <Property Name="stockmax" Type="int" />
+          <Property Name="fecha_creacion" Type="date" Nullable="false" />
+          <Property Name="rutaImg" Type="nchar" MaxLength="255" Nullable="false" />
+          <Property Name="prioridadid" Type="int" Nullable="false" />
+          <Property Name="categoriaid" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="rol_operacion">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="idrol" Type="int" Nullable="false" />
+          <Property Name="idoperacion" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Roles">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="rol" Type="nchar" MaxLength="15" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Usuarios">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nombreUsuario" Type="nchar" MaxLength="50" Nullable="false" />
+          <Property Name="clave" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="nombre" Type="nchar" MaxLength="30" Nullable="false" />
+          <Property Name="apellido" Type="nchar" MaxLength="30" Nullable="false" />
+          <Property Name="rutaImg" Type="nchar" MaxLength="255" />
+          <Property Name="rolid" Type="int" Nullable="false" />
+        </EntityType>
+        <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <EntityType Name="venta_producto">
+          <Key>
+            <PropertyRef Name="productoid" />
+            <PropertyRef Name="ventaid" />
+            <PropertyRef Name="total_precio_producto" />
+            <PropertyRef Name="total_cantidad_producto" />
+          </Key>
+          <Property Name="productoid" Type="int" Nullable="false" />
+          <Property Name="ventaid" Type="int" Nullable="false" />
+          <Property Name="total_precio_producto" Type="int" Nullable="false" />
+          <Property Name="total_cantidad_producto" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Ventas">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="total_venta" Type="int" Nullable="false" />
+          <Property Name="fecha_creacion" Type="date" Nullable="false" />
+          <Property Name="vuelto" Type="int" Nullable="false" />
+          <Property Name="cajeroid" Type="int" Nullable="false" />
+          <Property Name="metodo_pagoid" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Operaciones_Modulos">
+          <End Role="Modulos" Type="Self.Modulos" Multiplicity="1" />
+          <End Role="Operaciones" Type="Self.Operaciones" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Modulos">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Operaciones">
+              <PropertyRef Name="idmodulo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Productos_Categorias">
+          <End Role="Categorias" Type="Self.Categorias" Multiplicity="1" />
+          <End Role="Productos" Type="Self.Productos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Categorias">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Productos">
+              <PropertyRef Name="categoriaid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Productos_Prioridades">
+          <End Role="Prioridades" Type="Self.Prioridades" Multiplicity="1" />
+          <End Role="Productos" Type="Self.Productos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Prioridades">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Productos">
+              <PropertyRef Name="prioridadid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_rol_operacion_Operaciones">
+          <End Role="Operaciones" Type="Self.Operaciones" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="rol_operacion" Type="Self.rol_operacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Operaciones">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="rol_operacion">
+              <PropertyRef Name="idoperacion" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_rol_operacion_Roles">
+          <End Role="Roles" Type="Self.Roles" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="rol_operacion" Type="Self.rol_operacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="rol_operacion">
+              <PropertyRef Name="idrol" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Usuarios_Roles">
+          <End Role="Roles" Type="Self.Roles" Multiplicity="1" />
+          <End Role="Usuarios" Type="Self.Usuarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Usuarios">
+              <PropertyRef Name="rolid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_venta_producto_Productos">
+          <End Role="Productos" Type="Self.Productos" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="venta_producto" Type="Self.venta_producto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Productos">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="venta_producto">
+              <PropertyRef Name="productoid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_venta_producto_Ventas">
+          <End Role="Ventas" Type="Self.Ventas" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="venta_producto" Type="Self.venta_producto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ventas">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="venta_producto">
+              <PropertyRef Name="ventaid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ventas_MetodoPagos">
+          <End Role="MetodoPagos" Type="Self.MetodoPagos" Multiplicity="1" />
+          <End Role="Ventas" Type="Self.Ventas" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MetodoPagos">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Ventas">
+              <PropertyRef Name="metodo_pagoid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ventas_Usuarios">
+          <End Role="Usuarios" Type="Self.Usuarios" Multiplicity="1" />
+          <End Role="Ventas" Type="Self.Ventas" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Usuarios">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Ventas">
+              <PropertyRef Name="cajeroid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="CarewModelStoreContainer">
+          <EntitySet Name="Categorias" EntityType="Self.Categorias" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MetodoPagos" EntityType="Self.MetodoPagos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Modulos" EntityType="Self.Modulos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Operaciones" EntityType="Self.Operaciones" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Prioridades" EntityType="Self.Prioridades" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Productos" EntityType="Self.Productos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="rol_operacion" EntityType="Self.rol_operacion" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Roles" EntityType="Self.Roles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Usuarios" EntityType="Self.Usuarios" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Ventas" EntityType="Self.Ventas" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="venta_producto" EntityType="Self.venta_producto" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [venta_producto].[productoid] AS [productoid], 
+    [venta_producto].[ventaid] AS [ventaid], 
+    [venta_producto].[total_precio_producto] AS [total_precio_producto], 
+    [venta_producto].[total_cantidad_producto] AS [total_cantidad_producto]
+    FROM [dbo].[venta_producto] AS [venta_producto]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_Operaciones_Modulos" Association="Self.FK_Operaciones_Modulos">
+            <End Role="Modulos" EntitySet="Modulos" />
+            <End Role="Operaciones" EntitySet="Operaciones" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Productos_Categorias" Association="Self.FK_Productos_Categorias">
+            <End Role="Categorias" EntitySet="Categorias" />
+            <End Role="Productos" EntitySet="Productos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Productos_Prioridades" Association="Self.FK_Productos_Prioridades">
+            <End Role="Prioridades" EntitySet="Prioridades" />
+            <End Role="Productos" EntitySet="Productos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_rol_operacion_Operaciones" Association="Self.FK_rol_operacion_Operaciones">
+            <End Role="Operaciones" EntitySet="Operaciones" />
+            <End Role="rol_operacion" EntitySet="rol_operacion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_rol_operacion_Roles" Association="Self.FK_rol_operacion_Roles">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="rol_operacion" EntitySet="rol_operacion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Usuarios_Roles" Association="Self.FK_Usuarios_Roles">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="Usuarios" EntitySet="Usuarios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_venta_producto_Productos" Association="Self.FK_venta_producto_Productos">
+            <End Role="Productos" EntitySet="Productos" />
+            <End Role="venta_producto" EntitySet="venta_producto" />
+          </AssociationSet>
+          <AssociationSet Name="FK_venta_producto_Ventas" Association="Self.FK_venta_producto_Ventas">
+            <End Role="Ventas" EntitySet="Ventas" />
+            <End Role="venta_producto" EntitySet="venta_producto" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ventas_MetodoPagos" Association="Self.FK_Ventas_MetodoPagos">
+            <End Role="MetodoPagos" EntitySet="MetodoPagos" />
+            <End Role="Ventas" EntitySet="Ventas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ventas_Usuarios" Association="Self.FK_Ventas_Usuarios">
+            <End Role="Usuarios" EntitySet="Usuarios" />
+            <End Role="Ventas" EntitySet="Ventas" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="CarewModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Categoria">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nombre" Type="String" MaxLength="20" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="descripcion" Type="String" MaxLength="255" FixedLength="true" Unicode="true" />
+          <NavigationProperty Name="Productos" Relationship="Self.FK_Productos_Categorias" FromRole="Categorias" ToRole="Productos" />
+        </EntityType>
+        <EntityType Name="MetodoPago">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="metodo_pago" Type="String" MaxLength="20" FixedLength="true" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Ventas" Relationship="Self.FK_Ventas_MetodoPagos" FromRole="MetodoPagos" ToRole="Ventas" />
+        </EntityType>
+        <EntityType Name="Modulo">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nombre" Type="String" MaxLength="30" FixedLength="true" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Operaciones" Relationship="Self.FK_Operaciones_Modulos" FromRole="Modulos" ToRole="Operaciones" />
+        </EntityType>
+        <EntityType Name="Operacione">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nombre" Type="String" MaxLength="30" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="idmodulo" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Modulo" Relationship="Self.FK_Operaciones_Modulos" FromRole="Operaciones" ToRole="Modulos" />
+          <NavigationProperty Name="rol_operacion" Relationship="Self.FK_rol_operacion_Operaciones" FromRole="Operaciones" ToRole="rol_operacion" />
+        </EntityType>
+        <EntityType Name="Prioridade">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="prioridad" Type="String" MaxLength="10" FixedLength="true" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Productos" Relationship="Self.FK_Productos_Prioridades" FromRole="Prioridades" ToRole="Productos" />
+        </EntityType>
+        <EntityType Name="Producto">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="codigo_barra" Type="String" MaxLength="15" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="nombre" Type="String" MaxLength="100" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="precio" Type="Int32" />
+          <Property Name="stock" Type="Int32" />
+          <Property Name="stockmin" Type="Int32" />
+          <Property Name="stockmax" Type="Int32" />
+          <Property Name="fecha_creacion" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="rutaImg" Type="String" MaxLength="255" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="prioridadid" Type="Int32" Nullable="false" />
+          <Property Name="categoriaid" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Categoria" Relationship="Self.FK_Productos_Categorias" FromRole="Productos" ToRole="Categorias" />
+          <NavigationProperty Name="Prioridade" Relationship="Self.FK_Productos_Prioridades" FromRole="Productos" ToRole="Prioridades" />
+          <NavigationProperty Name="venta_producto" Relationship="Self.FK_venta_producto_Productos" FromRole="Productos" ToRole="venta_producto" />
+        </EntityType>
+        <EntityType Name="rol_operacion">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="idrol" Type="Int32" Nullable="false" />
+          <Property Name="idoperacion" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Operacione" Relationship="Self.FK_rol_operacion_Operaciones" FromRole="rol_operacion" ToRole="Operaciones" />
+          <NavigationProperty Name="Role" Relationship="Self.FK_rol_operacion_Roles" FromRole="rol_operacion" ToRole="Roles" />
+        </EntityType>
+        <EntityType Name="Role">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="rol" Type="String" MaxLength="15" FixedLength="true" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="rol_operacion" Relationship="Self.FK_rol_operacion_Roles" FromRole="Roles" ToRole="rol_operacion" />
+          <NavigationProperty Name="Usuarios" Relationship="Self.FK_Usuarios_Roles" FromRole="Roles" ToRole="Usuarios" />
+        </EntityType>
+        <EntityType Name="Usuario">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nombreUsuario" Type="String" MaxLength="50" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="clave" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="nombre" Type="String" MaxLength="30" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="apellido" Type="String" MaxLength="30" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="rutaImg" Type="String" MaxLength="255" FixedLength="true" Unicode="true" />
+          <Property Name="rolid" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Role" Relationship="Self.FK_Usuarios_Roles" FromRole="Usuarios" ToRole="Roles" />
+          <NavigationProperty Name="Ventas" Relationship="Self.FK_Ventas_Usuarios" FromRole="Usuarios" ToRole="Ventas" />
+        </EntityType>
+        <EntityType Name="Venta">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="total_venta" Type="Int32" Nullable="false" />
+          <Property Name="fecha_creacion" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="vuelto" Type="Int32" Nullable="false" />
+          <Property Name="cajeroid" Type="Int32" Nullable="false" />
+          <Property Name="metodo_pagoid" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="MetodoPago" Relationship="Self.FK_Ventas_MetodoPagos" FromRole="Ventas" ToRole="MetodoPagos" />
+          <NavigationProperty Name="Usuario" Relationship="Self.FK_Ventas_Usuarios" FromRole="Ventas" ToRole="Usuarios" />
+          <NavigationProperty Name="venta_producto" Relationship="Self.FK_venta_producto_Ventas" FromRole="Ventas" ToRole="venta_producto" />
+        </EntityType>
+        <EntityType Name="venta_producto">
+          <Key>
+            <PropertyRef Name="productoid" />
+            <PropertyRef Name="ventaid" />
+            <PropertyRef Name="total_precio_producto" />
+            <PropertyRef Name="total_cantidad_producto" />
+          </Key>
+          <Property Name="productoid" Type="Int32" Nullable="false" />
+          <Property Name="ventaid" Type="Int32" Nullable="false" />
+          <Property Name="total_precio_producto" Type="Int32" Nullable="false" />
+          <Property Name="total_cantidad_producto" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Producto" Relationship="Self.FK_venta_producto_Productos" FromRole="venta_producto" ToRole="Productos" />
+          <NavigationProperty Name="Venta" Relationship="Self.FK_venta_producto_Ventas" FromRole="venta_producto" ToRole="Ventas" />
+        </EntityType>
+        <Association Name="FK_Productos_Categorias">
+          <End Role="Categorias" Type="Self.Categoria" Multiplicity="1" />
+          <End Role="Productos" Type="Self.Producto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Categorias">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Productos">
+              <PropertyRef Name="categoriaid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ventas_MetodoPagos">
+          <End Role="MetodoPagos" Type="Self.MetodoPago" Multiplicity="1" />
+          <End Role="Ventas" Type="Self.Venta" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MetodoPagos">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Ventas">
+              <PropertyRef Name="metodo_pagoid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Operaciones_Modulos">
+          <End Role="Modulos" Type="Self.Modulo" Multiplicity="1" />
+          <End Role="Operaciones" Type="Self.Operacione" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Modulos">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Operaciones">
+              <PropertyRef Name="idmodulo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_rol_operacion_Operaciones">
+          <End Role="Operaciones" Type="Self.Operacione" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="rol_operacion" Type="Self.rol_operacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Operaciones">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="rol_operacion">
+              <PropertyRef Name="idoperacion" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Productos_Prioridades">
+          <End Role="Prioridades" Type="Self.Prioridade" Multiplicity="1" />
+          <End Role="Productos" Type="Self.Producto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Prioridades">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Productos">
+              <PropertyRef Name="prioridadid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_venta_producto_Productos">
+          <End Role="Productos" Type="Self.Producto" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="venta_producto" Type="Self.venta_producto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Productos">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="venta_producto">
+              <PropertyRef Name="productoid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_rol_operacion_Roles">
+          <End Role="Roles" Type="Self.Role" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="rol_operacion" Type="Self.rol_operacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="rol_operacion">
+              <PropertyRef Name="idrol" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Usuarios_Roles">
+          <End Role="Roles" Type="Self.Role" Multiplicity="1" />
+          <End Role="Usuarios" Type="Self.Usuario" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Usuarios">
+              <PropertyRef Name="rolid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ventas_Usuarios">
+          <End Role="Usuarios" Type="Self.Usuario" Multiplicity="1" />
+          <End Role="Ventas" Type="Self.Venta" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Usuarios">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Ventas">
+              <PropertyRef Name="cajeroid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_venta_producto_Ventas">
+          <End Role="Ventas" Type="Self.Venta" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="venta_producto" Type="Self.venta_producto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ventas">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="venta_producto">
+              <PropertyRef Name="ventaid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="ModelData" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Categorias" EntityType="Self.Categoria" />
+          <EntitySet Name="MetodoPagos" EntityType="Self.MetodoPago" />
+          <EntitySet Name="Modulos" EntityType="Self.Modulo" />
+          <EntitySet Name="Operaciones" EntityType="Self.Operacione" />
+          <EntitySet Name="Prioridades" EntityType="Self.Prioridade" />
+          <EntitySet Name="Productos" EntityType="Self.Producto" />
+          <EntitySet Name="rol_operacion" EntityType="Self.rol_operacion" />
+          <EntitySet Name="Roles" EntityType="Self.Role" />
+          <EntitySet Name="Usuarios" EntityType="Self.Usuario" />
+          <EntitySet Name="Ventas" EntityType="Self.Venta" />
+          <EntitySet Name="venta_producto" EntityType="Self.venta_producto" />
+          <AssociationSet Name="FK_Productos_Categorias" Association="Self.FK_Productos_Categorias">
+            <End Role="Categorias" EntitySet="Categorias" />
+            <End Role="Productos" EntitySet="Productos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ventas_MetodoPagos" Association="Self.FK_Ventas_MetodoPagos">
+            <End Role="MetodoPagos" EntitySet="MetodoPagos" />
+            <End Role="Ventas" EntitySet="Ventas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Operaciones_Modulos" Association="Self.FK_Operaciones_Modulos">
+            <End Role="Modulos" EntitySet="Modulos" />
+            <End Role="Operaciones" EntitySet="Operaciones" />
+          </AssociationSet>
+          <AssociationSet Name="FK_rol_operacion_Operaciones" Association="Self.FK_rol_operacion_Operaciones">
+            <End Role="Operaciones" EntitySet="Operaciones" />
+            <End Role="rol_operacion" EntitySet="rol_operacion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Productos_Prioridades" Association="Self.FK_Productos_Prioridades">
+            <End Role="Prioridades" EntitySet="Prioridades" />
+            <End Role="Productos" EntitySet="Productos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_venta_producto_Productos" Association="Self.FK_venta_producto_Productos">
+            <End Role="Productos" EntitySet="Productos" />
+            <End Role="venta_producto" EntitySet="venta_producto" />
+          </AssociationSet>
+          <AssociationSet Name="FK_rol_operacion_Roles" Association="Self.FK_rol_operacion_Roles">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="rol_operacion" EntitySet="rol_operacion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Usuarios_Roles" Association="Self.FK_Usuarios_Roles">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="Usuarios" EntitySet="Usuarios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ventas_Usuarios" Association="Self.FK_Ventas_Usuarios">
+            <End Role="Usuarios" EntitySet="Usuarios" />
+            <End Role="Ventas" EntitySet="Ventas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_venta_producto_Ventas" Association="Self.FK_venta_producto_Ventas">
+            <End Role="Ventas" EntitySet="Ventas" />
+            <End Role="venta_producto" EntitySet="venta_producto" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="CarewModelStoreContainer" CdmEntityContainer="ModelData">
+          <EntitySetMapping Name="Categorias">
+            <EntityTypeMapping TypeName="CarewModel.Categoria">
+              <MappingFragment StoreEntitySet="Categorias">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="descripcion" ColumnName="descripcion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MetodoPagos">
+            <EntityTypeMapping TypeName="CarewModel.MetodoPago">
+              <MappingFragment StoreEntitySet="MetodoPagos">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="metodo_pago" ColumnName="metodo_pago" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Modulos">
+            <EntityTypeMapping TypeName="CarewModel.Modulo">
+              <MappingFragment StoreEntitySet="Modulos">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Operaciones">
+            <EntityTypeMapping TypeName="CarewModel.Operacione">
+              <MappingFragment StoreEntitySet="Operaciones">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="idmodulo" ColumnName="idmodulo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Prioridades">
+            <EntityTypeMapping TypeName="CarewModel.Prioridade">
+              <MappingFragment StoreEntitySet="Prioridades">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="prioridad" ColumnName="prioridad" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Productos">
+            <EntityTypeMapping TypeName="CarewModel.Producto">
+              <MappingFragment StoreEntitySet="Productos">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="codigo_barra" ColumnName="codigo_barra" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="precio" ColumnName="precio" />
+                <ScalarProperty Name="stock" ColumnName="stock" />
+                <ScalarProperty Name="stockmin" ColumnName="stockmin" />
+                <ScalarProperty Name="stockmax" ColumnName="stockmax" />
+                <ScalarProperty Name="fecha_creacion" ColumnName="fecha_creacion" />
+                <ScalarProperty Name="rutaImg" ColumnName="rutaImg" />
+                <ScalarProperty Name="prioridadid" ColumnName="prioridadid" />
+                <ScalarProperty Name="categoriaid" ColumnName="categoriaid" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="rol_operacion">
+            <EntityTypeMapping TypeName="CarewModel.rol_operacion">
+              <MappingFragment StoreEntitySet="rol_operacion">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="idrol" ColumnName="idrol" />
+                <ScalarProperty Name="idoperacion" ColumnName="idoperacion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Roles">
+            <EntityTypeMapping TypeName="CarewModel.Role">
+              <MappingFragment StoreEntitySet="Roles">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="rol" ColumnName="rol" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Usuarios">
+            <EntityTypeMapping TypeName="CarewModel.Usuario">
+              <MappingFragment StoreEntitySet="Usuarios">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="nombreUsuario" ColumnName="nombreUsuario" />
+                <ScalarProperty Name="clave" ColumnName="clave" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="apellido" ColumnName="apellido" />
+                <ScalarProperty Name="rutaImg" ColumnName="rutaImg" />
+                <ScalarProperty Name="rolid" ColumnName="rolid" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Ventas">
+            <EntityTypeMapping TypeName="CarewModel.Venta">
+              <MappingFragment StoreEntitySet="Ventas">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="total_venta" ColumnName="total_venta" />
+                <ScalarProperty Name="fecha_creacion" ColumnName="fecha_creacion" />
+                <ScalarProperty Name="vuelto" ColumnName="vuelto" />
+                <ScalarProperty Name="cajeroid" ColumnName="cajeroid" />
+                <ScalarProperty Name="metodo_pagoid" ColumnName="metodo_pagoid" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="venta_producto">
+            <EntityTypeMapping TypeName="CarewModel.venta_producto">
+              <MappingFragment StoreEntitySet="venta_producto">
+                <ScalarProperty Name="productoid" ColumnName="productoid" />
+                <ScalarProperty Name="ventaid" ColumnName="ventaid" />
+                <ScalarProperty Name="total_precio_producto" ColumnName="total_precio_producto" />
+                <ScalarProperty Name="total_cantidad_producto" ColumnName="total_cantidad_producto" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

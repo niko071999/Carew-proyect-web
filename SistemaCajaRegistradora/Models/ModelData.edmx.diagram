@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="93a84570dd3240128557181853191106" Name="Diagram1">
+        <EntityTypeShape EntityType="CarewModel.Categoria" Width="1.5" PointX="3" PointY="15.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewModel.MetodoPago" Width="1.5" PointX="3" PointY="12.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewModel.Modulo" Width="1.5" PointX="5.875" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewModel.Operacione" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewModel.Prioridade" Width="1.5" PointX="3" PointY="18" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewModel.Producto" Width="1.5" PointX="5.25" PointY="15.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewModel.rol_operacion" Width="1.5" PointX="3" PointY="2.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewModel.Role" Width="1.5" PointX="0.75" PointY="3.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewModel.Usuario" Width="1.5" PointX="3" PointY="6.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewModel.Venta" Width="1.5" PointX="5.25" PointY="6.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewModel.venta_producto" Width="1.5" PointX="7.5" PointY="6.375" IsExpanded="true" />
+        <AssociationConnector Association="CarewModel.FK_Productos_Categorias" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewModel.FK_Ventas_MetodoPagos" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewModel.FK_Operaciones_Modulos" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewModel.FK_rol_operacion_Operaciones" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewModel.FK_Productos_Prioridades" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewModel.FK_venta_producto_Productos" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewModel.FK_rol_operacion_Roles" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewModel.FK_Usuarios_Roles" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewModel.FK_Ventas_Usuarios" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewModel.FK_venta_producto_Ventas" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
