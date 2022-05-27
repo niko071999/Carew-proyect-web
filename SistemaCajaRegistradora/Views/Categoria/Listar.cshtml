@@ -13,22 +13,22 @@
     </button>
 
     <!-- Topbar Navbar -->
+    <!-- Topbar Navbar -->
     <ul class="navbar-nav ml-auto">
 
         <!-- Nav Item - User Information -->
-        <div class="dropdown">
-            <a class="nav-link dropdown-toggle" href="javascript:void(0);" id="userDropdown" role="button"
-               data-toggle="dropdown" aria-expanded="false">
-                <span id="text_nameuser" class="mr-2 d-none d-lg-inline text-gray-600 small">NOMBRE DE USUARIO</span>
-                <img id="img_user" class="img-profile rounded-circle"
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span id="text_nameuser" class="mr-2 d-none d-md-inline text-gray-600 fw-bold">Cargando...</span>
+                <img id="img_user" class="img-profile rounded-circle img-fluid"
                      src="~/Assets/images/blank-profile.png">
             </a>
-            <ul class="dropdown-menu" aria-labelledby="userDropdown">
-                <li><a class="dropdown-item" href="#">Action</a></li>
-                <li><a class="dropdown-item" href="#">Another action</a></li>
-                <li><a class="dropdown-item" href="#">Something else here</a></li>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                <li><a class="dropdown-item" href="#">Cambiar contraseña</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a id="linksignout" class="dropdown-item text-danger" href="javascript:;">Cerrar sesion</a></li>
             </ul>
-        </div>
+        </li>
     </ul>
 </nav>
 <!-- End of Topbar -->
@@ -110,12 +110,11 @@
     </div>
 </div>
 <!-- /.container-fluid -->
-
 <!-- Modal core base-->
 <div class="modal fade" id="coreModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
 
 </div>
-
+<script src="~/Scripts/js/usersesion.js"></script>
 <script src="~/Scripts/js/alertmenssages.js"></script>
 <script src="~/Scripts/js/scriptsCategoria.js"></script>

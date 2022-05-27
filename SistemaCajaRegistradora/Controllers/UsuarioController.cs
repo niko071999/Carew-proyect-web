@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using System.Data.Entity;
 using System.Text.RegularExpressions;
 using System.Text;
+using SistemaCajaRegistradora.Filters;
 
 namespace SistemaCajaRegistradora.Controllers
 {
@@ -16,6 +17,7 @@ namespace SistemaCajaRegistradora.Controllers
 
         [HttpGet]
         [ActionName("Listar")]
+        [Autorizacion(idoperacion:12)]
         public ActionResult Listar()
         {
             var usuarios = db.Usuarios.Include(x => x.Role);
@@ -24,6 +26,7 @@ namespace SistemaCajaRegistradora.Controllers
 
         [HttpGet]
         [ActionName("AgregarForms")]
+        [Autorizacion(idoperacion: 13)]
         public PartialViewResult AgregarForms()
         {
             var roles = db.Roles.ToList();
@@ -33,12 +36,37 @@ namespace SistemaCajaRegistradora.Controllers
 
         [HttpPost]
         [ActionName("AgregarUsuario")]
+        [Autorizacion(idoperacion: 13)]
         public JsonResult AgregarUsuario(Usuario usuario)
         {
             int n = 0;
             usuario.clave = Encrypt.GetSHA256(usuario.clave);
             usuario.rutaImg = "./../Assets/images/blank-profile.png";
             db.Usuarios.Add(usuario);
+            n = db.SaveChanges();
+            return Json(n, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        [ActionName("formsEditar")]
+        [Autorizacion(idoperacion: 15)]
+        public PartialViewResult formsEditar(int? id)
+        {
+            var usuario = db.Usuarios.Include(u => u.Role)
+                            .Where(u => u.id == id).FirstOrDefault();
+            var roles = db.Roles.ToList();
+            quitarEspaciosVacios(usuario);
+            ViewBag.rolesId = new SelectList(roles, "id", "rol", usuario.rolid);
+            return PartialView("_formsUsuario", usuario);
+        }
+
+        [HttpPost]
+        [ActionName("editarUsuario")]
+        [Autorizacion(idoperacion: 15)]
+        public JsonResult editarUsuario(Usuario usuario)
+        {
+            int n = 0;
+            db.Entry(usuario).State = EntityState.Modified;
             n = db.SaveChanges();
             return Json(n, JsonRequestBehavior.AllowGet);
         }
@@ -112,6 +140,13 @@ namespace SistemaCajaRegistradora.Controllers
             {
                 return Json(null, JsonRequestBehavior.AllowGet);
             }
+        }
+        private void quitarEspaciosVacios(Usuario usuario)
+        {
+            usuario.nombreUsuario = usuario.nombreUsuario.Trim();
+            usuario.rutaImg = usuario.rutaImg.Trim();
+            usuario.nombre = usuario.nombre.Trim();
+            usuario.apellido = usuario.apellido.Trim();
         }
     }
 }

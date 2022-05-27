@@ -42,11 +42,54 @@ function AgregarUsuario(urlAgregar) {
     }
 
 }
+function formsEditar(urlEditarForms, id) {
+    $.get(urlEditarForms + '/' + id, function (data) {
+        abrirModal(data);
+    });
+}
+function editarUsuario(urlEditar) {
+    var idusuario = $('#id').val()
+    var nombre = $('#inputname').val();
+    var apellido = $('#inputapellido').val();
+    var nombreUsuario = $('#nombreUsuario').val();
+    var clave = $('#clave').val();
+    var rolid = $('#rolesId').val();
+    var rutaImg = $('#rutaImg').val();
+
+    let isValidCampo = true;
+    isValidCampo = validarCampos(nombre, apellido, nombreUsuario, clave, rolid);
+
+    if (isValidCampo) {
+        var usuario = {
+            "id": idusuario,
+            "nombre": nombre,
+            "apellido": apellido,
+            "nombreUsuario": nombreUsuario,
+            "clave": clave,
+            "rutaImg": rutaImg,
+            "rolid": rolid
+        }
+        $.post(urlEditar + '/', usuario, function (data) {
+            if (data > 0) {
+                sessionStorage.clear();
+                sessionStorage.nombre = usuario.nombreUsuario;
+                sessionStorage.mensaje = 'Usuario modificado correctamente: ';
+                location = location.href;
+            } else {
+                mensaje = "Error: Ocurrio un error en el servidor, intentelo nuevamente";
+                showMenssage('error', mensaje, true);
+            }
+        });
+    } else {
+        mensaje = "Error: Los campos estan vacios o la clave no cumple los requisitos";
+        showMenssage('error', mensaje, true);
+    }
+}
+
 const abrirModal = (data) => {
     $('#coreModal').html(data);
     $('#coreModal').modal('show');
 }
-
 const validarCampos = (nombre, apellido, nombreUsuario, clave, rolid) =>  {
     let valid = true;
     let atr = '';
@@ -102,7 +145,6 @@ const validarCampos = (nombre, apellido, nombreUsuario, clave, rolid) =>  {
     }
     return valid;
 }
-
 const showMenssage = (type, mensaje, toast) => {
     if (type == 'error') {
         Swal.fire({

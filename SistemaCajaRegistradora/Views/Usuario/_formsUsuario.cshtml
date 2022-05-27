@@ -27,7 +27,7 @@
                    {
                        @id = "inputname",
                        @class = "form-control",
-                       @placeholder = "Ingrese el nombre del cajero",
+                       @placeholder = "Ingrese el/los nombre/s",
                        maxlength = 30
                    })
                 </div>
@@ -37,7 +37,7 @@
                    {
                        @id = "inputapellido",
                        @class = "form-control",
-                       @placeholder = "Ingrese el apellido del cajero",
+                       @placeholder = "Ingrese el/los apellido/s",
                        maxlength = 30
                    })
                 </div>
@@ -56,38 +56,85 @@
                     @Html.DropDownList("rolesId", null, "Seleccione rol de usuario",
                     htmlAttributes: new { @class = "form-select" })
                 </div>
-                <div class="col-6">
-                    <label id="text_clave" class="form-label">Clave de acceso</label>
-                    <div class="input-group mb-3">
-                        @Html.TextBoxFor(model => model.clave, new
-                       {
-                           @class = "form-control",
-                           @type = "password",
-                           @placeholder = "Ingrese la clave",
-                           @aria_describedby = "passwordInfo viewPass",
-                           maxlength = 12
-                       })
-                        <button class="btn btn-outline-secondary" type="button" id="viewPass"><i id="icon" class="fas fa-eye"></i></button>
-                        <div id="passwordInfo" class="form-text">Contraseña de a lo menos 6 caracteres y maximo 12 caracteres</div>
+                @if (Model == null)
+                {
+                    <div class="col-6">
+                        <label id="text_clave" class="form-label">Clave de acceso</label>
+                        <div class="input-group mb-3">
+                            @Html.TextBoxFor(model => model.clave, new
+                           {
+                               @class = "form-control",
+                               @type = "password",
+                               @placeholder = "Ingrese la clave",
+                               @aria_describedby = "passwordInfo viewPass",
+                               maxlength = 12
+                           })
+                            <button class="btn btn-outline-secondary" type="button" id="viewPass"><i id="icon" class="fas fa-eye"></i></button>
+                            <div id="passwordInfo" class="form-text">Contraseña de a lo menos 6 caracteres y maximo 12 caracteres</div>
+                        </div>
                     </div>
-                </div>
+                }
+                else
+                {
+                    @Html.HiddenFor(model => model.clave)
+                }
             </div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
             @if (Model == null)
             {
-                <button class="btn btn-success" onclick="agregarUsuario()">Agregar</button>
+                <button class="btn btn-success" onclick="consultaNombreUsuario()">Agregar</button>
             }
             else
             {
-                <button class="btn btn-warning" onclick="editarUsuario('@Url.Action("editarUsuario","Usuario")')">Editar</button>
+                <button class="btn btn-warning" onclick="consultaNombreUsuario()">Editar</button>
             }
         </div>
     </div>
 </div>
 
 <script type="text/javascript" title="main">
+    let countEspacio = 0;
+    $("#inputname").keydown(function (event) {
+        return /[a-z, ]/i.test(event.key);
+    }).keyup(function (event) {
+        let nombre = $("#inputname").val();
+        if (nombre != ' ') {
+            countEspacio = cuantasVecesAparece(nombre, ' ');
+            if (event.key == ' ') {
+                if (countEspacio > 1) {
+                    let text = $("#inputname").val();
+                    text = text.slice(0, -1);
+                    $("#inputname").val(text);
+                }
+            }
+        } else {
+            $("#inputname").val('');
+        }
+    });
+    $("#inputapellido").keydown(function (event) {
+        return /[a-z, ]/i.test(event.key);
+    }).keyup(function (event) {
+        let apellido = $("#inputapellido").val();
+        if (apellido != ' ') {
+            countEspacio = cuantasVecesAparece(apellido, ' ');
+            if (event.key == ' ') {
+                if (countEspacio > 1) {
+                    let text = $("#inputapellido").val();
+                    text = text.slice(0, -1);
+                    $("#inputapellido").val(text);
+                }
+            }
+        } else {
+            $("#inputapellido").val('');
+        }
+    });;
+    $("#nombreUsuario").keyup(function () {
+        let text = $("#nombreUsuario").val();
+        text = text.replace(' ', '');
+        $("#nombreUsuario").val(text);
+    });
     let view = false;
     let nombreandapellido = '';
     $("#inputname").change(generadorUserName);
@@ -107,11 +154,14 @@
     });
 
     function generadorUserName() {
-        let nombre = $("#inputname").val().trim();
-        let apellido = $("#inputapellido").val().trim();
-        console.log(nombre, apellido);
-        if (nombre != '' && apellido != '') {
-            verificarNombreUser(nombre, apellido);
+        let nombreusuario = $("#nombreUsuario").val();
+        if (nombreusuario != sessionStorage.nombreusuarioactual) {
+            let nombre = $("#inputname").val().trim();
+            let apellido = $("#inputapellido").val().trim();
+            console.log(nombre, apellido);
+            if (nombre != '' && apellido != '') {
+                verificarNombreUser(nombre, apellido);
+            }
         }
     }
 
@@ -134,25 +184,42 @@
             }
         });
     }
-    function agregarUsuario() {
+    function consultaNombreUsuario() {
         let nU = $("#nombreUsuario").val();
-        var usuario = {
-            "id": -1,
-            "nombre": 'n',
-            "apellido": 'a',
-            "nombreUsuario": nU,
-            "clave": 'c',
-            "rutaImg": 'r',
-            "rolid": 0
-        }
-        $.post('@Url.Action("verificarNameUser", "Usuario")/', usuario, function (data) {
-            console.log(data);
-            if (data.nombreUsuario == "") {
-                AgregarUsuario('@Url.Action("AgregarUsuario","Usuario")');
-            } else {
-                mensaje = "Error: El nombre de usuario esta ocupado";
-                showMenssage('error', mensaje, true);
+        if (nU !== sessionStorage.nombreusuarioactual) {
+            var usuario = {
+                "id": -1,
+                "nombre": 'n',
+                "apellido": 'a',
+                "nombreUsuario": nU,
+                "clave": 'c',
+                "rutaImg": 'r',
+                "rolid": 0
             }
-        });
+
+            $.post('@Url.Action("verificarNameUser", "Usuario")/', usuario, function (data) {
+                console.log(data);
+                if (data.nombreUsuario == "") {
+                    if (sessionStorage.nombreusuarioactual == "") {
+                        AgregarUsuario('@Url.Action("AgregarUsuario","Usuario")');
+                    } else {
+                        editarUsuario('@Url.Action("editarUsuario","Usuario")');
+                    }
+                } else {
+                    mensaje = "Error: El nombre de usuario esta ocupado";
+                    showMenssage('error', mensaje, true);
+                }
+            });
+        } else {
+            editarUsuario('@Url.Action("editarUsuario","Usuario")');
+        }
+
+    }
+    function cuantasVecesAparece(cadena, caracter) {
+        var indices = [];
+        for (var i = 0; i < cadena.length; i++) {
+            if (cadena[i] === caracter) indices.push(i);
+        }
+        return indices.length;
     }
 </script>

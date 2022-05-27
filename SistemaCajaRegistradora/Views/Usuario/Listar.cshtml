@@ -13,25 +13,21 @@
     </button>
 
     <!-- Topbar Navbar -->
+    <!-- Topbar Navbar -->
     <ul class="navbar-nav ml-auto">
 
         <!-- Nav Item - User Information -->
-        <li class="nav-item dropdown no-arrow">
-            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small">NOMBRE DE USUARIO</span>
-                <img class="img-profile rounded-circle"
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span id="text_nameuser" class="mr-2 d-none d-md-inline text-gray-600 fw-bold">Cargando...</span>
+                <img id="img_user" class="img-profile rounded-circle img-fluid"
                      src="~/Assets/images/blank-profile.png">
             </a>
-            <!-- Dropdown - User Information -->
-            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                 aria-labelledby="userDropdown">
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Salir del sistema
-                </a>
-            </div>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                <li><a class="dropdown-item" href="#">Cambiar contraseña</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a id="linksignout" class="dropdown-item text-danger" href="javascript:;">Cerrar sesion</a></li>
+            </ul>
         </li>
     </ul>
 </nav>
@@ -107,5 +103,14 @@
 
 </div>
 
+<script src="~/Scripts/js/usersesion.js"></script>
 <script src="~/Scripts/js/alertmenssages.js"></script>
 <script src="~/Scripts/js/scriptsUsuarios.js"></script>
+<script type="text/javascript" title="main">
+    var coreModal = document.getElementById('coreModal');
+    coreModal.addEventListener('shown.bs.modal', function() {
+        var nombreusuario = $("#nombreUsuario").val();
+        sessionStorage.nombreusuarioactual = nombreusuario;
+        console.log(sessionStorage.nombreusuarioactual);
+    })
+</script>

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Data.Entity;
+using SistemaCajaRegistradora.Filters;
 
 namespace SistemaCajaRegistradora.Controllers
 {
@@ -14,6 +15,7 @@ namespace SistemaCajaRegistradora.Controllers
 
         [HttpGet]
         [ActionName("Listar")]
+        [Autorizacion(idoperacion:8)]
         public ActionResult Listar()
         {
             var categorias = db.Categorias;
@@ -22,12 +24,14 @@ namespace SistemaCajaRegistradora.Controllers
 
         [HttpGet]
         [ActionName("AgregarForms")]
+        [Autorizacion(idoperacion:9)]
         public PartialViewResult AgregarForms()
         {
             return PartialView("_formsCategoria");
         }
         [HttpPost]
         [ActionName("AgregarCategoria")]
+        [Autorizacion(idoperacion:9)]
         public JsonResult AgregarCategoria(Categoria categoria)
         {
             db.Categorias.Add(categoria);
@@ -36,6 +40,7 @@ namespace SistemaCajaRegistradora.Controllers
         }
         [HttpGet]
         [ActionName("formsEditar")]
+        [Autorizacion(idoperacion:10)]
         public PartialViewResult formsEditar(int? id)
         {
             var categoria = db.Categorias.Find(id);
@@ -45,6 +50,7 @@ namespace SistemaCajaRegistradora.Controllers
         }
         [HttpPost]
         [ActionName("editarCategoria")]
+        [Autorizacion(idoperacion: 10)]
         public JsonResult editarCategoria(Categoria categoria)
         {
             db.Entry(categoria).State = EntityState.Modified;
@@ -53,6 +59,7 @@ namespace SistemaCajaRegistradora.Controllers
         }
         [HttpGet]
         [ActionName("formsEliminar")]
+        [Autorizacion(idoperacion: 11)]
         public PartialViewResult formsEliminar(int? id)
         {
             var categoria = db.Categorias.Find(id);
@@ -61,6 +68,7 @@ namespace SistemaCajaRegistradora.Controllers
         }
         [HttpPost]
         [ActionName("eliminarCategoria")]
+        [Autorizacion(idoperacion: 11)]
         public JsonResult eliminarCategoria(int? id)
         {
             int n = 0;
