@@ -18,10 +18,10 @@ function AgregarProducto(urlAgregar) {
     var rutaImg = $('#rutaImg').val();
     var fecha_creacion = "";
 
-    precio = quitarPuntosNumber(precio);
-    stock = quitarPuntosNumber(stock);
-    stockmin = quitarPuntosNumber(stockmin);
-    stockmax = quitarPuntosNumber(stockmax);
+    precio = quitarPuntoNumber(precio);
+    stock = quitarPuntoNumber(stock);
+    stockmin = quitarPuntoNumber(stockmin);
+    stockmax = quitarPuntoNumber(stockmax);
 
     //Validaciones campos vacios
     let isValidCampo = true;
@@ -350,7 +350,9 @@ function desabilitar() {
     }
 }
 
-const quitarPuntoNumber = (number) => { return number.replace(',', ''); }
+const quitarPuntoNumber = (number) => {
+    return number.replace(',', '');
+}
 
 function borrarCodigo() { $('#codigo_barra').val(''); }
 
