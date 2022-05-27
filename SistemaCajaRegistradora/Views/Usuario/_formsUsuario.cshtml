@@ -27,7 +27,7 @@
                    {
                        @id = "inputname",
                        @class = "form-control",
-                       @placeholder = "Ingrese el nombre del cajero",
+                       @placeholder = "Ingrese el/los nombre/s",
                        maxlength = 30
                    })
                 </div>
@@ -37,7 +37,7 @@
                    {
                        @id = "inputapellido",
                        @class = "form-control",
-                       @placeholder = "Ingrese el apellido del cajero",
+                       @placeholder = "Ingrese el/los apellido/s",
                        maxlength = 30
                    })
                 </div>
@@ -88,6 +88,50 @@
 </div>
 
 <script type="text/javascript" title="main">
+    let nombre = '';
+    let countEspacio = 0;
+    $("#inputname").keydown(function (event) {
+        nombre = $("#inputname").val();
+        if (nombre == ' ') {
+            $("#inputname").val('');
+        }
+        return /[a-z, ]/i.test(event.key);
+    }).keyup(function (event) {
+        if (nombre != ' ') {
+            countEspacio = cuantasVecesAparece(nombre, ' ');
+            if (event.key == ' ') {
+                if (countEspacio > 1) {
+                    let text = $("#inputname").val();
+                    text = text.slice(0, -1);
+                    $("#inputname").val(text);
+                }
+            }
+        } else {
+            $("#inputname").val('');
+        }
+    });
+    $("#inputapellido").keydown(function (event) {
+        return /[a-z, ]/i.test(event.key);
+    }).keyup(function (event) {
+        let apellido = $("#inputapellido").val();
+        if (apellido != ' ') {
+            countEspacio = cuantasVecesAparece(apellido, ' ');
+            if (event.key == ' ') {
+                if (countEspacio > 1) {
+                    let text = $("#inputapellido").val();
+                    text = text.slice(0, -1);
+                    $("#inputapellido").val(text);
+                }
+            }
+        } else {
+            $("#inputapellido").val('');
+        }
+    });;
+    $("#nombreUsuario").keyup(function () {
+        let text = $("#nombreUsuario").val();
+        text = text.replace(' ', '');
+        $("#nombreUsuario").val(text);
+    });
     let view = false;
     let nombreandapellido = '';
     $("#inputname").change(generadorUserName);
@@ -154,5 +198,12 @@
                 showMenssage('error', mensaje, true);
             }
         });
+    }
+    function cuantasVecesAparece(cadena, caracter) {
+        var indices = [];
+        for (var i = 0; i < cadena.length; i++) {
+            if (cadena[i] === caracter) indices.push(i);
+        }
+        return indices.length;
     }
 </script>

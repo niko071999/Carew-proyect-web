@@ -239,7 +239,6 @@ const abrirModal = (data) => {
     }
     
 }
-
 const validarCampos = (codigo_barra, nombre, prioridadid, categoriaid) => {
     let valid = true;
     let atr = '';
@@ -281,20 +280,6 @@ const validarCampos = (codigo_barra, nombre, prioridadid, categoriaid) => {
     }
     return valid;
 }
-
-const esNatural = (number) => {
-    if (!isNaN(number)) {
-        if (parseInt(number) % 1 == 0) {
-            return true;
-        } else {
-            return false;
-        }
-        return true;
-    } else {
-        return false;
-    }
-}
-
 const showMenssage = (type, mensaje, toast) => {
     if (type == 'error') {
         Swal.fire({
@@ -339,7 +324,6 @@ const showMenssage = (type, mensaje, toast) => {
     }
     console.log('Type not found')
 }
-
 function desabilitar() {
     var inputArchivoId = document.getElementById('idArchivo');
     var btn = document.getElementById('btnSubir');
@@ -349,10 +333,8 @@ function desabilitar() {
         btn.disabled = false;
     }
 }
-
 const quitarPuntoNumber = (number) => {
     return number.replace(',', '');
 }
-
 function borrarCodigo() { $('#codigo_barra').val(''); }
 

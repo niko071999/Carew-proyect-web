@@ -87,10 +87,18 @@ function eliminarCategoria(urlEliminar, id) {
 }
 
 const abrirModal = (data) => {
-    $('#coreModal').html(data);
-    $('#coreModal').modal('show');
-}
+    try {
+        $('#coreModal').html(data);
+        $('#coreModal').modal('show');
+    } catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de autorizacion!',
+            text: 'No puede ingresar a este modulo o funcion, ya que no tiene los permisos suficientes'
+        });
+    }
 
+}
 const validarCampos = (nombre) => {
     let valid = true;
     let atr = '';
@@ -106,7 +114,6 @@ const validarCampos = (nombre) => {
     }
     return valid;
 }
-
 const showMenssage = (type, mensaje, toast) => {
     if (type == 'error') {
         Swal.fire({

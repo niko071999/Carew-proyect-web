@@ -3,9 +3,6 @@
         if (data != null) {
             document.getElementById('text_nameuser').innerText = data.nombreuser;
             document.getElementById('img_user').src = data.imgruta;
-            //$("#text_nameuser").val(data.nombreuser);
-            //$("#img_user").attr("src", data.imgruta);
-            console.log(textuser, imgruta);
         } else {
             console.log('error null');
         }

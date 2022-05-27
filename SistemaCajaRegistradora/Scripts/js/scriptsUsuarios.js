@@ -42,11 +42,11 @@ function AgregarUsuario(urlAgregar) {
     }
 
 }
+
 const abrirModal = (data) => {
     $('#coreModal').html(data);
     $('#coreModal').modal('show');
 }
-
 const validarCampos = (nombre, apellido, nombreUsuario, clave, rolid) =>  {
     let valid = true;
     let atr = '';
@@ -102,7 +102,6 @@ const validarCampos = (nombre, apellido, nombreUsuario, clave, rolid) =>  {
     }
     return valid;
 }
-
 const showMenssage = (type, mensaje, toast) => {
     if (type == 'error') {
         Swal.fire({
