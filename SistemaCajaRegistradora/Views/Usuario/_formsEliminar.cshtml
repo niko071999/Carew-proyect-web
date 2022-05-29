@@ -1,0 +1,19 @@
+﻿@model SistemaCajaRegistradora.Models.Usuario
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header bg-danger">
+            <h5 class="modal-title text-light" id="exampleModalLabel">Eliminar usuario</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="post">
+            <div class="modal-body">
+                <h5>¿Esta seguro de eliminar el usuario "@Model.nombre @Model.apellido (@Model.nombreUsuario)"?</h5>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" onclick="eliminarUsuario('@Url.Action("eliminarUsuario", "Usuario")', @Model.id)">Eliminar</button>
+            </div>
+        </form>
+    </div>
+</div>

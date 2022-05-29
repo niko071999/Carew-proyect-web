@@ -85,6 +85,23 @@ function editarUsuario(urlEditar) {
         showMenssage('error', mensaje, true);
     }
 }
+function formsEliminar(urlFormsEliminar, id) {
+    $.get(urlFormsEliminar + '/' + id, function (data) {
+        abrirModal(data);
+    });
+}
+function eliminarUsuario(urlEliminar, id) {
+    $.post(urlEliminar + '/' + id, function (data) {
+        if (data > 0) {
+            sessionStorage.clear();
+            sessionStorage.mensaje = 'Usuario eliminado correctamente';
+            location = location.href;
+        } else {
+            mensaje = "Error: El Usuario no se elimino, asegurese de que el producto no se ocupe en algun producto";
+            showMenssage('error', mensaje, true);
+        }
+    }, 'json');
+}
 
 const abrirModal = (data) => {
     $('#coreModal').html(data);

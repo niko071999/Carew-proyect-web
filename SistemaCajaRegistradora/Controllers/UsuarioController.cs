@@ -11,6 +11,7 @@ using SistemaCajaRegistradora.Filters;
 
 namespace SistemaCajaRegistradora.Controllers
 {
+    [HandleError]
     public class UsuarioController : Controller
     {
         ModelData db = new ModelData();
@@ -67,6 +68,28 @@ namespace SistemaCajaRegistradora.Controllers
         {
             int n = 0;
             db.Entry(usuario).State = EntityState.Modified;
+            n = db.SaveChanges();
+            return Json(n, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        [ActionName("formsEliminar")]
+        [Autorizacion(idoperacion:16)]
+        public PartialViewResult formsEliminar(int? id)
+        {
+            var usuario = db.Usuarios.Include(u=>u.Role).Where(u=>u.id == id).FirstOrDefault();
+            quitarEspaciosVacios(usuario);
+            return PartialView("_formsEliminar", usuario);
+        }
+
+        [HttpPost]
+        [ActionName("eliminarUsuario")]
+        [Autorizacion(idoperacion: 16)]
+        public JsonResult eliminarUsuario(int? id)
+        {
+            int n = 0;
+            var usuario = db.Usuarios.Find(id);
+            db.Usuarios.Remove(usuario);
             n = db.SaveChanges();
             return Json(n, JsonRequestBehavior.AllowGet);
         }

@@ -95,12 +95,12 @@
 </div>
 
 <script type="text/javascript" title="main">
-    let countEspacio = 0;
     $("#inputname").keydown(function (event) {
         return /[a-z, ]/i.test(event.key);
     }).keyup(function (event) {
         let nombre = $("#inputname").val();
         if (nombre != ' ') {
+            let countEspacio = 0;
             countEspacio = cuantasVecesAparece(nombre, ' ');
             if (event.key == ' ') {
                 if (countEspacio > 1) {
@@ -135,8 +135,8 @@
         text = text.replace(' ', '');
         $("#nombreUsuario").val(text);
     });
-    let view = false;
-    let nombreandapellido = '';
+    var view = false;
+    var nombreandapellido = '';
     $("#inputname").change(generadorUserName);
     $("#inputapellido").change(generadorUserName);
     $("#viewPass").click(function () {
@@ -155,6 +155,7 @@
 
     function generadorUserName() {
         let nombreusuario = $("#nombreUsuario").val();
+        console.log('NombreUser: ' + nombreusuario, 'sessionNombre: ' + sessionStorage.nombreusuarioactual);
         if (nombreusuario != sessionStorage.nombreusuarioactual) {
             let nombre = $("#inputname").val().trim();
             let apellido = $("#inputapellido").val().trim();
@@ -162,7 +163,15 @@
             if (nombre != '' && apellido != '') {
                 verificarNombreUser(nombre, apellido);
             }
+        } else if (nombreusuario == '' && sessionStorage.nombreusuarioactual == '') {
+            let nombre = $("#inputname").val().trim();
+            let apellido = $("#inputapellido").val().trim();
+            console.log(nombre, apellido);
+            if (nombre != '' && apellido != '') {
+                verificarNombreUser(nombre, apellido);
+            }
         }
+
     }
 
     function verificarNombreUser(n = "", a = "") {

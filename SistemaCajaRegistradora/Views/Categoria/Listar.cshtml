@@ -73,12 +73,14 @@
                                         </div>
                                     </td>
                                     <td class="align-middle">
-                                        <div class="d-grid gap-2">
-                                            <button class="btn btn-warning" type="button" onclick="formsEditar('@Url.Action("formsEditar", "Categoria")',@c.id)">
-                                                <i class="fas fa-pen"></i>Editar
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                            <button class="btn btn-warning btn-icon-split" type="button" onclick="formsEditar('@Url.Action("formsEditar", "Categoria")',@c.id)">
+                                                <span class="icon text-white-50"><i class="fas fa-pen float-left"></i></span>
+                                                <span class="text">Editar</span>
                                             </button>
-                                            <button class="btn btn-outline-danger" type="button" onclick="formsEliminar('@Url.Action("formsEliminar", "Categoria")', @c.id)">
-                                                <i class="fas fa-trash"></i>Eliminar
+                                            <button class="btn btn-danger btn-icon-split" type="button" onclick="formsEliminar('@Url.Action("formsEliminar", "Categoria")', @c.id)">
+                                                <span class="icon text-white-50"><i class="fas fa-trash float-left"></i></span>
+                                                <span class="text">Eliminar</span>
                                             </button>
                                         </div>
                                     </td>

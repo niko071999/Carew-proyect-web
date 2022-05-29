@@ -151,9 +151,9 @@ namespace SistemaCajaRegistradora.Controllers
             }
             catch (Exception)
             {
-
+                return Json(n, JsonRequestBehavior.AllowGet);
             }
-            return Json(producto, JsonRequestBehavior.AllowGet);
+            return Json(n, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
