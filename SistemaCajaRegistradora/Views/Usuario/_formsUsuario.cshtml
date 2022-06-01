@@ -232,4 +232,11 @@
         }
         return indices.length;
     }
+    function cuantasVecesAparece(cadena, caracter) {
+        var indices = [];
+        for (var i = 0; i < cadena.length; i++) {
+            if (cadena[i] === caracter) indices.push(i);
+        }
+        return indices.length;
+    }
 </script>
