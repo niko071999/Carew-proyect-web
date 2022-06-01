@@ -232,6 +232,11 @@ function eliminarProducto(urlEliminar, id) {
 }
 
 const validarCamposPro = (codigo_barra, nombre, prioridadid, categoriaid) => {
+const validarCampos = (codigo_barra, nombre, prioridadid, categoriaid) => {
+const validarCampos = (codigo_barra, nombre, prioridadid, categoriaid) => {
+const validarCampos = (codigo_barra, nombre, prioridadid, categoriaid) => {
+const validarCampos = (codigo_barra, nombre, prioridadid, categoriaid) => {
+const validarCampos = (codigo_barra, nombre, prioridadid, categoriaid) => {
     let valid = true;
     let atr = '';
     if (codigo_barra.trim() == "") {
@@ -267,11 +272,6 @@ const validarCamposPro = (codigo_barra, nombre, prioridadid, categoriaid) => {
         $('#categoriaId').css('border-color', 'red');
         valid = false;
     } else {
-        $('#text_categoria').removeClass('text-danger');
-        $('#categoriaId').css('border-color', '');
-    }
-    return valid;
-}
 //const showMenssage = (type, mensaje, toast) => {
 //    if (type == 'error') {
 //        Swal.fire({
@@ -316,6 +316,11 @@ const validarCamposPro = (codigo_barra, nombre, prioridadid, categoriaid) => {
 //    }
 //    console.log('Type not found')
 //}
+        })
+    }
+    console.log('Type not found')
+}
+
 function desabilitar() {
     var inputArchivoId = document.getElementById('idArchivo');
     var btn = document.getElementById('btnSubir');
