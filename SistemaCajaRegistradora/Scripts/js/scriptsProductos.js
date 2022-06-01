@@ -180,12 +180,12 @@ function editarProducto(urlEditar) {
         }
     }
 }
-function formsImage(urlFormsImagen, id) {
+function formsImagenP(urlFormsImagen, id) {
     $.get(urlFormsImagen + '/' + id, function (data) {
         abrirModal(data);
     });
 }
-function subirImagen(url) {
+function subirImagenP(url) {
     var inputArchivoId = document.getElementById('idArchivo');
     var archivo = inputArchivoId.files[0];
     var dataForm = new FormData();
@@ -226,19 +226,6 @@ function eliminarProducto(urlEliminar, id) {
     },'json');
 }
 
-const abrirModal = (data) => {
-    try {
-        $('#coreModal').html(data);
-        $('#coreModal').modal('show');
-    } catch (e) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error de autorizacion!',
-            text: 'No puede ingresar a este modulo o funcion, ya que no tiene los permisos suficientes'
-        });
-    }
-    
-}
 const validarCampos = (codigo_barra, nombre, prioridadid, categoriaid) => {
     let valid = true;
     let atr = '';

@@ -7,6 +7,13 @@
         console.log(codigo, nombre, mensaje);
         if (codigo != undefined || nombre != undefined
             && mensaje != undefined) {
+            if (mensaje != undefined) {
+                Swal.fire({
+                    title: 'Bien!',
+                    text: mensaje,
+                    icon: 'success',
+                });
+            }
             if (codigo != undefined) {
                 Swal.fire({
                     title: 'Bien!',
@@ -21,7 +28,6 @@
                 });
             }
         }
-       
         sessionStorage.clear();
     }
 });

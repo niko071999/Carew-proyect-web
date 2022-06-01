@@ -97,15 +97,72 @@ function eliminarUsuario(urlEliminar, id) {
             sessionStorage.mensaje = 'Usuario eliminado correctamente';
             location = location.href;
         } else {
-            mensaje = "Error: El Usuario no se elimino, asegurese de que el producto no se ocupe en algun producto";
+            mensaje = "Error: El Usuario no se elimino";
             showMenssage('error', mensaje, true);
         }
     }, 'json');
 }
+function cambiarClave(urlChange, pass) {
+    let usuario = {
+        "id": 0,
+        "nombre": 'n',
+        "apellido": 'a',
+        "nombreUsuario": 'new',
+        "clave": pass,
+        "rutaImg": 'r',
+        "rolid": 0
+    }
+    $.post(urlChange+'/', usuario, function (data) {
+        if (data > 0) {
+            sessionStorage.clear();
+            sessionStorage.mensaje = 'Se cambio la contraseña correctamente';
+            location = location.href;
+        } else {
+            mensaje = "Error: El Usuario no se elimino debido a problemas de servicio";
+            showMenssage('error', mensaje, true);
+        }
+    });
+}
+function formsImagenU(urlImagen,id) {
+    $.get(urlImagen + '/' + id, function (data) {
+        abrirModal(data);
+    });
+}
+function subirImagenU(urlSubirIMG) {U
+    var inputArchivoId = document.getElementById('idArchivo');
+    var archivo = inputArchivoId.files[0];
+    var dataForm = new FormData();
+    dataForm.append('archivo', archivo);
+
+    $.ajax({
+        url: urlSubirIMG,
+        type: 'POST',
+        data: dataForm,
+        contentType: false,
+        processData: false,
+        success: function (data) {
+            sessionStorage.clear();
+            sessionStorage.mensaje = data.mensaje;
+            location = location.href;
+        },
+        error: function (data) {
+            mensaje = data.mensaje;
+            showMenssage('error', mensaje);
+        },
+    });
+}
 
 const abrirModal = (data) => {
-    $('#coreModal').html(data);
-    $('#coreModal').modal('show');
+    try {
+        $('#coreModal').html(data);
+        $('#coreModal').modal('show');
+    } catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de autorizacion!',
+            text: 'No puede ingresar a este modulo o funcion, ya que no tiene los permisos suficientes'
+        });
+    }
 }
 const validarCampos = (nombre, apellido, nombreUsuario, clave, rolid) =>  {
     let valid = true;
@@ -205,4 +262,13 @@ const showMenssage = (type, mensaje, toast) => {
         })
     }
     console.log('Type not found')
+}
+function desabilitar() {
+    var inputArchivoId = document.getElementById('idArchivo');
+    var btn = document.getElementById('btnSubir');
+    if (inputArchivoId.files[0] == undefined) {
+        btn.disabled = true;
+    } else {
+        btn.disabled = false;
+    }
 }

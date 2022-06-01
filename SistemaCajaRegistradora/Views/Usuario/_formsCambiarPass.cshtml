@@ -1,0 +1,30 @@
+﻿@model SistemaCajaRegistradora.Models.Usuario
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Cambiar contraseña</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col col-6">
+                    <label id="t_passnew" for="passNew" class="form-label">Contraseña nueva</label>
+                    <input type="password" class="form-control form-control-user" id="passNew" placeholder="Ingrese nueva contraseña">
+                </div>
+                <div class="col col-6">
+                    <label id="t_passrepeat" for="passRepeat" class="form-label">Repetir Nueva Contraseña</label>
+                    <input type="password" class="form-control form-control-user" id="passRepeat" placeholder="Repita la nueva contraseña">
+                </div>
+                <div class="col col-12">
+                    <label id="t_pass" for="pass" class="form-label">Ingrese su contraseña</label>
+                    <input type="password" class="form-control form-control-user" id="pass" placeholder="Ingrese su contraseña actual">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-primary" onclick="verificarClave()">Cambiar contraseña</button>
+        </div>
+    </div>
+</div>

@@ -24,7 +24,7 @@
                      src="~/Assets/images/blank-profile.png">
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                <li><a class="dropdown-item" href="#">Cambiar contraseña</a></li>
+                <li><a id="linksChangePass" class="dropdown-item" href="javascript:;">Cambiar contraseña</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a id="linksignout" class="dropdown-item text-danger" href="javascript:;">Cerrar sesion</a></li>
             </ul>
@@ -68,9 +68,9 @@
                         {
                             <tr>
                                 <td>
-                                    <a href="javascript:void(0);" onclick="formsImage('@Url.Action("formsImagen", "Usuario")',@u.id)">
+                                    <a href="javascript:void(0);" onclick="formsImagenU('@Url.Action("formsImagen", "Usuario")',@u.id)">
                                         <img class="rounded mx-auto d-block" src="@u.rutaImg" alt="Imagen del usuario"
-                                             style="width: 100px; min-width: 100px; min-height: 50px; height: 80px;" />
+                                             style="width: 80px; min-width: 50px; min-height: 50px; height: 80px;" />
                                     </a>
                                 </td>
                                 <td class="align-middle">@u.nombre</td>
@@ -83,10 +83,13 @@
                                             <span class="icon text-white-50"><i class="fas fa-pen float-left"></i></span>
                                             <span class="text">Editar</span>
                                         </button>
-                                        <button class="btn btn-danger btn-icon-split" type="button" onclick="formsEliminar('@Url.Action("formsEliminar", "Usuario")', @u.id)">
-                                            <span class="icon text-white-50"><i class="fas fa-trash float-left"></i></span>
-                                            <span class="text">Eliminar</span>
-                                        </button>
+                                        @if (!u.nombreUsuario.Equals(ViewBag.nombreUser))
+                                        {
+                                            <button class="btn btn-danger btn-icon-split" type="button" onclick="formsEliminar('@Url.Action("formsEliminar", "Usuario")', @u.id)">
+                                                <span class="icon text-white-50"><i class="fas fa-trash float-left"></i></span>
+                                                <span class="text">Eliminar</span>
+                                            </button>
+                                        }
                                     </div>
                                 </td>
                             </tr>
@@ -105,9 +108,6 @@
 
 </div>
 
-<script src="~/Scripts/js/usersesion.js"></script>
-<script src="~/Scripts/js/alertmenssages.js"></script>
-<script src="~/Scripts/js/scriptsUsuarios.js"></script>
 <script type="text/javascript" title="main">
     var coreModal = document.getElementById('coreModal');
     coreModal.addEventListener('shown.bs.modal', function() {

@@ -130,11 +130,13 @@
             $("#inputapellido").val('');
         }
     });;
+
     $("#nombreUsuario").keyup(function () {
         let text = $("#nombreUsuario").val();
         text = text.replace(' ', '');
         $("#nombreUsuario").val(text);
     });
+
     var view = false;
     var nombreandapellido = '';
     $("#inputname").change(generadorUserName);
@@ -184,7 +186,6 @@
             "clave": 'c',
             "rutaImg": 'r',
             "rolid": 0
-
         }
         $.post('@Url.Action("verificarNameUser", "Usuario")/', usuario, function (data) {
             console.log(data.nombreUsuario);

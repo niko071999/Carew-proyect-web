@@ -86,19 +86,6 @@ function eliminarCategoria(urlEliminar, id) {
     },'json');
 }
 
-const abrirModal = (data) => {
-    try {
-        $('#coreModal').html(data);
-        $('#coreModal').modal('show');
-    } catch (e) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error de autorizacion!',
-            text: 'No puede ingresar a este modulo o funcion, ya que no tiene los permisos suficientes'
-        });
-    }
-
-}
 const validarCampos = (nombre) => {
     let valid = true;
     let atr = '';

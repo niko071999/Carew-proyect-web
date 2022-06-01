@@ -2057,10 +2057,12 @@
     <Content Include="Views\Error\Error404.cshtml" />
     <Content Include="Views\Usuario\_formsEliminar.cshtml" />
     <Content Include="Views\Usuario\_formsImagen.cshtml" />
+    <Content Include="Views\Usuario\_formsCambiarPass.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Assets\icons\" />
+    <Folder Include="Assets\images\usuarios\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

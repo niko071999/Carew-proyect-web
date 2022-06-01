@@ -21,6 +21,8 @@ namespace SistemaCajaRegistradora.Controllers
         [Autorizacion(idoperacion:12)]
         public ActionResult Listar()
         {
+            Usuario usuario = (Usuario)Session["User"];
+            ViewBag.nombreUser = usuario.nombreUsuario;
             var usuarios = db.Usuarios.Include(x => x.Role);
             return View(usuarios.ToList());
         }
@@ -94,6 +96,79 @@ namespace SistemaCajaRegistradora.Controllers
             return Json(n, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpGet]
+        [ActionName("formsCambiarPass")]
+        public PartialViewResult formsCambiarPass()
+        {
+            Usuario user = null;
+            if (Session["User"] != null)
+            {
+                user = (Usuario)Session["User"];
+                return PartialView("_formsCambiarPass", user);
+            }
+            else
+            {
+                return PartialView("_formsRestablecerPass");
+            }
+        }
+
+        [HttpPost]
+        [ActionName("cambiarClave")]
+        public JsonResult cambiarClave(Usuario usuario)
+        {
+            int n = 0;
+            usuario.clave = Encrypt.GetSHA256(usuario.clave);
+            var user = (Usuario)Session["User"];
+            usuario.id = user.id;
+            db.Usuarios.Attach(usuario);
+            db.Entry(usuario).Property(u => u.clave).IsModified = true;
+            n = db.SaveChanges();
+            return Json(n, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        [ActionName("formsImagen")]
+        [Autorizacion(idoperacion: 16)]
+        public PartialViewResult formsImagen(int? id)
+        {
+            Session["idUser"] = id;
+            return PartialView("_formsImagen");
+        }
+
+        [HttpPost]
+        [ActionName("subirImagen")]
+        [Autorizacion(idoperacion:16)]
+        public JsonResult subirImagen(HttpPostedFileBase archivo)
+        {
+            try
+            {
+                if (archivo != null)
+                {
+                    string path = Server.MapPath("~/Assets/images/usuarios/");
+                    if (!System.IO.Directory.Exists(path))
+                    {
+                        System.IO.Directory.CreateDirectory(path);
+                    }
+                    archivo.SaveAs(path + System.IO.Path.GetFileName(archivo.FileName));
+
+                    int iduser = (int)Session["idUser"];
+                    var usuario = db.Usuarios.Find(iduser);
+                    usuario.rutaImg = "./../Assets/images/usuarios/" + archivo.FileName;
+                    db.Entry(usuario).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return Json(new { mensaje = "Archivo subido correctamente" }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return Json(new { mensaje = "Error de subida de archivo" }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception)
+            {
+                return Json(new { mensaje = "Error de subida de archivo" }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
         [HttpPost]
         [ActionName("verificarNameUser")]
         public JsonResult verificarNameUser(Usuario usuario)
@@ -143,6 +218,22 @@ namespace SistemaCajaRegistradora.Controllers
                     nombreUsuario = "",
                     createNameUser = usuario.nombreUsuario,
                 }, JsonRequestBehavior.AllowGet);
+            }
+        }
+        [HttpPost]
+        [ActionName("verificarClave")]
+        public JsonResult verificarClave(Usuario usuario)
+        {
+            usuario.clave = Encrypt.GetSHA256(usuario.clave);
+            var user = (Usuario)Session["User"];
+            user.clave = user.clave.Trim();
+            if (user.clave==usuario.clave)
+            {
+                return Json(new { success = true },JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(new { success = false }, JsonRequestBehavior.AllowGet);
             }
         }
 

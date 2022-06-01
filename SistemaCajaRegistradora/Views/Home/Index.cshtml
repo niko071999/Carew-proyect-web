@@ -21,7 +21,7 @@
                      src="~/Assets/images/blank-profile.png">
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                <li><a class="dropdown-item" href="#">Cambiar contraseña</a></li>
+                <li><a id="linksChangePass" class="dropdown-item" href="javascript:;">Cambiar contraseña</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a id="linksignout" class="dropdown-item text-danger" href="javascript:;">Cerrar sesion</a></li>
             </ul>
@@ -29,10 +29,15 @@
     </ul>
 </nav>
 <!-- End of Topbar -->
+<!-- Modal core base-->
+<div class="modal fade" id="coreModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+
+</div>
+
 <!-- Begin Page Content -->
 <div class="container-fluid">
     <!-- Page Heading -->
     <h1 class="h3 mb-4 text-gray-800">@ViewBag.Title</h1>
 </div>
 <!-- /.container-fluid -->
-<script src="~/Scripts/js/usersesion.js"></script>

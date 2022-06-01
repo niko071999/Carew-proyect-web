@@ -23,7 +23,7 @@
                      src="~/Assets/images/blank-profile.png">
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                <li><a class="dropdown-item" href="#">Cambiar contraseña</a></li>
+                <li><a id="linksChangePass" class="dropdown-item" href="javascript:;">Cambiar contraseña</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a id="linksignout" class="dropdown-item text-danger" href="javascript:;">Cerrar sesion</a></li>
             </ul>
@@ -110,7 +110,7 @@
                             <tr>
                                 <th class="align-middle" scope="row">@p.codigo_barra</th>
                                 <td>
-                                    <a href="javascript:void(0);" onclick="formsImage('@Url.Action("formsImagen", "Producto")',@p.id)">
+                                    <a href="javascript:void(0);" onclick="formsImagenP('@Url.Action("formsImagen", "Producto")',@p.id)">
                                         <img class="rounded mx-auto d-block" src="@p.rutaImg" alt="Imagen del producto"
                                              style="width: 100px; min-width: 100px; min-height: 50px; height: 80px;" />
                                     </a>
@@ -245,9 +245,6 @@
      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
 
 </div>
-<script src="~/Scripts/js/alertmenssages.js"></script>
-<script src="~/Scripts/js/scriptsProductos.js"></script>
-<script src="~/Scripts/js/usersesion.js"></script>
 <script type="text/javascript" title="main">
     var coreModal = document.getElementById('coreModal');
     coreModal.addEventListener('shown.bs.modal', function () {
@@ -360,3 +357,4 @@
         $('#codigoAdd').val('');
     }
 </script>
+<script src="~/Scripts/js/scriptsProductos.js"></script>

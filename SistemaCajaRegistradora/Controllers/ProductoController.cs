@@ -110,7 +110,7 @@ namespace SistemaCajaRegistradora.Controllers
                     db.Entry(producto).State = EntityState.Modified;
                     db.SaveChanges();
                     return Json(
-                    new { mensaje = "Archivo subido correctamente" }, JsonRequestBehavior.AllowGet); ;
+                    new { mensaje = "Imagen subida correctamente" }, JsonRequestBehavior.AllowGet); ;
                 }
                 else
                 {
