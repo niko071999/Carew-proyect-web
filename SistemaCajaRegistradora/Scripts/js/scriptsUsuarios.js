@@ -208,7 +208,7 @@ const validarCampos = (nombre, apellido, nombreUsuario, clave, rolid) =>  {
         $('#text_clave').removeClass('text-danger');
         $('#clave').css('border-color', '');
     }
-    if (rolid.trim() == "") {
+    if (rolid == "") {
         atr = $('#text_rol').attr('class');
         $('#text_rol').addClass(atr + ' text-danger');
         $('#rolesId').css('border-color', 'red');

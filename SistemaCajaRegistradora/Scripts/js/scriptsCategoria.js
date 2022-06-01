@@ -9,7 +9,7 @@ function AgregarCategoria(urlAgregar) {
     var descripcion = $('#descripcion').val();
 
     let isValidCampo = true;
-    isValidCampo = validarCampos(nombre);
+    isValidCampo = validarCamposCat(nombre);
 
     if (isValidCampo) {
         var categoria = {
@@ -44,7 +44,7 @@ function editarCategoria(urlEditar) {
     var descripcion = $('#descripcion').val();
 
     var isValidCampo = true;
-    isValidCampo = validarCampos(nombre);
+    isValidCampo = validarCamposCat(nombre);
     if (isValidCampo) {
         var categoria = {
             "id": idCategoria,
@@ -86,7 +86,7 @@ function eliminarCategoria(urlEliminar, id) {
     },'json');
 }
 
-const validarCampos = (nombre) => {
+const validarCamposCat = (nombre) => {
     let valid = true;
     let atr = '';
 
@@ -101,47 +101,47 @@ const validarCampos = (nombre) => {
     }
     return valid;
 }
-const showMenssage = (type, mensaje, toast) => {
-    if (type == 'error') {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            text: mensaje,
-            toast: toast,
-            position: 'top-end'
-        });
-        return;
-    } else if (type == 'success') {
-        Swal.fire({
-            icon: 'success',
-            title: 'Exito!',
-            text: mensaje,
-            toast: toast,
-            position: 'top-end',
-        });
-        return;
-    } else if (type == 'warning') {
-        const swal = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-success',
-                cancelButton: 'btn btn-danger'
-            },
-            buttonsStyling: false
-        });
-        swal.fire({
-            title: 'Informacion!',
-            text: mensaje,
-            icon: type,
-            showCancelButton: true,
-            confirmButtonText: 'Si',
-            cancelButtonText: 'No',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                verificarOpcion(true)
-            }
-            return;
-        })
-    }
-    console.log('Type not found')
-}
+//const showMenssage = (type, mensaje, toast) => {
+//    if (type == 'error') {
+//        Swal.fire({
+//            icon: 'error',
+//            title: 'Error!',
+//            text: mensaje,
+//            toast: toast,
+//            position: 'top-end'
+//        });
+//        return;
+//    } else if (type == 'success') {
+//        Swal.fire({
+//            icon: 'success',
+//            title: 'Exito!',
+//            text: mensaje,
+//            toast: toast,
+//            position: 'top-end',
+//        });
+//        return;
+//    } else if (type == 'warning') {
+//        const swal = Swal.mixin({
+//            customClass: {
+//                confirmButton: 'btn btn-success',
+//                cancelButton: 'btn btn-danger'
+//            },
+//            buttonsStyling: false
+//        });
+//        swal.fire({
+//            title: 'Informacion!',
+//            text: mensaje,
+//            icon: type,
+//            showCancelButton: true,
+//            confirmButtonText: 'Si',
+//            cancelButtonText: 'No',
+//            reverseButtons: true
+//        }).then((result) => {
+//            if (result.isConfirmed) {
+//                verificarOpcion(true)
+//            }
+//            return;
+//        })
+//    }
+//    console.log('Type not found')
+//}

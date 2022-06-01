@@ -25,7 +25,7 @@ function AgregarProducto(urlAgregar) {
 
     //Validaciones campos vacios
     let isValidCampo = true;
-    isValidCampo = validarCampos(codigo_barra, nombre, prioridadid, categoriaid);
+    isValidCampo = validarCamposPro(codigo_barra, nombre, prioridadid, categoriaid);
 
     if (isValidCampo) {
         if ((stockmin != "" || stockmax != "") || (stockmin == '0' || stockmax == '0')) {
@@ -110,11 +110,16 @@ function editarProducto(urlEditar) {
     var rutaImg = $('#rutaImg').val();
     var fecha_creacion = $('#fecha_creacion').val();
 
+    precio = quitarPuntoNumber(precio);
+    stock = quitarPuntoNumber(stock);
+    stockmin = quitarPuntoNumber(stockmin);
+    stockmax = quitarPuntoNumber(stockmax);
+
     let validarCodigoExist = verificar(codigo_barra);
 
     if (!validarCodigoExist) {
         var isValidCampo = true;
-        isValidCampo = validarCampos(codigo_barra, nombre, prioridadid, categoriaid);
+        isValidCampo = validarCamposPro(codigo_barra, nombre, prioridadid, categoriaid);
 
         if (isValidCampo) {
             if (stockmin != "" || stockmax != "" || stockmin == 0 || stockmax == 0) {
@@ -226,7 +231,7 @@ function eliminarProducto(urlEliminar, id) {
     },'json');
 }
 
-const validarCampos = (codigo_barra, nombre, prioridadid, categoriaid) => {
+const validarCamposPro = (codigo_barra, nombre, prioridadid, categoriaid) => {
     let valid = true;
     let atr = '';
     if (codigo_barra.trim() == "") {
@@ -267,50 +272,50 @@ const validarCampos = (codigo_barra, nombre, prioridadid, categoriaid) => {
     }
     return valid;
 }
-const showMenssage = (type, mensaje, toast) => {
-    if (type == 'error') {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            text: mensaje,
-            toast: toast,
-            position: 'top-end'
-        });
-        return;
-    } else if (type == 'success') {
-        Swal.fire({
-            icon: 'success',
-            title: 'Exito!',
-            text: mensaje,
-            toast: toast,
-            position: 'top-end',
-        });
-        return;
-    } else if (type == 'warning') {
-        const swal = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-success',
-                cancelButton: 'btn btn-danger'
-            },
-            buttonsStyling: false
-        });
-        swal.fire({
-            title: 'Informacion!',
-            text: mensaje,
-            icon: type,
-            showCancelButton: true,
-            confirmButtonText: 'Si',
-            cancelButtonText: 'No',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                verificarOpcion(true)
-            }
-            return;
-        })
-    }
-    console.log('Type not found')
-}
+//const showMenssage = (type, mensaje, toast) => {
+//    if (type == 'error') {
+//        Swal.fire({
+//            icon: 'error',
+//            title: 'Error!',
+//            text: mensaje,
+//            toast: toast,
+//            position: 'top-end'
+//        });
+//        return;
+//    } else if (type == 'success') {
+//        Swal.fire({
+//            icon: 'success',
+//            title: 'Exito!',
+//            text: mensaje,
+//            toast: toast,
+//            position: 'top-end',
+//        });
+//        return;
+//    } else if (type == 'warning') {
+//        const swal = Swal.mixin({
+//            customClass: {
+//                confirmButton: 'btn btn-success',
+//                cancelButton: 'btn btn-danger'
+//            },
+//            buttonsStyling: false
+//        });
+//        swal.fire({
+//            title: 'Informacion!',
+//            text: mensaje,
+//            icon: type,
+//            showCancelButton: true,
+//            confirmButtonText: 'Si',
+//            cancelButtonText: 'No',
+//            reverseButtons: true
+//        }).then((result) => {
+//            if (result.isConfirmed) {
+//                verificarOpcion(true)
+//            }
+//            return;
+//        })
+//    }
+//    console.log('Type not found')
+//}
 function desabilitar() {
     var inputArchivoId = document.getElementById('idArchivo');
     var btn = document.getElementById('btnSubir');
