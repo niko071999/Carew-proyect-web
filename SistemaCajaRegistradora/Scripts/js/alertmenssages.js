@@ -5,8 +5,7 @@
         let nombre = sessionStorage.nombre;
         let mensaje = sessionStorage.mensaje;
         console.log(codigo, nombre, mensaje);
-        if (codigo != undefined || nombre != undefined
-            && mensaje != undefined) {
+        if (mensaje != undefined) {
             if (mensaje != undefined) {
                 Swal.fire({
                     title: 'Bien!',

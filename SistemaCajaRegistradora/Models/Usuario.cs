@@ -27,6 +27,7 @@ namespace SistemaCajaRegistradora.Models
         public string apellido { get; set; }
         public string rutaImg { get; set; }
         public int rolid { get; set; }
+        public Nullable<bool> solrespass { get; set; }
     
         public virtual Role Role { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

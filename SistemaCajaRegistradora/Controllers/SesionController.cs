@@ -49,7 +49,15 @@ namespace SistemaCajaRegistradora.Controllers
                     ViewBag.Error = "El nombre de usuario y/o contraseña son erroneos";
                     return View();
                 }
+                if (usuario.solrespass == true)
+                {
+                    //Dar error cuando se pidio una solicitud de restablecimiento de contraseña
+                    ViewBag.Error = "Este usuario tiene una solicitud de restablecimiento de contraseña pendiente";
+                    return View();
+                }
                 Session["User"] = usuario;
+
+                //Reedireccionamiento de los usuarios a los diferentes modulos
                 if (usuario.rolid == 1)
                 {
                     return RedirectToAction("Index", "Home");
@@ -77,6 +85,47 @@ namespace SistemaCajaRegistradora.Controllers
         {
             Session["User"] = null;
             return Redirect("~/Sesion/Login");
+        }
+
+        [HttpGet]
+        [ActionName("SolicitarResPass")]
+        public ActionResult SolicitarResPass()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ActionName("SolicitarResPass")]
+        public ActionResult SolicitarResPass(string user)
+        {
+            user = user.Trim();
+            if (user != "")
+            {
+                var usuario = db.Usuarios.Where(u => u.nombreUsuario == user).FirstOrDefault();
+                if (usuario != null)
+                {
+                    if (usuario.rolid != 1)
+                    {
+                        int n = 0; 
+                        usuario.solrespass = true;
+                        db.Entry(usuario).State = EntityState.Modified;
+                        n = db.SaveChanges();
+                        TempData["Success"] = "Se solicito al administrador restablecimiento de contraseña";
+                        return RedirectToAction("Login","Sesion");
+                    }
+                    else
+                    {
+                        ViewBag.Error = "El usuario es un administrador";
+                        return View();
+                    }
+                }
+            }
+            else
+            {
+                ViewBag.Error = "El campo de texto esta vacio";
+                return View();
+            }
+            return View();
         }
     }
 }

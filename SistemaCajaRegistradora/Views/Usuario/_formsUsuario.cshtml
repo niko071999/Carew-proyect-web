@@ -21,6 +21,7 @@
             <div class="row g-2">
                 @Html.HiddenFor(model => model.id)
                 @Html.HiddenFor(model => model.rutaImg)
+                @Html.HiddenFor(model => model.solrespass)
                 <div class="col-6">
                     <label id="text_nombre" class="form-label">Nombre</label>
                     @Html.TextBoxFor(model => model.nombre, new
@@ -185,7 +186,8 @@
             "nombreUsuario": nombreandapellido,
             "clave": 'c',
             "rutaImg": 'r',
-            "rolid": 0
+            "rolid": 0,
+            "solrespass": false
         }
         $.post('@Url.Action("verificarNameUser", "Usuario")/', usuario, function (data) {
             console.log(data.nombreUsuario);
@@ -204,7 +206,8 @@
                 "nombreUsuario": nU,
                 "clave": 'c',
                 "rutaImg": 'r',
-                "rolid": 0
+                "rolid": 0,
+                "solrespass": false
             }
 
             $.post('@Url.Action("verificarNameUser", "Usuario")/', usuario, function (data) {

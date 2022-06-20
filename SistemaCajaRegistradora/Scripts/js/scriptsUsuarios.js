@@ -10,7 +10,8 @@ function AgregarUsuario(urlAgregar) {
     var nombreUsuario = $('#nombreUsuario').val();
     var clave = $('#clave').val();
     var rolid = $('#rolesId').val();
-    var rutaImg = $('#rutaImg').val();
+    var rutaImg = '';
+    var solrespass = false;
 
     let isValidCampo = true;
     isValidCampo = validarCampos(nombre, apellido, nombreUsuario, clave, rolid);
@@ -23,7 +24,8 @@ function AgregarUsuario(urlAgregar) {
             "nombreUsuario": nombreUsuario,
             "clave": clave,
             "rutaImg": rutaImg,
-            "rolid": rolid
+            "rolid": rolid,
+            "solrespass": solrespass
         }
         $.post(urlAgregar + '/', usuario, function (data) {
             if (data > 0) {
@@ -55,6 +57,7 @@ function editarUsuario(urlEditar) {
     var clave = $('#clave').val();
     var rolid = $('#rolesId').val();
     var rutaImg = $('#rutaImg').val();
+    var solrespass = $('#solrespass').val();
 
     let isValidCampo = true;
     isValidCampo = validarCampos(nombre, apellido, nombreUsuario, clave, rolid);
@@ -67,7 +70,8 @@ function editarUsuario(urlEditar) {
             "nombreUsuario": nombreUsuario,
             "clave": clave,
             "rutaImg": rutaImg,
-            "rolid": rolid
+            "rolid": rolid,
+            "solrespass": solrespass
         }
         $.post(urlEditar + '/', usuario, function (data) {
             if (data > 0) {

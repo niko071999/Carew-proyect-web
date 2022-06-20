@@ -90,6 +90,13 @@
                                                 <span class="text">Eliminar</span>
                                             </button>
                                         }
+                                        @if (u.solrespass == true)
+                                        {
+                                            <button onclick="restablecerClave('@u.nombreUsuario.Trim()')" class="btn btn-dark btn-icon-split" type="button">
+                                                <span class="icon text-white-50"><i class="fas fa-key float-left"></i></span>
+                                                <span class="text">Restablecer Clave</span>
+                                            </button>
+                                        }
                                     </div>
                                 </td>
                             </tr>
@@ -110,9 +117,48 @@
 
 <script type="text/javascript" title="main">
     var coreModal = document.getElementById('coreModal');
-    coreModal.addEventListener('shown.bs.modal', function() {
+    coreModal.addEventListener('shown.bs.modal', function () {
         var nombreusuario = $("#nombreUsuario").val();
         sessionStorage.nombreusuarioactual = nombreusuario;
-        console.log(sessionStorage.nombreusuarioactual+';');
-    })
+        console.log(sessionStorage.nombreusuarioactual + ';');
+    });
+
+    function restablecerClave(user) {
+        const swal = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success',
+                cancelButton: 'btn btn-secundary'
+            },
+            buttonsStyling: false
+        });
+        swal.fire({
+            title: 'Importante',
+            text: 'La contraseña se restablecerá a "cajero". ¿Desea continuar con el proceso?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Si',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                try {
+                    $.ajax({
+                        url: '/Usuario/RestablecerPass',
+                        type: 'POST',
+                        contentType: 'application/json;',
+                        data: JSON.stringify({ user: user, clave: 'cajero' }),
+                        success: function (res) {
+                            sessionStorage.clear();
+                            sessionStorage.mensaje = 'Contraseña restablecida con exito';
+                            location = location.href;
+                        }
+                    });
+                } catch (e) {
+                    mensaje = "Error: Ocurrio un error en el servidor, intentelo nuevamente";
+                    showMenssage('error', mensaje, true);
+                }
+            }
+            return;
+        });   
+    }
 </script>

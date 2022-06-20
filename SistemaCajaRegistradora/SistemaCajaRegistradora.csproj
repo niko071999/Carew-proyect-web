@@ -136,6 +136,7 @@
     <Compile Include="Controllers\ProductoController.cs" />
     <Compile Include="Controllers\SesionController.cs" />
     <Compile Include="Controllers\UsuarioController.cs" />
+    <Compile Include="Controllers\VentaController.cs" />
     <Compile Include="Filters\Autorizacion.cs" />
     <Compile Include="Filters\VerificarSesion.cs" />
     <Compile Include="Global.asax.cs">
@@ -2058,6 +2059,8 @@
     <Content Include="Views\Usuario\_formsEliminar.cshtml" />
     <Content Include="Views\Usuario\_formsImagen.cshtml" />
     <Content Include="Views\Usuario\_formsCambiarPass.cshtml" />
+    <Content Include="Views\Sesion\SolicitarResPass.cshtml" />
+    <Content Include="Views\Venta\Listar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

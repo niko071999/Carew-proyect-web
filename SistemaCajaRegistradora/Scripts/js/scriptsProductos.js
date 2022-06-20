@@ -266,54 +266,8 @@ const validarCamposPro = (codigo_barra, nombre, prioridadid, categoriaid) => {
         $('#text_categoria').addClass(atr + ' text-danger')
         $('#categoriaId').css('border-color', 'red');
         valid = false;
-    } else {
-//const showMenssage = (type, mensaje, toast) => {
-//    if (type == 'error') {
-//        Swal.fire({
-//            icon: 'error',
-//            title: 'Error!',
-//            text: mensaje,
-//            toast: toast,
-//            position: 'top-end'
-//        });
-//        return;
-//    } else if (type == 'success') {
-//        Swal.fire({
-//            icon: 'success',
-//            title: 'Exito!',
-//            text: mensaje,
-//            toast: toast,
-//            position: 'top-end',
-//        });
-//        return;
-//    } else if (type == 'warning') {
-//        const swal = Swal.mixin({
-//            customClass: {
-//                confirmButton: 'btn btn-success',
-//                cancelButton: 'btn btn-danger'
-//            },
-//            buttonsStyling: false
-//        });
-//        swal.fire({
-//            title: 'Informacion!',
-//            text: mensaje,
-//            icon: type,
-//            showCancelButton: true,
-//            confirmButtonText: 'Si',
-//            cancelButtonText: 'No',
-//            reverseButtons: true
-//        }).then((result) => {
-//            if (result.isConfirmed) {
-//                verificarOpcion(true)
-//            }
-//            return;
-//        })
-//    }
-//    console.log('Type not found')
-//}
-        })
     }
-    console.log('Type not found')
+    return valid;
 }
 
 function desabilitar() {

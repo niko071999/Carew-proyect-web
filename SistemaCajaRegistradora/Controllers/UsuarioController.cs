@@ -170,6 +170,21 @@ namespace SistemaCajaRegistradora.Controllers
         }
 
         [HttpPost]
+        [ActionName("RestablecerPass")]
+        [Autorizacion(idoperacion: 20)]
+        public ActionResult RestablecerPass(string user, string clave)
+        {
+            int n = 0;
+            var usuario = db.Usuarios.Where(u => u.nombreUsuario == user).FirstOrDefault();
+            usuario.solrespass = false;
+            usuario.clave = clave;
+            usuario.clave = Encrypt.GetSHA256(usuario.clave);
+            db.Entry(usuario).State = EntityState.Modified;
+            n = db.SaveChanges();
+            return RedirectToAction("Listar", "Usuario");
+        }
+
+        [HttpPost]
         [ActionName("verificarNameUser")]
         public JsonResult verificarNameUser(Usuario usuario)
         {
