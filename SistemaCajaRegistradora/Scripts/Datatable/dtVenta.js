@@ -35,4 +35,5 @@
             url: 'https://cdn.datatables.net/plug-ins/1.12.0/i18n/es-ES.json',
         }
     });
+    
 });
