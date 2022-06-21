@@ -1,0 +1,51 @@
+﻿@model IEnumerable<SistemaCajaRegistradora.Models.venta_producto>
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Detalles de la venta</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <h3>Productos de la venta</h3>
+            <table class="table table-sm h-75 overflow-auto">
+                <thead>
+                    <tr>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Precio</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Precio total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Producto.nombre.Trim()</td>
+                            <td>$@item.Producto.precio</td>
+                            <td>@item.total_cantidad_producto</td>
+                            <td>@item.total_precio_producto</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2">
+                            Total
+                        </td>
+                        <td>$@Model.First().Venta.total_venta</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            Monto entregado
+                        </td>
+                        <td>$@Model.First().Venta.total_venta</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+    </div>
+</div>
