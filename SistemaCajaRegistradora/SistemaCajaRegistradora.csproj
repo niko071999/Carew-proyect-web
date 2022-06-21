@@ -191,14 +191,23 @@
     <Compile Include="Models\venta_producto.cs">
       <DependentUpon>ModelData.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ViewModels\vmVenta.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\icons\sort_asc.png" />
+    <Content Include="Assets\icons\sort_asc_disabled.png" />
+    <Content Include="Assets\icons\sort_both.png" />
+    <Content Include="Assets\icons\sort_desc.png" />
+    <Content Include="Assets\icons\sort_desc_disabled.png" />
     <Content Include="Assets\images\blank-profile.png" />
     <Content Include="Assets\images\productos\default-product-image.png" />
     <Content Include="Assets\logo\logo-web-carew.jpg" />
     <Content Include="Content\css\sb-admin-2.css" />
     <Content Include="Content\css\sb-admin-2.min.css" />
+    <Content Include="Content\Datatable\dataTables.bootstrap5.min.css" />
+    <Content Include="Content\Datatable\datatables.min.css" />
+    <Content Include="Content\Datatable\responsive.bootstrap5.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -220,6 +229,10 @@
       <DependentUpon>ModelData.edmx</DependentUpon>
       <LastGenOutput>ModelData.cs</LastGenOutput>
     </Content>
+    <Content Include="Scripts\Datatable\dataTables.bootstrap5.min.js" />
+    <Content Include="Scripts\Datatable\datatables.min.js" />
+    <Content Include="Scripts\Datatable\dtVenta.js" />
+    <Content Include="Scripts\Datatable\responsive.bootstrap5.min.js" />
     <Content Include="Scripts\jquery-3.5.1.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
@@ -231,6 +244,7 @@
     <Content Include="Scripts\js\sb-admin-2.js" />
     <Content Include="Scripts\js\sb-admin-2.min.js" />
     <Content Include="Scripts\js\scriptsUsuarios.js" />
+    <Content Include="Scripts\js\scriptVenta.js" />
     <Content Include="Scripts\js\usersesion.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\vendor\bootstrap\js\bootstrap.bundle.js" />
@@ -2064,7 +2078,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Assets\icons\" />
     <Folder Include="Assets\images\usuarios\" />
   </ItemGroup>
   <ItemGroup>

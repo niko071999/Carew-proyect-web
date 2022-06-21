@@ -19,7 +19,10 @@
           rel="stylesheet">
     <!-- Custom styles for this template-->
     <link href="~/Content/css/sb-admin-2.min.css" rel="stylesheet" />
-    
+    <!-- Custom styles for tables -->
+    <link href="~/Content/Datatable/datatables.min.css" rel="stylesheet" />
+    <link href="~/Content/Datatable/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="~/Content/Datatable/responsive.bootstrap5.min.css" rel="stylesheet" />
 </head>
 <body id="page-top">
     <!-- Page Wrapper -->
@@ -51,13 +54,29 @@
 
             <!-- Heading -->
             <div class="sidebar-heading">
+                Modulo Venta
+            </div>
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Listar","Venta")">
+                    <i class="fas fa-money-bill-wave-alt"></i>
+                    <span>Gestor de Ventas</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
                 Modulo Producto
             </div>
 
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
                 <a class="nav-link" href="@Url.Action("Listar","Producto")">
-                    <i class="fa fa-archive"></i>
+                    <i class="fas fa-cube"></i>
                     <span>Gestor Producto</span>
                 </a>
             </li>
@@ -123,5 +142,9 @@
     <script src="~/Scripts/js/alertmenssages.js"></script>
     <script src="~/Scripts/js/usersesion.js"></script>
     <script src="~/Scripts/js/scriptsUsuarios.js"></script>
+    <!-- Custom scripts for tables -->
+    <script src="~/Scripts/Datatable/datatables.min.js"></script>
+    <script src="~/Scripts/Datatable/dataTables.bootstrap5.min.js"></script>
+    <script src="~/Scripts/Datatable/responsive.bootstrap5.min.js"></script>
 </body>
 </html>
