@@ -110,6 +110,7 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
           <Property Name="vuelto" Type="int" Nullable="false" />
           <Property Name="cajeroid" Type="int" Nullable="false" />
           <Property Name="metodo_pagoid" Type="int" Nullable="false" />
+          <Property Name="monto_ingresado" Type="int" Nullable="false" />
         </EntityType>
         <Association Name="FK_Operaciones_Modulos">
           <End Role="Modulos" Type="Self.Modulos" Multiplicity="1" />
@@ -412,6 +413,7 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
           <NavigationProperty Name="MetodoPago" Relationship="Self.FK_Ventas_MetodoPagos" FromRole="Ventas" ToRole="MetodoPagos" />
           <NavigationProperty Name="Usuario" Relationship="Self.FK_Ventas_Usuarios" FromRole="Ventas" ToRole="Usuarios" />
           <NavigationProperty Name="venta_producto" Relationship="Self.FK_venta_producto_Ventas" FromRole="Ventas" ToRole="venta_producto" />
+          <Property Name="monto_ingresado" Type="Int32" Nullable="false" />
         </EntityType>
         <EntityType Name="venta_producto">
           <Key>
@@ -707,6 +709,7 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
           <EntitySetMapping Name="Ventas">
             <EntityTypeMapping TypeName="CarewModel.Venta">
               <MappingFragment StoreEntitySet="Ventas">
+                <ScalarProperty Name="monto_ingresado" ColumnName="monto_ingresado" />
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="total_venta" ColumnName="total_venta" />
                 <ScalarProperty Name="fecha_creacion" ColumnName="fecha_creacion" />

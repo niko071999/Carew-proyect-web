@@ -1,18 +1,18 @@
 ﻿@model IEnumerable<SistemaCajaRegistradora.Models.venta_producto>
 
-<div class="modal-dialog">
+<div class="modal-dialog modal-lg modal-fullscreen-md-down">
     <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="staticBackdropLabel">Detalles de la venta</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body overflow-auto">
             <h3>Productos de la venta</h3>
-            <table class="table table-sm h-75 overflow-auto">
+            <table class="table table-sm table-secondary">
                 <thead>
                     <tr>
                         <th scope="col">Nombre</th>
-                        <th scope="col">Precio</th>
+                        <th scope="col">Precio unitario</th>
                         <th scope="col">Cantidad</th>
                         <th scope="col">Precio total</th>
                     </tr>
@@ -22,24 +22,36 @@
                     {
                         <tr>
                             <td>@item.Producto.nombre.Trim()</td>
-                            <td>$@item.Producto.precio</td>
-                            <td>@item.total_cantidad_producto</td>
-                            <td>@item.total_precio_producto</td>
+                            <td class="precio">@item.Producto.precio</td>
+                            <td class="numero">@item.total_cantidad_producto</td>
+                            <td class="precio">@item.total_precio_producto</td>
                         </tr>
                     }
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="2">
-                            Total
+                        <td colspan="3">
+                            <p class="text-end fw-bold">Total</p>
                         </td>
-                        <td>$@Model.First().Venta.total_venta</td>
+                        <td class="precio">@Model.First().Venta.total_venta</td>
                     </tr>
                     <tr>
-                        <td colspan="2">
-                            Monto entregado
+                        <td colspan="3">
+                            <p class="text-end fw-bold">Metodo de pago</p>
                         </td>
-                        <td>$@Model.First().Venta.total_venta</td>
+                        <td>@Model.First().Venta.MetodoPago.metodo_pago.Trim()</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <p class="text-end fw-bold">Monto entregado</p>
+                        </td>
+                        <td class="precio">@Model.First().Venta.monto_ingresado</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <p class="text-end fw-bold">Vuelto</p>
+                        </td>
+                        <td class="precio">@Model.First().Venta.vuelto</td>
                     </tr>
                 </tfoot>
             </table>
@@ -49,3 +61,10 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    var myModalEl = document.getElementById('coreModal')
+    myModalEl.addEventListener('shown.bs.modal', function (event) {
+        $("td.precio").each(function () { $(this).html(parseFloat($(this).text()).toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })); });
+        $("td.numero").each(function () { $(this).html(parseFloat($(this).text()).toLocaleString('es-CL')); })
+    })
+</script>

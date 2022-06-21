@@ -26,6 +26,7 @@ namespace SistemaCajaRegistradora.Models
         public int vuelto { get; set; }
         public int cajeroid { get; set; }
         public int metodo_pagoid { get; set; }
+        public int monto_ingresado { get; set; }
     
         public virtual MetodoPago MetodoPago { get; set; }
         public virtual Usuario Usuario { get; set; }

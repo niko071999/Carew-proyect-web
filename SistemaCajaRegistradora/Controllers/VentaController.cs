@@ -31,10 +31,10 @@ namespace SistemaCajaRegistradora.Controllers
             var result = db.Ventas.Include(v => v.MetodoPago).Include(v => v.Usuario).ToArray();
             
             List<vmVenta> ventas = new List<vmVenta>();
-            vmVenta venta = new vmVenta();
 
             foreach (var item in result)
             {
+                vmVenta venta = new vmVenta();
                 venta.id = item.id;
                 venta.cajero = item.Usuario.nombre.Trim() + " " + item.Usuario.apellido.Trim();
                 venta.metodoPago = item.MetodoPago.metodo_pago.Trim();
