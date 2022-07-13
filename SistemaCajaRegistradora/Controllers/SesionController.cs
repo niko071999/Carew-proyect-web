@@ -84,6 +84,7 @@ namespace SistemaCajaRegistradora.Controllers
         public ActionResult SignOut()
         {
             Session["User"] = null;
+            TempData["logout"] = "Sesion finalizada";
             return Redirect("~/Sesion/Login");
         }
 

@@ -132,7 +132,7 @@ function formsImagenU(urlImagen,id) {
         abrirModal(data);
     });
 }
-function subirImagenU(urlSubirIMG) {U
+function subirImagenU(urlSubirIMG) {
     var inputArchivoId = document.getElementById('idArchivo');
     var archivo = inputArchivoId.files[0];
     var dataForm = new FormData();

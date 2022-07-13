@@ -250,7 +250,6 @@
     coreModal.addEventListener('shown.bs.modal', function () {
         var codigo_barra = $('#codigo_barra').val();
         sessionStorage.codigobarrainit = codigo_barra.trim();
-        console.log(sessionStorage.codigobarrainit;
     })
 
     var lista = [];
@@ -278,13 +277,13 @@
                 console.log("1: ", lista);
                 if (data.codigobarra != "") {
                     let exist = false;
-                    console.log(jQuery.inArray(data.codigobarra, lista));
+                    console.log(data.codigobarra);
                     $('#listProductos').empty();
                     if (lista.length > 0) {
                         for (let i = 0; i < lista.length; i++) {
-                            exist = lista[i].codigobarra == data.codigobarra ? true : false;
                             if (lista[i].codigobarra == data.codigobarra) {
                                 lista[i].newstock++;
+                                exist = true;
                             }
                         }
                         if (!exist) {

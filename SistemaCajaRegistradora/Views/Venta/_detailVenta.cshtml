@@ -62,9 +62,6 @@
     </div>
 </div>
 <script type="text/javascript">
-    var myModalEl = document.getElementById('coreModal')
-    myModalEl.addEventListener('shown.bs.modal', function (event) {
-        $("td.precio").each(function () { $(this).html(parseFloat($(this).text()).toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })); });
-        $("td.numero").each(function () { $(this).html(parseFloat($(this).text()).toLocaleString('es-CL')); })
-    })
+    $("td.precio").each(function () { $(this).html(parseFloat($(this).text()).toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })); });
+    $("td.numero").each(function () { $(this).html(parseFloat($(this).text()).toLocaleString('es-CL')); });
 </script>
