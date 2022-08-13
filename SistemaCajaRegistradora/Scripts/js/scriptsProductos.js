@@ -1,4 +1,166 @@
 ﻿let mensaje = '';
+let lista = [];
+
+let stockProd = document.getElementById('stockProd');
+let borrarCod = document.getElementById('btnBorrar');
+stockProd.addEventListener("change", verificarStock);
+borrarCod.addEventListener("click", borrarCodigo);
+$('#btnAplicar').attr('disabled', true);
+
+//listener modal
+let coreModal = document.getElementById('coreModal');
+coreModal.addEventListener('shown.bs.modal', function () {
+    var codigo_barra = $('#codigo_barra').val();
+    sessionStorage.codigobarrainit = codigo_barra.trim();
+});
+
+let collapseStock = document.getElementById('accordionPanelsStayOpenExample')
+collapseStock.addEventListener('shown.bs.collapse', function () {
+    //Cargo por defecto el input de cantidad en 1
+    $('#stockProd').val(1);
+})
+
+$('#codigoAdd').bind('keyup', function (e) {
+    var key = e.keyCode || e.which;
+    cargarExistencias(key);
+});
+$('#stockProd').bind('keyup', function (e) {
+    var key = e.keyCode || e.which;
+    cargarExistencias(key);
+});
+
+function cargarExistencias(key) {
+    var codigo = $('#codigoAdd').val();
+    var newStock = $('#stockProd').val();
+    var producto = {
+        "id": 0,
+        "codigo_barra": codigo,
+        "nombre": 'test',
+        "precio": 0,
+        "stock": newStock,
+        "stockmin": 0,
+        "stockmax": 0,
+        "fecha_creacion": null,
+        "prioridadid": 0,
+        "categoriaid": 0,
+        "rutaImg": 'test'
+    };
+    if (key === 13 && codigo.trim() != '') {
+        $.post('/Producto/addExistencias', producto, function (data) {
+            console.log("1: ", lista);
+            if (data.codigobarra != "") {
+                let exist = false;
+                $('#listProductos').empty();
+                if (lista.length > 0) {
+                    for (let i = 0; i < lista.length; i++) {
+                        if (lista[i].codigobarra == data.codigobarra) {
+                            lista[i].newstock = lista[i].newstock + data.newstock;
+                            exist = true;
+                        }
+                    }
+                    if (!exist) {
+                        lista.push(data);
+                    }
+                } else {
+                    lista.push(data);
+                }
+
+                $('#btnAplicar').attr('disabled', false);
+
+                //Se carga la lista para ser visualizada
+                drawList();
+
+                mensaje = 'Codigo de barra ' + producto.codigo_barra + ' añadido';
+                showMenssage('success', mensaje, true);
+            } else {
+                mensaje = "No existe ningun producto asociado a este codigo de barra";
+                showMenssage('error', mensaje, true);
+                $('#codigoAdd').val('');
+            }
+        }, 'json');
+    };
+}
+function drawList() {
+    for (let i = 0; i < lista.length; i++) {
+        //diferencia = lista[i].newstock - lista[i].oldStock;
+        $('#listProductos').append(
+            `<li id="${lista[i].codigobarra}" class="list-group-item">${lista[i].codigobarra} - ${lista[i].nombre}
+                    <span class="badge bg-primary rounded-pill">
+                        ${lista[i].newstock} ingresadas
+                    </span>
+                    <button type="button" class="btn-close" aria-label="Close" onclick="quitarItem(${lista[i].codigobarra})"></button>
+                </li>`
+        );
+        $('#codigoAdd').val('');
+        $('#stockProd').val(1);
+    }
+}
+function aplicarExistencias() {
+    let error = false;
+    if (lista.length > 0) {
+        for (let i = 0; i < lista.length; i++) {
+            var producto = {
+                "id": 0,
+                "codigo_barra": lista[i].codigobarra,
+                "nombre": 'test',
+                "precio": 0,
+                "stock": lista[i].newstock,
+                "stockmin": 0,
+                "stockmax": 0,
+                "fecha_creacion": null,
+                "prioridadid": 0,
+                "categoriaid": 0,
+                "rutaImg": 'test'
+            };
+            $.post('/Producto/aplicarExistencias', producto, function (data) {
+                if (data > 0) {
+                    error = false;
+                } else {
+                    error = true;
+                }
+            });
+        }
+    } else {
+        mensaje = "Lista vacia, no existe ningun cambio en las existencias.";
+        showMenssage('error', mensaje, true);
+    }
+    if (error) {
+        mensaje = "No se actualizo ningun producto";
+        showMenssage('error', mensaje, true);
+    } else {
+        sessionStorage.clear();
+        sessionStorage.mensaje = 'Se actualizo las existencia/s de los producto/s';
+        location = location.href
+    }
+}
+function cancelar() {
+    lista = [];
+    $('#codigoAdd').val('');
+    $('#listProductos').empty();
+    var myCollapse = document.getElementById('addExistenciasPanel')
+    var bsCollapse = new bootstrap.Collapse(myCollapse, {
+        hide: true,
+    });
+    $('#btnAplicar').attr('disabled', true);
+    sessionStorage.clear();
+}
+function verificarStock() {
+    let cantidadProd = stockProd.value;
+    if (cantidadProd < 1) {
+        stockProd.value = 1;
+    }
+}
+function borrarCodigo() {
+    let codbarra = document.getElementById('codigoAdd');
+    codbarra.value = '';
+}
+function quitarItem(codigoItem) {
+    lista = lista.filter((item) => item.codigobarra != codigoItem)
+    console.log(lista);
+    $('#listProductos').empty();
+    $('#btnAplicar').attr('disabled', true);
+    drawList();
+}
 
 function AgregarForms(urlForms) {
     $.get(urlForms+'/', function (data) {
@@ -270,6 +432,23 @@ const validarCamposPro = (codigo_barra, nombre, prioridadid, categoriaid) => {
     return valid;
 }
 
+function accion(cod, id) {
+    //SI COD == 1 : EDITAR - SI COD == 2 : BORRAR - SI COD == 3 : VISUALIZAR IMAGEN
+    switch (cod) {
+        case (1):
+            formsEditar('/Producto/formsEditar/', id);
+            break;
+        case (2):
+            formsEliminar('/Producto/formsEliminar/', id);
+            break;
+        case (3):
+            formsImagenP('/Producto/formsImagen/',id)
+            break;
+        default:
+            mensaje = 'Se ha producido un error inesperado, intentelo nuevamente o recargue la pagina';
+            showMenssage('error', mensaje, true);
+    }
+}
 function desabilitar() {
     var inputArchivoId = document.getElementById('idArchivo');
     var btn = document.getElementById('btnSubir');

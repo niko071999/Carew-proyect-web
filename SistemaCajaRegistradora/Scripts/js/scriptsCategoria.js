@@ -86,6 +86,21 @@ function eliminarCategoria(urlEliminar, id) {
     },'json');
 }
 
+function accion(cod,id) {
+    //SI COD == 1 : EDITAR - SI COD == 2 : BORRAR
+    switch (cod) {
+        case (1):
+            formsEditar('/Categoria/formsEditar/', id);
+            break;
+        case (2):
+            formsEliminar('/Categoria/formsEliminar/', id);
+            break;
+        default:
+            mensaje = 'Se ha producido un error inesperado, intentelo nuevamente o recargue la pagina';
+            showMenssage('error', mensaje, true);
+    }
+}
+
 const validarCamposCat = (nombre) => {
     let valid = true;
     let atr = '';

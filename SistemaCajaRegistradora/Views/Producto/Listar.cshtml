@@ -1,7 +1,7 @@
-﻿@model IEnumerable<SistemaCajaRegistradora.Models.Producto>
-@{
+﻿@{
     ViewBag.Title = "Listado de productos";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    int lenght = (int)ViewData["ProductosLength"];
 }
 <!-- Topbar  -->
 <nav class="navbar navbar-expand navbar-light bg-white mb-4 topbar shadow">
@@ -38,7 +38,7 @@
         <div class="col-4">
             <h1 class="h3 mb-4 text-gray-800">@ViewBag.Title</h1>
         </div>
-        @if (Model.Count() > 0)
+        @if (lenght > 0)
         {
             <div class="col-4">
                 <div class="d-grid gap-2 mb-2">
@@ -50,7 +50,7 @@
             </div>
         }
     </div>
-    @if (Model.Count() > 0)
+    @if (lenght > 0)
     {
         //Acordion
         <div class="accordion accordion-flush" id="accordionPanelsStayOpenExample">
@@ -67,10 +67,14 @@
                             <h5 class="card-header">Agregar existencias</h5>
                             <div class="card-body">
                                 <h4>Escanea el producto</h4>
-                                <label class="form-label">Codigo de barra</label>
                                 <div class="input-group mb-3">
-                                    <button id="btnBorrar" class="btn btn-close btn-circle btn-sm" type="button" aria-label="Close" onclick="borrarCodigo()"></button>
+                                    <button id="btnBorrar" type="button" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    <span class="input-group-text">Codigo Barra</span>
                                     <input id="codigoAdd" type="text" class="form-control" placeholder="Ingrese codigo de barra" aria-describedby="btnBorrar">
+                                    <span class="input-group-text">Cantidad</span>
+                                    <input id="stockProd" type="number" class="form-control" placeholder="Ingrese cantidad" aria-label="Stock del producto">
                                 </div>
                                 <ul id="listProductos" class="list-group list-group-horizontal overflow-auto">
                                 </ul>
@@ -89,22 +93,25 @@
         <!-- table -->
         <div class="row">
             <div class="col-12 table-responsive">
-                <table class="table table-sm table-bordered table-hover">
+                <table id="tablaProducto" class="table table-sm table-bordered table-hover">
                     <thead>
                         <tr>
+                            <th scope="col">*id*</th>
                             <th scope="col">Codigo barra</th>
                             <th scope="col">Imagen</th>
                             <th scope="col">Nombre</th>
                             <th scope="col">Categoria</th>
                             <th scope="col">Precio</th>
                             <th scope="col">Stock</th>
+                            <th scope="col">*stockmin*</th>
+                            <th scope="col">*stockmax*</th>
                             <th scope="col">Prioridad</th>
                             <th scope="col">Fecha creacion</th>
                             <th scope="col">Acciones</th>
                             <th scope="col">Informacion</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    @*<tbody>
                         @foreach (var p in Model)
                         {
                             <tr>
@@ -140,19 +147,27 @@
                                     {
                                         if (p.stock > 0 && p.stock > p.stockmin && p.stock <= p.stockmax)
                                         {
-                                            <h4 class="text-center"><span class="badge bg-secondary">Producto dentro del rango stock minimo y maximo</span></h4>
+                                            string mensaje = "Producto dentro del rango stock minimo y maximo";
+                                            <button type="button" class="btn btn-secondary btn-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="@mensaje">
+                                                <i class="fas fa-info-circle"></i>
+                                            </button>
                                         }
                                         else if (p.stock > 0 && p.stock > p.stockmax)
                                         {
                                             int result = (int)p.stock - (int)p.stockmax;
                                             if (p.Prioridade.prioridad.Contains("Baja"))
                                             {
-                                                <h4 class="text-center"><span class="badge bg-secondary">Producto sobrepasado en @result existencias</span></h4>
+                                                string mensaje = "Producto sobrepasado en " + result + " existencias maximas";
+                                                <button type="button" class="btn btn-secondary btn-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="@mensaje">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </button>
                                             }
                                             else if (p.Prioridade.prioridad.Contains("Medio") || p.Prioridade.prioridad.Contains("Alta"))
                                             {
-                                                <h4 class="text-center"><span class="badge bg-secondary">Stock correcto</span></h4>
-
+                                                string mensaje = "Buena existencia de producto";
+                                                <button type="button" class="btn btn-secondary btn-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="@mensaje">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </button>
                                             }
                                         }
                                         else if (p.stock > 0 && p.stock <= p.stockmin)
@@ -162,30 +177,48 @@
                                             {
                                                 if (p.Prioridade.prioridad.Contains("Baja"))
                                                 {
-                                                    <h4 class="text-center"><span class="badge bg-gradient-primary">Producto en su existencia minima</span></h4>
+                                                    string mensaje = "Producto en su existencia minima";
+                                                    <button type="button" class="btn bg-gradient-primary btn-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="@mensaje">
+                                                        <i class="fas fa-info-circle"></i>
+                                                    </button>
                                                 }
                                                 else if (p.Prioridade.prioridad.Contains("Medio"))
                                                 {
-                                                    <h4 class="text-center"><span class="badge bg-gradient-warning">Producto en su existencia minima</span></h4>
+                                                    string mensaje = "Producto en su existencia minima";
+                                                    <button type="button" class="btn bg-gradient-warning btn-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="@mensaje">
+                                                        <i class="fas fa-info-circle"></i>
+                                                    </button>
                                                 }
                                                 else
                                                 {
-                                                    <h4 class="text-center"><span class="badge bg-gradient-danger">Producto en su existencia minima</span></h4>
+                                                    string mensaje = "Producto en su existencia minima";
+                                                    <button type="button" class="btn bg-gradient-danger btn-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="@mensaje">
+                                                        <i class="fas fa-info-circle"></i>
+                                                    </button>
                                                 }
                                             }
                                             else
                                             {
                                                 if (p.Prioridade.prioridad.Contains("Baja"))
                                                 {
-                                                    <h4 class="text-center"><span class="badge bg-gradient-primary">Producto por debajo de @result existencia del stock minimo</span></h4>
+                                                    string mensaje = "Producto por debajo de " + result + " existencia del stock minimo";
+                                                    <button type="button" class="btn bg-gradient-primary btn-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="@mensaje">
+                                                        <i class="fas fa-info-circle"></i>
+                                                    </button>
                                                 }
                                                 else if (p.Prioridade.prioridad.Contains("Medio"))
                                                 {
-                                                    <h4 class="text-center"><span class="badge bg-gradient-warning">Producto por debajo de @result existencia del stock minimo</span></h4>
+                                                    string mensaje = "Producto por debajo de " + result + " existencia del stock minimo";
+                                                    <button type="button" class="btn bg-gradient-warning btn-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="@mensaje">
+                                                        <i class="fas fa-info-circle"></i>
+                                                    </button>
                                                 }
                                                 else
                                                 {
-                                                    <h4 class="text-center"><span class="badge bg-gradient-danger">Producto por debajo de @result existencia del stock minimo</span></h4>
+                                                    string mensaje = "Producto por debajo de " + result + " existencia del stock minimo";
+                                                    <button type="button" class="btn bg-gradient-danger btn-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="@mensaje">
+                                                        <i class="fas fa-info-circle"></i>
+                                                    </button>
                                                 }
                                             }
                                         }
@@ -193,29 +226,40 @@
                                         {
                                             if (p.Prioridade.prioridad.Contains("Baja"))
                                             {
-                                                <h4 class="text-center"><span class="badge bg-gradient-primary">Producto sin existencia minima</span></h4>
+                                                string mensaje = "Producto sin existencia minima";
+                                                <button type="button" class="btn bg-gradient-primary btn-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="@mensaje">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </button>
 
                                             }
                                             else if (p.Prioridade.prioridad.Contains("Medio"))
                                             {
-                                                <h4 class="text-center"><span class="badge bg-gradient-warning">Producto sin existencia minima</span></h4>
+                                                string mensaje = "Producto sin existencia minima";
+                                                <button type="button" class="btn bg-gradient-warning btn-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="@mensaje">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </button>
                                             }
                                             else
                                             {
-                                                <h4 class="text-center"><span class="badge bg-gradient-danger">Producto sin existencia minima</span></h4>
+                                                string mensaje = "Producto sin existencia minima";
+                                                <button type="button" class="btn bg-gradient-danger btn-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="@mensaje">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </button>
                                             }
                                         }
-
-
                                     }
                                     else
                                     {
-                                        <h4 class="text-center"><span class="badge bg-gradient-primary">Stock minimo y maximo por defecto</span></h4>
+                                        string mensaje = "Stock minimo y maximo en 0";
+                                        <button type="button" class="btn bg-gradient-primary btn-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="@mensaje">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
                                     }
+
                                 </td>
                             </tr>
                         }
-                    </tbody>
+                    </tbody>*@
                 </table>
             </div>
         </div>
@@ -245,115 +289,5 @@
      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
 
 </div>
-<script type="text/javascript" title="main">
-    var coreModal = document.getElementById('coreModal');
-    coreModal.addEventListener('shown.bs.modal', function () {
-        var codigo_barra = $('#codigo_barra').val();
-        sessionStorage.codigobarrainit = codigo_barra.trim();
-    })
-
-    var lista = [];
-    $('#btnAplicar').attr('disabled', true);
-
-    $('#codigoAdd').bind('keyup', function (e) {
-        var key = e.keyCode || e.which;
-        var codigo = $('#codigoAdd').val();
-        var producto = {
-            "id": 0,
-            "codigo_barra": codigo,
-            "nombre": 'test',
-            "precio": 0,
-            "stock": 1,
-            "stockmin": 0,
-            "stockmax": 0,
-            "fecha_creacion": null,
-            "prioridadid": 0,
-            "categoriaid": 0,
-            "rutaImg": 'test'
-        };
-        if (key === 13) {
-            $.post('@Url.Action("addExistencias","Producto")', producto, function (data) {
-                let diferencia = 0;
-                console.log("1: ", lista);
-                if (data.codigobarra != "") {
-                    let exist = false;
-                    console.log(data.codigobarra);
-                    $('#listProductos').empty();
-                    if (lista.length > 0) {
-                        for (let i = 0; i < lista.length; i++) {
-                            if (lista[i].codigobarra == data.codigobarra) {
-                                lista[i].newstock++;
-                                exist = true;
-                            }
-                        }
-                        if (!exist) {
-                            lista.push(data);
-                        }
-                    } else {
-                        lista.push(data);
-                    }
-                    $('#btnAplicar').attr('disabled', false);
-                    for (let i = 0; i < lista.length; i++) {
-                        diferencia = lista[i].newstock - lista[i].oldStock;
-                        $('#listProductos').append(`<li id="${lista[i].codigobarra}" class="list-group-item m-2">${lista[i].codigobarra}<span class="badge bg-primary rounded-pill">${diferencia}</span></li>`);
-                        $('#codigoAdd').val('');
-                    }
-                    mensaje = 'Codigo de barra ' + producto.codigo_barra + ' añadido';
-                    showMenssage('success', mensaje, true);
-                } else {
-                    mensaje = "No existe ningun producto asociado a este codigo de barra";
-                    showMenssage('error', mensaje, true);
-                    $('#codigoAdd').val('');
-                }
-            }, 'json');
-        };
-    });
-    function aplicarExistencias() {
-        let error = false;
-        for (let i = 0; i < lista.length; i++) {
-            var producto = {
-                "id": 0,
-                "codigo_barra": lista[i].codigobarra,
-                "nombre": 'test',
-                "precio": 0,
-                "stock": lista[i].newstock,
-                "stockmin": 0,
-                "stockmax": 0,
-                "fecha_creacion": null,
-                "prioridadid": 0,
-                "categoriaid": 0,
-                "rutaImg": 'test'
-            };
-            $.post('@Url.Action("aplicarExistencias","Producto")', producto, function (data) {
-                if (data > 0) {
-                    error = false;
-                } else {
-                    error = true;
-                }
-            });
-        }
-        if (error) {
-            mensaje = "No se actualizo ningun producto";
-            showMenssage('error', mensaje, true);
-        } else {
-            sessionStorage.clear();
-            sessionStorage.mensaje = 'Se actualizo las existencia/s de los producto/s';
-            location = location.href
-        }
-    }
-    function cancelar() {
-        lista = [];
-        $('#codigoAdd').val('')
-        $('#listProductos').empty();
-        var myCollapse = document.getElementById('addExistenciasPanel')
-        var bsCollapse = new bootstrap.Collapse(myCollapse, {
-            hide: true,
-        });
-        $('#btnAplicar').attr('disabled', true);
-        sessionStorage.clear();
-    }
-    function borrarCodigo() {
-        $('#codigoAdd').val('');
-    }
-</script>
 <script src="~/Scripts/js/scriptsProductos.js"></script>
+<script src="~/Scripts/Datatable/dtProducto.js"></script>
