@@ -6,7 +6,6 @@ using System.Web;
 using System.Web.Mvc;
 using System.Data.Entity;
 using SistemaCajaRegistradora.Filters;
-using SistemaCajaRegistradora.Models.ViewModels;
 
 namespace SistemaCajaRegistradora.Controllers
 {
@@ -20,41 +19,8 @@ namespace SistemaCajaRegistradora.Controllers
         [Autorizacion(idoperacion:1)]
         public ActionResult Listar()
         {
-            ViewData["ProductosLength"] = db.Productos.Include(p => p.Categoria).Include(p => p.Prioridade).ToArray().Length;
-            return View();
-        }
-
-        [HttpGet]
-        [ActionName("getProductos")]
-        public JsonResult getProductos()
-        {
-            db.Configuration.LazyLoadingEnabled = false;
-            var result = db.Productos.Include(p => p.Categoria).Include(p => p.Prioridade).ToArray();
-
-            List<vmProducto> productos = new List<vmProducto>();
-
-            foreach (var item in result)
-            {
-                vmProducto producto = new vmProducto();
-                producto.id = item.id;
-                producto.codigobarra = item.codigo_barra.Trim();
-                producto.nombre = item.nombre.Trim();
-                producto.categoria = item.Categoria.nombre.Trim();
-                producto.prioridad = item.Prioridade.prioridad.Trim();
-                producto.rutaimg = item.rutaImg.Trim();
-                producto.precio = (int)item.precio;
-                producto.stock = (int)item.stock;
-                producto.stockmin = (int)item.stockmin;
-                producto.stockmax = (int)item.stockmax;
-                producto.fechacreacion = item.fecha_creacion.ToShortDateString();
-
-                productos.Add(producto);
-            }
-
-            return Json(new
-            {
-                data = productos
-            }, JsonRequestBehavior.AllowGet);
+            var producto = db.Productos.Include(p => p.Categoria).Include(p => p.Prioridade);
+            return View(producto.ToList());
         }
 
         [HttpGet]
@@ -201,14 +167,14 @@ namespace SistemaCajaRegistradora.Controllers
                 var prod = db.Productos.Where(p => p.codigo_barra.Equals(codigo)).FirstOrDefault();
                 if (prod != null)
                 {
-                    
+                    prod.stock++;
                     return Json(new
                     {
                         id = prod.id,
                         codigobarra = prod.codigo_barra.Trim(),
                         nombre = prod.nombre.Trim(),
-                        newstock = producto.stock,
-                        oldStock = prod.stock,
+                        newstock = prod.stock,
+                        oldStock = prod.stock - 1,
                     }, JsonRequestBehavior.AllowGet);
                 }
                 else
@@ -235,7 +201,7 @@ namespace SistemaCajaRegistradora.Controllers
                 .Where(p => p.codigo_barra == producto.codigo_barra).FirstOrDefault();
             if (resulProducto!=null)
             {
-                resulProducto.stock += producto.stock;
+                resulProducto.stock = producto.stock;
                 db.Entry(resulProducto).State = EntityState.Modified;
                 n = db.SaveChanges();
                 return Json(n,JsonRequestBehavior.AllowGet);

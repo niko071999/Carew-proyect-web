@@ -18,23 +18,10 @@ namespace SistemaCajaRegistradora.Controllers
         [Autorizacion(idoperacion:8)]
         public ActionResult Listar()
         {
-            ViewData["CategoriasLength"] = db.Categorias.ToArray().Length;
-            //var categorias = db.Categorias;
-            return View();
+            var categorias = db.Categorias;
+            return View(categorias.ToList());
         }
 
-        [HttpGet]
-        [ActionName("getCategorias")]
-        public JsonResult getCategorias()
-        {
-            db.Configuration.LazyLoadingEnabled = false;
-            var result = db.Categorias.ToArray();
-            
-            return Json(new
-            {
-                data = result
-            }, JsonRequestBehavior.AllowGet);
-        }
         [HttpGet]
         [ActionName("AgregarForms")]
         [Autorizacion(idoperacion:9)]
