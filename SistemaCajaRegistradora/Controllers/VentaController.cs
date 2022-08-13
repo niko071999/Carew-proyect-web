@@ -29,7 +29,7 @@ namespace SistemaCajaRegistradora.Controllers
         {
             //db.Configuration.LazyLoadingEnabled = false;
             var result = db.Ventas.Include(v => v.MetodoPago).Include(v => v.Usuario).ToArray();
-            
+
             List<vmVenta> ventas = new List<vmVenta>();
 
             foreach (var item in result)
@@ -66,7 +66,41 @@ namespace SistemaCajaRegistradora.Controllers
             {
                 return PartialView(null);
             }
+        }
 
+        [HttpGet]
+        [ActionName("POS")]
+        public ActionResult POS()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        [ActionName("getMiVentas")]
+        public JsonResult getMiVentas()
+        {
+            Usuario user = (Usuario)Session["User"];
+
+            var result = db.Ventas.Include(v => v.MetodoPago).Include(v => v.Usuario).Where(v => v.cajeroid==user.id).ToArray();
+
+            List<vmVenta> ventas = new List<vmVenta>();
+
+            foreach (var item in result)
+            {
+                vmVenta venta = new vmVenta();
+                venta.id = item.id;
+                venta.cajero = item.Usuario.nombre.Trim() + " " + item.Usuario.apellido.Trim();
+                venta.metodoPago = item.MetodoPago.metodo_pago.Trim();
+                venta.totalVenta = item.total_venta;
+                venta.fecha = item.fecha_creacion.ToShortDateString();
+
+                ventas.Add(venta);
+            }
+
+            return Json(new
+            {
+                data = ventas
+            }, JsonRequestBehavior.AllowGet);
         }
     }
 }
