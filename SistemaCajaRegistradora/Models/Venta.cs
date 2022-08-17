@@ -27,7 +27,8 @@ namespace SistemaCajaRegistradora.Models
         public int cajeroid { get; set; }
         public int metodo_pagoid { get; set; }
         public int monto_ingresado { get; set; }
-    
+        public long num_boleta { get; set; }
+
         public virtual MetodoPago MetodoPago { get; set; }
         public virtual Usuario Usuario { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

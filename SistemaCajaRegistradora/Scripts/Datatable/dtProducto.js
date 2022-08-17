@@ -1,9 +1,10 @@
-﻿$(document).ready(function () {
+﻿$(document).ready(function () {     
     let idProd = 0;
     let sprod = 0;
     let smin = 0;
     let smax = 0;
     let prioridad = '';
+    //Ordenar dependiendo del contexto del dato (Ordenando de acuerdo a la prioridad)
     $.fn.dataTable.ext.type.order['prioridad-pre'] = function (d) {
         switch (d) {
             case 'Baja':
@@ -14,8 +15,29 @@
                 return 3;
         }
     };
-    $("#tablaProducto").DataTable({
+    //Customizacion del filtro para rango
+    $.fn.dataTable.ext.search.push(function (settings, data, dataindex) {
+        let min = parseInt($('#text_preciomin').val(), 10);
+        let max = parseInt($('#text_preciomax').val(), 10);
+        let precio = data[5].replace(/[$.]/g, ''); 
+
+        console.log(min, max, precio);
+
+        if ((isNaN(min) && isNaN(max)) ||
+            (isNaN(min) && precio <= max) ||
+            (min <= precio && isNaN(max)) ||
+            (min <= precio && precio <= max)) {
+            return true;
+        } else {
+            return false;
+        }
+    });
+    let table = $("#tablaProducto").DataTable({
         responsive: 'true',
+        lengthMenu: [
+            [5,10, -1],
+            [5,10, 'All'],
+        ],
         ajax: {
             'url': '/Producto/getProductos',
             'type': 'GET',
@@ -236,5 +258,9 @@
         language: {
             url: 'https://cdn.datatables.net/plug-ins/1.12.0/i18n/es-ES.json',
         }
+    });
+    // Event listener to the two range filtering inputs to redraw on input
+    $('#text_preciomin, #text_preciomax').keyup(function () {
+        table.draw();
     });
 });

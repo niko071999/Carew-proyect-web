@@ -1,8 +1,20 @@
-﻿let mensaje = '';
+﻿$(document).ready(function () {
+    obtenerPrecios();    
+});
+
+let mensaje = '';
 let lista = [];
 
+let txt_min = document.getElementById('txt_preciomin');
+let txt_max = document.getElementById('txt_preciomax');
 let stockProd = document.getElementById('stockProd');
 let borrarCod = document.getElementById('btnBorrar');
+//txt_min.addEventListener("change", function () {
+//    aplicarFormato(txt_min.value, 'min');
+//});
+//txt_max.addEventListener("change", function () {
+//    aplicarFormato(txt_max.value, 'max');
+//});
 stockProd.addEventListener("change", verificarStock);
 borrarCod.addEventListener("click", borrarCodigo);
 $('#btnAplicar').attr('disabled', true);
@@ -151,8 +163,7 @@ function verificarStock() {
     }
 }
 function borrarCodigo() {
-    let codbarra = document.getElementById('codigoAdd');
-    codbarra.value = '';
+    $("#codigoAdd").val('');
 }
 function quitarItem(codigoItem) {
     lista = lista.filter((item) => item.codigobarra != codigoItem)
@@ -432,6 +443,46 @@ const validarCamposPro = (codigo_barra, nombre, prioridadid, categoriaid) => {
     return valid;
 }
 
+function obtenerPrecios() {
+    let precios = [];
+    let productos = [];
+    const promesa = new Promise((resolver) => {
+        $.get('/Producto/getProductos/', function (data) {
+            productos = data;
+            $.each(productos.data, function (index, item) {
+                precios.push(parseInt(item.precio));
+            });
+            resolver(precios);
+        });
+    });
+    promesa.then((data) => {
+        let min = Math.min.apply(null, data);
+        let max = Math.max.apply(null, data);
+
+        $("#text_preciomin").val(min);
+        $("#text_preciomax").val(max);
+
+        aplicarFormato($("#text_preciomin").val(),'min');
+        aplicarFormato($("#text_preciomax").val(), 'max');
+    });
+}
+
+function aplicarFormato(n,t) {
+    const f = new Intl.NumberFormat('es-CL', {
+        style: 'currency',
+        currency: 'CLP'
+    });
+    switch (t) {
+        case t === 'min':
+            $("#text_preciomin").val(f.format(n));     
+            break;
+        case t === 'max':
+            $("#text_preciomax").val(f.format(n));
+            break;
+        default:
+
+    }
+}
 function accion(cod, id) {
     //SI COD == 1 : EDITAR - SI COD == 2 : BORRAR - SI COD == 3 : VISUALIZAR IMAGEN
     switch (cod) {
