@@ -17,7 +17,7 @@ namespace SistemaCajaRegistradora.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Producto()
         {
-            this.venta_producto = new HashSet<venta_producto>();
+            this.DetalleVentas = new HashSet<DetalleVenta>();
         }
     
         public int id { get; set; }
@@ -33,8 +33,8 @@ namespace SistemaCajaRegistradora.Models
         public int categoriaid { get; set; }
     
         public virtual Categoria Categoria { get; set; }
-        public virtual Prioridade Prioridade { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<venta_producto> venta_producto { get; set; }
+        public virtual ICollection<DetalleVenta> DetalleVentas { get; set; }
+        public virtual Prioridade Prioridade { get; set; }
     }
 }

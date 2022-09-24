@@ -26,6 +26,7 @@ namespace SistemaCajaRegistradora.Models
         }
     
         public virtual DbSet<Categoria> Categorias { get; set; }
+        public virtual DbSet<DetalleVenta> DetalleVentas { get; set; }
         public virtual DbSet<MetodoPago> MetodoPagos { get; set; }
         public virtual DbSet<Modulo> Modulos { get; set; }
         public virtual DbSet<Operacione> Operaciones { get; set; }
@@ -35,6 +36,5 @@ namespace SistemaCajaRegistradora.Models
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Usuario> Usuarios { get; set; }
         public virtual DbSet<Venta> Ventas { get; set; }
-        public virtual DbSet<venta_producto> venta_producto { get; set; }
     }
 }

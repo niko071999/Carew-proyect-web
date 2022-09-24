@@ -46,7 +46,7 @@ namespace SistemaCajaRegistradora.Controllers
                 producto.stock = (int)item.stock;
                 producto.stockmin = (int)item.stockmin;
                 producto.stockmax = (int)item.stockmax;
-                producto.fechacreacion = item.fecha_creacion.ToShortDateString();
+                producto.fechacreacion = item.fecha_creacion;
 
                 productos.Add(producto);
             }
@@ -216,9 +216,6 @@ namespace SistemaCajaRegistradora.Controllers
                     return Json(new
                     {
                         codigobarra = "",
-                        nombre = "",
-                        stock = "",
-                        increment = "",
                     }, JsonRequestBehavior.AllowGet);
                 }
             }

@@ -145,6 +145,9 @@
     <Compile Include="Models\Categoria.cs">
       <DependentUpon>ModelData.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\DetalleVenta.cs">
+      <DependentUpon>ModelData.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Encrypt.cs" />
     <Compile Include="Models\MetodoPago.cs">
       <DependentUpon>ModelData.tt</DependentUpon>
@@ -188,9 +191,6 @@
     <Compile Include="Models\Venta.cs">
       <DependentUpon>ModelData.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\venta_producto.cs">
-      <DependentUpon>ModelData.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\ViewModels\vmProducto.cs" />
     <Compile Include="Models\ViewModels\vmVenta.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -202,8 +202,15 @@
     <Content Include="Assets\icons\sort_desc.png" />
     <Content Include="Assets\icons\sort_desc_disabled.png" />
     <Content Include="Assets\images\blank-profile.png" />
+    <Content Include="Assets\images\dinero\pesos1000.jpg" />
+    <Content Include="Assets\images\dinero\pesos10000.jpg" />
+    <Content Include="Assets\images\dinero\pesos2000.jpg" />
+    <Content Include="Assets\images\dinero\pesos20000.jpg" />
+    <Content Include="Assets\images\dinero\pesos5000.jpg" />
     <Content Include="Assets\images\productos\default-product-image.png" />
     <Content Include="Assets\logo\logo-web-carew.jpg" />
+    <Content Include="Content\css\boleta.css" />
+    <Content Include="Content\css\bootstrap.min.css" />
     <Content Include="Content\css\sb-admin-2.css" />
     <Content Include="Content\css\sb-admin-2.min.css" />
     <Content Include="Content\Datatable\dataTables.bootstrap5.min.css" />
@@ -235,6 +242,8 @@
     <Content Include="Scripts\Datatable\dtCategoria.js" />
     <Content Include="Scripts\Datatable\dtProducto.js" />
     <Content Include="Scripts\Datatable\dtVenta.js" />
+    <Content Include="Scripts\Datatable\jquery.dataTables.min.js" />
+    <Content Include="Scripts\Datatable\moment.min.js" />
     <Content Include="Scripts\Datatable\responsive.bootstrap5.min.js" />
     <Content Include="Scripts\jquery-3.5.1.js" />
     <Content Include="Scripts\jquery.validate.js" />
@@ -242,6 +251,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\js\alertmenssages.js" />
+    <Content Include="Scripts\js\printThis.js" />
     <Content Include="Scripts\js\scriptsCategoria.js" />
     <Content Include="Scripts\js\scriptspos.js" />
     <Content Include="Scripts\js\scriptsProductos.js" />
@@ -2081,6 +2091,7 @@
     <Content Include="Views\Venta\Listar.cshtml" />
     <Content Include="Views\Venta\_detailVenta.cshtml" />
     <Content Include="Views\Venta\POS.cshtml" />
+    <Content Include="Views\Venta\_boletaVenta.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

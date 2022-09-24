@@ -14,7 +14,7 @@ namespace SistemaCajaRegistradora.Models.ViewModels
         public int stock { get; set; }
         public int stockmin { get; set; }
         public int stockmax { get; set; }
-        public string fechacreacion { get; set; }
+        public DateTime fechacreacion { get; set; }
         public string rutaimg { get; set; }
         public string prioridad { get; set; }
         public string categoria { get; set; }

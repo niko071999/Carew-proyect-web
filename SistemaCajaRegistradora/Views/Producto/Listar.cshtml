@@ -91,13 +91,20 @@
         </div>
         <!-- filter -->
         <div class="row">
-            <div class="col col-6">
+            <div class="col col-5">
                 <div class="input-group mb-2">
                     <span class="input-group-text" id="preciomin">Precio min.</span>
                     <input id="text_preciomin" type="text" class="form-control" placeholder="Ingrese precio minimo" aria-describedby="preciomin">
                     <span class="input-group-text" id="preciomax">Precio max.</span>
                     <input id="text_preciomax" type="text" class="form-control" placeholder="Ingrese precio maximo" aria-describedby="preciomax">
                 </div>
+            </div>
+            <div class="col col-2">
+                <div class="d-flex justify-content-center" style="height: 40px;">
+                    <div class="vr"></div>
+                </div>
+            </div>
+            <div class="col col-5">
             </div>
         </div>
         <!-- table -->
@@ -106,15 +113,15 @@
                 <table id="tablaProducto" class="w-100 table table-sm table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th scope="col">*id*</th>
+                            <th>*id*</th>
                             <th scope="col">Codigo barra</th>
                             <th scope="col">Imagen</th>
                             <th scope="col">Nombre</th>
                             <th scope="col">Categoria</th>
                             <th scope="col">Precio</th>
                             <th scope="col">Stock</th>
-                            <th scope="col">*stockmin*</th>
-                            <th scope="col">*stockmax*</th>
+                            <th>*stockmin*</th>
+                            <th>*stockmax*</th>
                             <th scope="col">Prioridad</th>
                             <th scope="col">Fecha creacion</th>
                             <th scope="col">Acciones</th>

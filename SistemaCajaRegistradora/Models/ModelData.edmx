@@ -13,6 +13,16 @@
           <Property Name="nombre" Type="nchar" MaxLength="20" Nullable="false" />
           <Property Name="descripcion" Type="nchar" MaxLength="255" />
         </EntityType>
+        <EntityType Name="DetalleVenta">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="productoid" Type="int" Nullable="false" />
+          <Property Name="ventaid" Type="bigint" Nullable="false" />
+          <Property Name="total_precio_producto" Type="int" Nullable="false" />
+          <Property Name="total_cantidad_producto" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="MetodoPagos">
           <Key>
             <PropertyRef Name="id" />
@@ -86,32 +96,43 @@
           <Property Name="rolid" Type="int" Nullable="false" />
           <Property Name="solrespass" Type="bit" />
         </EntityType>
-        <!--Errores durante la generación:
-advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
-        <EntityType Name="venta_producto">
-          <Key>
-            <PropertyRef Name="productoid" />
-            <PropertyRef Name="ventaid" />
-            <PropertyRef Name="total_precio_producto" />
-            <PropertyRef Name="total_cantidad_producto" />
-          </Key>
-          <Property Name="productoid" Type="int" Nullable="false" />
-          <Property Name="ventaid" Type="int" Nullable="false" />
-          <Property Name="total_precio_producto" Type="int" Nullable="false" />
-          <Property Name="total_cantidad_producto" Type="int" Nullable="false" />
-        </EntityType>
         <EntityType Name="Ventas">
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="total_venta" Type="int" Nullable="false" />
           <Property Name="fecha_creacion" Type="date" Nullable="false" />
           <Property Name="vuelto" Type="int" Nullable="false" />
           <Property Name="cajeroid" Type="int" Nullable="false" />
           <Property Name="metodo_pagoid" Type="int" Nullable="false" />
           <Property Name="monto_ingresado" Type="int" Nullable="false" />
+          <Property Name="num_boleta" Type="bigint" Nullable="false" />
         </EntityType>
+        <Association Name="FK_DetalleVenta_Productos">
+          <End Role="Productos" Type="Self.Productos" Multiplicity="1" />
+          <End Role="DetalleVenta" Type="Self.DetalleVenta" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Productos">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="DetalleVenta">
+              <PropertyRef Name="productoid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DetalleVenta_Ventas">
+          <End Role="Ventas" Type="Self.Ventas" Multiplicity="1" />
+          <End Role="DetalleVenta" Type="Self.DetalleVenta" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ventas">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="DetalleVenta">
+              <PropertyRef Name="ventaid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Operaciones_Modulos">
           <End Role="Modulos" Type="Self.Modulos" Multiplicity="1" />
           <End Role="Operaciones" Type="Self.Operaciones" Multiplicity="*" />
@@ -188,34 +209,6 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_venta_producto_Productos">
-          <End Role="Productos" Type="Self.Productos" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="venta_producto" Type="Self.venta_producto" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Productos">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="venta_producto">
-              <PropertyRef Name="productoid" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_venta_producto_Ventas">
-          <End Role="Ventas" Type="Self.Ventas" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="venta_producto" Type="Self.venta_producto" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Ventas">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="venta_producto">
-              <PropertyRef Name="ventaid" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Ventas_MetodoPagos">
           <End Role="MetodoPagos" Type="Self.MetodoPagos" Multiplicity="1" />
           <End Role="Ventas" Type="Self.Ventas" Multiplicity="*" />
@@ -242,6 +235,7 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
         </Association>
         <EntityContainer Name="CarewModelStoreContainer">
           <EntitySet Name="Categorias" EntityType="Self.Categorias" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DetalleVenta" EntityType="Self.DetalleVenta" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="MetodoPagos" EntityType="Self.MetodoPagos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Modulos" EntityType="Self.Modulos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Operaciones" EntityType="Self.Operaciones" Schema="dbo" store:Type="Tables" />
@@ -251,14 +245,14 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
           <EntitySet Name="Roles" EntityType="Self.Roles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Usuarios" EntityType="Self.Usuarios" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Ventas" EntityType="Self.Ventas" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="venta_producto" EntityType="Self.venta_producto" store:Type="Tables" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [venta_producto].[productoid] AS [productoid], 
-    [venta_producto].[ventaid] AS [ventaid], 
-    [venta_producto].[total_precio_producto] AS [total_precio_producto], 
-    [venta_producto].[total_cantidad_producto] AS [total_cantidad_producto]
-    FROM [dbo].[venta_producto] AS [venta_producto]</DefiningQuery>
-          </EntitySet>
+          <AssociationSet Name="FK_DetalleVenta_Productos" Association="Self.FK_DetalleVenta_Productos">
+            <End Role="Productos" EntitySet="Productos" />
+            <End Role="DetalleVenta" EntitySet="DetalleVenta" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DetalleVenta_Ventas" Association="Self.FK_DetalleVenta_Ventas">
+            <End Role="Ventas" EntitySet="Ventas" />
+            <End Role="DetalleVenta" EntitySet="DetalleVenta" />
+          </AssociationSet>
           <AssociationSet Name="FK_Operaciones_Modulos" Association="Self.FK_Operaciones_Modulos">
             <End Role="Modulos" EntitySet="Modulos" />
             <End Role="Operaciones" EntitySet="Operaciones" />
@@ -283,14 +277,6 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
             <End Role="Roles" EntitySet="Roles" />
             <End Role="Usuarios" EntitySet="Usuarios" />
           </AssociationSet>
-          <AssociationSet Name="FK_venta_producto_Productos" Association="Self.FK_venta_producto_Productos">
-            <End Role="Productos" EntitySet="Productos" />
-            <End Role="venta_producto" EntitySet="venta_producto" />
-          </AssociationSet>
-          <AssociationSet Name="FK_venta_producto_Ventas" Association="Self.FK_venta_producto_Ventas">
-            <End Role="Ventas" EntitySet="Ventas" />
-            <End Role="venta_producto" EntitySet="venta_producto" />
-          </AssociationSet>
           <AssociationSet Name="FK_Ventas_MetodoPagos" Association="Self.FK_Ventas_MetodoPagos">
             <End Role="MetodoPagos" EntitySet="MetodoPagos" />
             <End Role="Ventas" EntitySet="Ventas" />
@@ -312,6 +298,18 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
           <Property Name="nombre" Type="String" MaxLength="20" FixedLength="true" Unicode="true" Nullable="false" />
           <Property Name="descripcion" Type="String" MaxLength="255" FixedLength="true" Unicode="true" />
           <NavigationProperty Name="Productos" Relationship="Self.FK_Productos_Categorias" FromRole="Categorias" ToRole="Productos" />
+        </EntityType>
+        <EntityType Name="DetalleVenta">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="productoid" Type="Int32" Nullable="false" />
+          <Property Name="ventaid" Type="Int64" Nullable="false" />
+          <Property Name="total_precio_producto" Type="Int32" Nullable="false" />
+          <Property Name="total_cantidad_producto" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Producto" Relationship="Self.FK_DetalleVenta_Productos" FromRole="DetalleVenta" ToRole="Productos" />
+          <NavigationProperty Name="Venta" Relationship="Self.FK_DetalleVenta_Ventas" FromRole="DetalleVenta" ToRole="Ventas" />
         </EntityType>
         <EntityType Name="MetodoPago">
           <Key>
@@ -363,8 +361,8 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
           <Property Name="prioridadid" Type="Int32" Nullable="false" />
           <Property Name="categoriaid" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Categoria" Relationship="Self.FK_Productos_Categorias" FromRole="Productos" ToRole="Categorias" />
+          <NavigationProperty Name="DetalleVentas" Relationship="Self.FK_DetalleVenta_Productos" FromRole="Productos" ToRole="DetalleVenta" />
           <NavigationProperty Name="Prioridade" Relationship="Self.FK_Productos_Prioridades" FromRole="Productos" ToRole="Prioridades" />
-          <NavigationProperty Name="venta_producto" Relationship="Self.FK_venta_producto_Productos" FromRole="Productos" ToRole="venta_producto" />
         </EntityType>
         <EntityType Name="rol_operacion">
           <Key>
@@ -396,38 +394,25 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
           <Property Name="apellido" Type="String" MaxLength="30" FixedLength="true" Unicode="true" Nullable="false" />
           <Property Name="rutaImg" Type="String" MaxLength="255" FixedLength="true" Unicode="true" />
           <Property Name="rolid" Type="Int32" Nullable="false" />
+          <Property Name="solrespass" Type="Boolean" />
           <NavigationProperty Name="Role" Relationship="Self.FK_Usuarios_Roles" FromRole="Usuarios" ToRole="Roles" />
           <NavigationProperty Name="Ventas" Relationship="Self.FK_Ventas_Usuarios" FromRole="Usuarios" ToRole="Ventas" />
-          <Property Name="solrespass" Type="Boolean" />
         </EntityType>
         <EntityType Name="Venta">
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="total_venta" Type="Int32" Nullable="false" />
           <Property Name="fecha_creacion" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="vuelto" Type="Int32" Nullable="false" />
           <Property Name="cajeroid" Type="Int32" Nullable="false" />
           <Property Name="metodo_pagoid" Type="Int32" Nullable="false" />
+          <Property Name="monto_ingresado" Type="Int32" Nullable="false" />
+          <Property Name="num_boleta" Type="Int64" Nullable="false" />
+          <NavigationProperty Name="DetalleVentas" Relationship="Self.FK_DetalleVenta_Ventas" FromRole="Ventas" ToRole="DetalleVenta" />
           <NavigationProperty Name="MetodoPago" Relationship="Self.FK_Ventas_MetodoPagos" FromRole="Ventas" ToRole="MetodoPagos" />
           <NavigationProperty Name="Usuario" Relationship="Self.FK_Ventas_Usuarios" FromRole="Ventas" ToRole="Usuarios" />
-          <NavigationProperty Name="venta_producto" Relationship="Self.FK_venta_producto_Ventas" FromRole="Ventas" ToRole="venta_producto" />
-          <Property Name="monto_ingresado" Type="Int32" Nullable="false" />
-        </EntityType>
-        <EntityType Name="venta_producto">
-          <Key>
-            <PropertyRef Name="productoid" />
-            <PropertyRef Name="ventaid" />
-            <PropertyRef Name="total_precio_producto" />
-            <PropertyRef Name="total_cantidad_producto" />
-          </Key>
-          <Property Name="productoid" Type="Int32" Nullable="false" />
-          <Property Name="ventaid" Type="Int32" Nullable="false" />
-          <Property Name="total_precio_producto" Type="Int32" Nullable="false" />
-          <Property Name="total_cantidad_producto" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Producto" Relationship="Self.FK_venta_producto_Productos" FromRole="venta_producto" ToRole="Productos" />
-          <NavigationProperty Name="Venta" Relationship="Self.FK_venta_producto_Ventas" FromRole="venta_producto" ToRole="Ventas" />
         </EntityType>
         <Association Name="FK_Productos_Categorias">
           <End Role="Categorias" Type="Self.Categoria" Multiplicity="1" />
@@ -438,6 +423,30 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
             </Principal>
             <Dependent Role="Productos">
               <PropertyRef Name="categoriaid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DetalleVenta_Productos">
+          <End Role="Productos" Type="Self.Producto" Multiplicity="1" />
+          <End Role="DetalleVenta" Type="Self.DetalleVenta" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Productos">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="DetalleVenta">
+              <PropertyRef Name="productoid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DetalleVenta_Ventas">
+          <End Role="Ventas" Type="Self.Venta" Multiplicity="1" />
+          <End Role="DetalleVenta" Type="Self.DetalleVenta" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ventas">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="DetalleVenta">
+              <PropertyRef Name="ventaid" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -491,20 +500,6 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_venta_producto_Productos">
-          <End Role="Productos" Type="Self.Producto" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="venta_producto" Type="Self.venta_producto" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Productos">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="venta_producto">
-              <PropertyRef Name="productoid" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_rol_operacion_Roles">
           <End Role="Roles" Type="Self.Role" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -543,22 +538,9 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_venta_producto_Ventas">
-          <End Role="Ventas" Type="Self.Venta" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="venta_producto" Type="Self.venta_producto" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Ventas">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="venta_producto">
-              <PropertyRef Name="ventaid" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityContainer Name="ModelData" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Categorias" EntityType="Self.Categoria" />
+          <EntitySet Name="DetalleVentas" EntityType="Self.DetalleVenta" />
           <EntitySet Name="MetodoPagos" EntityType="Self.MetodoPago" />
           <EntitySet Name="Modulos" EntityType="Self.Modulo" />
           <EntitySet Name="Operaciones" EntityType="Self.Operacione" />
@@ -568,10 +550,17 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
           <EntitySet Name="Roles" EntityType="Self.Role" />
           <EntitySet Name="Usuarios" EntityType="Self.Usuario" />
           <EntitySet Name="Ventas" EntityType="Self.Venta" />
-          <EntitySet Name="venta_producto" EntityType="Self.venta_producto" />
           <AssociationSet Name="FK_Productos_Categorias" Association="Self.FK_Productos_Categorias">
             <End Role="Categorias" EntitySet="Categorias" />
             <End Role="Productos" EntitySet="Productos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DetalleVenta_Productos" Association="Self.FK_DetalleVenta_Productos">
+            <End Role="Productos" EntitySet="Productos" />
+            <End Role="DetalleVenta" EntitySet="DetalleVentas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DetalleVenta_Ventas" Association="Self.FK_DetalleVenta_Ventas">
+            <End Role="Ventas" EntitySet="Ventas" />
+            <End Role="DetalleVenta" EntitySet="DetalleVentas" />
           </AssociationSet>
           <AssociationSet Name="FK_Ventas_MetodoPagos" Association="Self.FK_Ventas_MetodoPagos">
             <End Role="MetodoPagos" EntitySet="MetodoPagos" />
@@ -589,10 +578,6 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
             <End Role="Prioridades" EntitySet="Prioridades" />
             <End Role="Productos" EntitySet="Productos" />
           </AssociationSet>
-          <AssociationSet Name="FK_venta_producto_Productos" Association="Self.FK_venta_producto_Productos">
-            <End Role="Productos" EntitySet="Productos" />
-            <End Role="venta_producto" EntitySet="venta_producto" />
-          </AssociationSet>
           <AssociationSet Name="FK_rol_operacion_Roles" Association="Self.FK_rol_operacion_Roles">
             <End Role="Roles" EntitySet="Roles" />
             <End Role="rol_operacion" EntitySet="rol_operacion" />
@@ -604,10 +589,6 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
           <AssociationSet Name="FK_Ventas_Usuarios" Association="Self.FK_Ventas_Usuarios">
             <End Role="Usuarios" EntitySet="Usuarios" />
             <End Role="Ventas" EntitySet="Ventas" />
-          </AssociationSet>
-          <AssociationSet Name="FK_venta_producto_Ventas" Association="Self.FK_venta_producto_Ventas">
-            <End Role="Ventas" EntitySet="Ventas" />
-            <End Role="venta_producto" EntitySet="venta_producto" />
           </AssociationSet>
         </EntityContainer>
       </Schema>
@@ -622,6 +603,17 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="nombre" ColumnName="nombre" />
                 <ScalarProperty Name="descripcion" ColumnName="descripcion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DetalleVentas">
+            <EntityTypeMapping TypeName="CarewModel.DetalleVenta">
+              <MappingFragment StoreEntitySet="DetalleVenta">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="productoid" ColumnName="productoid" />
+                <ScalarProperty Name="ventaid" ColumnName="ventaid" />
+                <ScalarProperty Name="total_precio_producto" ColumnName="total_precio_producto" />
+                <ScalarProperty Name="total_cantidad_producto" ColumnName="total_cantidad_producto" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -695,7 +687,6 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
           <EntitySetMapping Name="Usuarios">
             <EntityTypeMapping TypeName="CarewModel.Usuario">
               <MappingFragment StoreEntitySet="Usuarios">
-                <ScalarProperty Name="solrespass" ColumnName="solrespass" />
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="nombreUsuario" ColumnName="nombreUsuario" />
                 <ScalarProperty Name="clave" ColumnName="clave" />
@@ -703,29 +694,21 @@ advertencia 6002: La tabla o vista 'Carew.dbo.venta_producto' no tiene definida 
                 <ScalarProperty Name="apellido" ColumnName="apellido" />
                 <ScalarProperty Name="rutaImg" ColumnName="rutaImg" />
                 <ScalarProperty Name="rolid" ColumnName="rolid" />
+                <ScalarProperty Name="solrespass" ColumnName="solrespass" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Ventas">
             <EntityTypeMapping TypeName="CarewModel.Venta">
               <MappingFragment StoreEntitySet="Ventas">
-                <ScalarProperty Name="monto_ingresado" ColumnName="monto_ingresado" />
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="total_venta" ColumnName="total_venta" />
                 <ScalarProperty Name="fecha_creacion" ColumnName="fecha_creacion" />
                 <ScalarProperty Name="vuelto" ColumnName="vuelto" />
                 <ScalarProperty Name="cajeroid" ColumnName="cajeroid" />
                 <ScalarProperty Name="metodo_pagoid" ColumnName="metodo_pagoid" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="venta_producto">
-            <EntityTypeMapping TypeName="CarewModel.venta_producto">
-              <MappingFragment StoreEntitySet="venta_producto">
-                <ScalarProperty Name="productoid" ColumnName="productoid" />
-                <ScalarProperty Name="ventaid" ColumnName="ventaid" />
-                <ScalarProperty Name="total_precio_producto" ColumnName="total_precio_producto" />
-                <ScalarProperty Name="total_cantidad_producto" ColumnName="total_cantidad_producto" />
+                <ScalarProperty Name="monto_ingresado" ColumnName="monto_ingresado" />
+                <ScalarProperty Name="num_boleta" ColumnName="num_boleta" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

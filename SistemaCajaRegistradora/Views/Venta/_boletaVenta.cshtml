@@ -1,14 +1,22 @@
 ﻿@model IEnumerable<SistemaCajaRegistradora.Models.DetalleVenta>
 
-<div class="modal-dialog modal-lg modal-fullscreen-md-down">
+<div class="modal-dialog">
     <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel">Detalles de la venta</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body overflow-auto">
-            <h3>Productos de la venta</h3>
-            <table class="table table-sm table-secondary">
+        <div class="modal-body boleta table-responsive">
+            <ul class="list-unstyled">
+                <li class="h3 fw-bold">ALMACEN PAN Y VINO</li>
+                <li>RUT: 12.491.384-5</li>
+                <li>DIRECCIÓN: PJE. HERMOSO, TALCA, REGION DEL MAULE</li>
+                <li>GIRO: MINIMARKET BOTILLERÍA</li>
+                <li>TELEFONO: 9 87654321</li>
+                <li class="h3 fw-bold text-center">BOLETA N°: @Model.First().Venta.num_boleta</li>
+                <li class="text-center">FECHA EMISION: @Model.First().Venta.fecha_creacion.ToShortDateString()</li>
+                <li class="text-center">CAJERO: @Model.First().Venta.Usuario.nombre @Model.First().Venta.Usuario.apellido</li>
+            </ul>
+            <table class="table table-sm table-borderless">
                 <thead>
                     <tr>
                         <th scope="col">Nombre</th>
@@ -23,8 +31,8 @@
                         <tr>
                             <td>@item.Producto.nombre.Trim()</td>
                             <td class="precio">@item.Producto.precio</td>
-                            <td class="numero">@item.total_cantidad_producto</td>
-                            <td class="precio">@item.total_precio_producto</td>
+                            <td class="numero text-end">@item.total_cantidad_producto</td>
+                            <td class="precio text-end">@item.total_precio_producto</td>
                         </tr>
                     }
                 </tbody>
@@ -35,33 +43,26 @@
                         </td>
                         <td class="precio">@Model.First().Venta.total_venta</td>
                     </tr>
-                    <tr>
-                        <td colspan="3">
-                            <p class="text-end fw-bold">Metodo de pago</p>
-                        </td>
-                        <td>@Model.First().Venta.MetodoPago.metodo_pago.Trim()</td>
-                    </tr>
-                    <tr>
-                        <td colspan="3">
-                            <p class="text-end fw-bold">Monto entregado</p>
-                        </td>
-                        <td class="precio">@Model.First().Venta.monto_ingresado</td>
-                    </tr>
-                    <tr>
-                        <td colspan="3">
-                            <p class="text-end fw-bold">Vuelto</p>
-                        </td>
-                        <td class="precio">@Model.First().Venta.vuelto</td>
-                    </tr>
                 </tfoot>
             </table>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button id="btn_print" type="button" class="btn btn-secondary">Imprimir</button>
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal">Cerrar</button>
         </div>
     </div>
 </div>
+
 <script type="text/javascript">
     $("td.precio").each(function () { $(this).html(parseFloat($(this).text()).toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })); });
     $("td.numero").each(function () { $(this).html(parseFloat($(this).text()).toLocaleString('es-CL')); });
+    $("#btn_print").click(function () {
+        console.log('imprimiendo...')
+        $(".modal-body").printThis({
+            importCSS: true,
+            importStyle: true,
+        });
+    });
 </script>
+
+@* 12491384_5 *@

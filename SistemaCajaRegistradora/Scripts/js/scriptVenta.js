@@ -5,3 +5,9 @@
         }
     });
 }
+function generarBoleta(id) {
+    $.get('/Venta/viewBoletaVenta/' + id, function (data) {
+        abrirModal(data);
+    });
+}
+

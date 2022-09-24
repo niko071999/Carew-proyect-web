@@ -42,14 +42,121 @@
     <div class="input-group mb-3">
         <span class="input-group-text">Codigo Barra</span>
         <input id="codigoAdd" type="text" class="form-control" placeholder="Ingrese codigo de barra" aria-describedby="btnBorrar">
+        <button id="btn_findproducto" type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" 
+                data-bs-auto-close="outside" aria-expanded="false">
+            <i class="fas fa-search"></i>
+        </button>
+        <div id="dropdownProd" class="dropdown-menu dropdown-menu-end p-4 overflow-auto" style="width: 500px; max-height: 600px" aria-labelledby="btn_findproducto">
+            <h4 class="dropdown-header fw-bold text-center">Listado productos</h4>
+            <table id="findTable" class="table display w-100" >
+                <thead>
+                    <tr>
+                        <th scope="col">Imagen</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Precio</th>
+                        <th scope="col">Stock</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
         <button id="btnBorrar" type="button" class="btn btn-outline-secondary">
             <i class="fas fa-times"></i>
         </button>
         <span class="input-group-text">Cantidad</span>
         <input id="stockProd" type="number" class="form-control" placeholder="Ingrese cantidad" aria-label="Stock del producto">
     </div>
-</div>
+    <div class="row">
+        <div class="col col-8 table-responsive overflow-auto">
+            <table id="tablePos" class="table">
+                <thead class="table-secondary">
+                    <tr>
+                        <th scope="col" class="w-50">Producto</th>
+                        <th scope="col">Precio Unitario</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Precio Total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="bodyTable">
+                </tbody>
+            </table>
+        </div>
+        <div class="col col-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-auto me-auto">
+                            <h5 class="card-title">Detalle de venta</h5>
+                        </div>
+                        <div class="col-auto opacity-75">
+                            <i id="icon_circle" class="fas fa-circle text-secondary"></i>
+                            <span id="txt_estadoVenta" class="fw-bold h6">Sin proceso de Venta</span>
+                        </div>
+                    </div>
+                    <div id="btn_groupmetodo" class="btn-group w-100" role="group"
+                         aria-label="Basic radio toggle button group">
+                        <input type="radio" class="btn-check" name="btnradio"
+                               id="btn_efectivo" autocomplete="off" checked>
+                        <label class="btn btn-outline-success" for="btn_efectivo">
+                            Efectivo
+                        </label>
 
+                        <input type="radio" class="btn-check" name="btnradio"
+                               id="btn_debcred" autocomplete="off">
+                        <label class="btn btn-outline-success" for="btn_debcred">
+                            Credito/Debito
+                        </label>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tbody id="tableInfo">
+                                <tr>
+                                    <td>
+                                        <p class="h4 fw-bold">Metodo de pago:</p>
+                                    </td>
+                                    <td id="txt_metodopago" class="h4 text-end fw-bold"></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p class="h4 fw-bold">Productos añadidos:</p>
+                                    </td>
+                                    <td id="cantidadTotalProd" class="numero h4 text-end fw-bold">0</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p class="fw-bold h4">Total venta:</p>
+                                    </td>
+                                    <td id="precioTotalPagar" class="precio h4 fw-bold text-end">0</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p class="fw-bold h4">Monto recibido:</p>
+                                    </td>
+                                    <td class="h4 fw-bold">
+                                        <input id="input_montoRecibido"
+                                               class="form-control form-control-lg text-end" type="text"
+                                               placeholder="Monto">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p class="fw-bold h4">Vuelto:</p>
+                                    </td>
+                                    <td id="totalVuelto" class="precio h4 fw-bold text-end">0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button id="btn_finalizarventa" class="btn btn-success btn-lg" type="button">Finalizar Venta</button>
+                        <button id="btn_cancelarventa" class="btn btn-outline-secondary" type="button">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <!-- Modal core base-->
@@ -57,4 +164,6 @@
      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
 
 </div>
+<script src="~/Scripts/js/printThis.js"></script>
 <script src="~/Scripts/js/scriptspos.js"></script>
+<script src="~/Scripts/Datatable/dtProducto.js"></script>

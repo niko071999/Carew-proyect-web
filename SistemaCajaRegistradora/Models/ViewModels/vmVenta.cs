@@ -7,7 +7,7 @@ namespace SistemaCajaRegistradora.Models.ViewModels
 {
     public class vmVenta
     {
-        public int id { get; set; }
+        public long id { get; set; }
         public string cajero { get; set; }
         public string metodoPago { get; set; }
         public int totalVenta { get; set; }

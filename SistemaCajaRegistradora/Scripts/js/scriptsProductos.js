@@ -17,6 +17,8 @@ let borrarCod = document.getElementById('btnBorrar');
 //});
 stockProd.addEventListener("change", verificarStock);
 borrarCod.addEventListener("click", borrarCodigo);
+$("#text_preciomin").change(formatearIputs);
+$("#text_preciomax").change(formatearIputs);
 $('#btnAplicar').attr('disabled', true);
 
 //listener modal
@@ -41,6 +43,12 @@ $('#stockProd').bind('keyup', function (e) {
     cargarExistencias(key);
 });
 
+function formatearIputs() {
+    $("#text_preciomin").val(parseFloat($("#text_preciomin").val().replace(/[$.]/g, ''))
+        .toLocaleString('es-CL'));
+    $("#text_preciomax").val(parseFloat($("#text_preciomax").val().replace(/[$.]/g, ''))
+        .toLocaleString('es-CL'));
+}
 function cargarExistencias(key) {
     var codigo = $('#codigoAdd').val();
     var newStock = $('#stockProd').val();
@@ -104,6 +112,7 @@ function drawList() {
                 </li>`
         );
         $('#codigoAdd').val('');
+        $('#codigoAdd').focus();
         $('#stockProd').val(1);
     }
 }
@@ -166,10 +175,11 @@ function borrarCodigo() {
     $("#codigoAdd").val('');
 }
 function quitarItem(codigoItem) {
-    lista = lista.filter((item) => item.codigobarra != codigoItem)
-    console.log(lista);
+    lista = lista.filter((item) => item.codigobarra != codigoItem);
     $('#listProductos').empty();
-    $('#btnAplicar').attr('disabled', true);
+    if (lista.length == 0) {
+        $('#btnAplicar').attr('disabled', true);
+    }
     drawList();
 }
 
@@ -462,26 +472,8 @@ function obtenerPrecios() {
         $("#text_preciomin").val(min);
         $("#text_preciomax").val(max);
 
-        aplicarFormato($("#text_preciomin").val(),'min');
-        aplicarFormato($("#text_preciomax").val(), 'max');
+        formatearIputs();
     });
-}
-
-function aplicarFormato(n,t) {
-    const f = new Intl.NumberFormat('es-CL', {
-        style: 'currency',
-        currency: 'CLP'
-    });
-    switch (t) {
-        case t === 'min':
-            $("#text_preciomin").val(f.format(n));     
-            break;
-        case t === 'max':
-            $("#text_preciomax").val(f.format(n));
-            break;
-        default:
-
-    }
 }
 function accion(cod, id) {
     //SI COD == 1 : EDITAR - SI COD == 2 : BORRAR - SI COD == 3 : VISUALIZAR IMAGEN

@@ -40,10 +40,10 @@
         </div>
         <div class="col-4">
             <div class="d-grid gap-2 mb-2">
-                <button class="btn color-carew text-white" onclick="gotoPOS('@Url.Action("POS","Venta")')" type="button">
+                <a class="btn color-carew text-white" href="@Url.Action("POS","Venta")">
                     <i class="fas fa-cash-register"></i>
                     Ir a POS
-                </button>
+                </a>
             </div>
         </div>
         <!-- table -->
@@ -69,5 +69,6 @@
      aria-hidden="true" data-bs-backdrop="static">
 
 </div>
+<script src="~/Scripts/js/printThis.js"></script>
 <script src="~/Scripts/js/scriptVenta.js"></script>
 <script src="~/Scripts/Datatable/dtVenta.js"></script>

@@ -12,10 +12,11 @@ namespace SistemaCajaRegistradora.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class venta_producto
+    public partial class DetalleVenta
     {
+        public long id { get; set; }
         public int productoid { get; set; }
-        public int ventaid { get; set; }
+        public long ventaid { get; set; }
         public int total_precio_producto { get; set; }
         public int total_cantidad_producto { get; set; }
     
