@@ -55,30 +55,6 @@
                             .display(data);
                         return number;
                     }
-                },
-                {
-                    data: 'stock',
-                    render: function (data) {
-                        sprod = data;
-                        let number = $.fn.dataTable.render
-                            .number('.', ',', 0)
-                            .display(data);
-                        return number;
-                    }
-                },
-                {
-                    data: 'codigobarra',
-                    render: function (data) {
-                        let codigo = data;
-                        return `<button class="btn btn-success" type="button" onclick="ingresarCodigo(${codigo})">
-                                    <i class="fas fa-check"></i>
-                            </button>`;
-                    }
-                }
-            ],
-            language: {
-                url: 'https://cdn.datatables.net/plug-ins/1.12.0/i18n/es-ES.json',
-            }
         });
     }
     if (tabla1) {
