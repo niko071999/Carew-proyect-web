@@ -1,4 +1,6 @@
-﻿<div class="modal-dialog">
+﻿@model SistemaCajaRegistradora.Models.Producto
+
+<div class="modal-dialog">
     <div class="modal-content">
         <form enctype="multipart/form-data">
             <div class="modal-header">
@@ -6,6 +8,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <h5 class="fw-bold">Producto: @Model.codigo_barra - @Model.nombre</h5>
                 <label for="idArchivo" class="form-label">Seleccione imagen. (Formato JPG o PNG)</label>
                 <input class="form-control form-control-sm" onchange="desabilitar()" accept=".jpg,.png" id="idArchivo" type="file">
             </div>

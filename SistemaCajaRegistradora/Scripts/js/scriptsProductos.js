@@ -4,22 +4,29 @@
 
 let mensaje = '';
 let lista = [];
+let min = 0;
+let max = 0;
 
-let txt_min = document.getElementById('txt_preciomin');
-let txt_max = document.getElementById('txt_preciomax');
 let stockProd = document.getElementById('stockProd');
 let borrarCod = document.getElementById('btnBorrar');
-//txt_min.addEventListener("change", function () {
-//    aplicarFormato(txt_min.value, 'min');
-//});
-//txt_max.addEventListener("change", function () {
-//    aplicarFormato(txt_max.value, 'max');
-//});
 stockProd.addEventListener("change", verificarStock);
 borrarCod.addEventListener("click", borrarCodigo);
-$("#text_preciomin").change(formatearIputs);
-$("#text_preciomax").change(formatearIputs);
-$('#btnAplicar').attr('disabled', true);
+
+$("#btnAplicar").attr('disabled', true);
+$("#text_preciomin").change(function () {
+    let txt_min = parseInt($("#text_preciomin").val().replace(/[$.]/g, ''));
+    if (txt_min < min || txt_min > max) {
+        $("#text_preciomin").val(min);
+        formatearIputs();
+    }
+});
+$("#text_preciomax").change(function () {
+    let txt_max = parseInt($("#text_preciomax").val().replace(/[$.]/g, ''));
+    if (txt_max < min || txt_max > max) {
+        $("#text_preciomax").val(max);
+        formatearIputs();
+    }
+});
 
 //listener modal
 let coreModal = document.getElementById('coreModal');
@@ -466,8 +473,8 @@ function obtenerPrecios() {
         });
     });
     promesa.then((data) => {
-        let min = Math.min.apply(null, data);
-        let max = Math.max.apply(null, data);
+        min = Math.min.apply(null, data);
+        max = Math.max.apply(null, data);
 
         $("#text_preciomin").val(min);
         $("#text_preciomax").val(max);

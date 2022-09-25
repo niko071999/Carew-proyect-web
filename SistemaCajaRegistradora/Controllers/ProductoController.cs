@@ -1,12 +1,12 @@
-﻿using SistemaCajaRegistradora.Models;
+﻿using SistemaCajaRegistradora.Filters;
+using SistemaCajaRegistradora.Models;
+using SistemaCajaRegistradora.Models.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using System.Data.Entity;
-using SistemaCajaRegistradora.Filters;
-using SistemaCajaRegistradora.Models.ViewModels;
 
 namespace SistemaCajaRegistradora.Controllers
 {
@@ -119,7 +119,8 @@ namespace SistemaCajaRegistradora.Controllers
         public PartialViewResult formsImagen(int? id)
         {
             Session["idProducto"] = id;
-            return PartialView("_formsImagen");
+            var producto = db.Productos.Where(p=>p.id==id).FirstOrDefault();
+            return PartialView("_formsImagen", producto);
         }
 
         [HttpPost]

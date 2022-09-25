@@ -91,41 +91,49 @@
         </div>
         <!-- filter -->
         <div class="row">
-            <div class="col col-5">
+            <div class="col col-4">
                 <div class="input-group mb-2">
                     <span class="input-group-text" id="preciomin">Precio min.</span>
+                    <span class="input-group-text" id="preciomin">$</span>
                     <input id="text_preciomin" type="text" class="form-control" placeholder="Ingrese precio minimo" aria-describedby="preciomin">
                     <span class="input-group-text" id="preciomax">Precio max.</span>
+                    <span class="input-group-text" id="preciomax">$</span>
                     <input id="text_preciomax" type="text" class="form-control" placeholder="Ingrese precio maximo" aria-describedby="preciomax">
                 </div>
             </div>
-            <div class="col col-2">
+            <div class="col col-1">
                 <div class="d-flex justify-content-center" style="height: 40px;">
                     <div class="vr"></div>
                 </div>
             </div>
-            <div class="col col-5">
+            <div class="col col-4 d-flex align-items-center">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="text_viewstockmin">
+                    <label class="form-check-label" for="text_viewstockmin">
+                        Productos por debajo del stock minimo
+                    </label>
+                </div>
             </div>
         </div>
         <!-- table -->
         <div class="row mb-2">
             <div class="col-12 table-responsive">
-                <table id="tablaProducto" class="w-100 table table-sm table-bordered table-hover">
+                <table id="tablaProducto" class="table table-sm table-bordered table-hover display nowrap">
                     <thead>
                         <tr>
-                            <th>*id*</th>
-                            <th scope="col">Codigo barra</th>
-                            <th scope="col">Imagen</th>
-                            <th scope="col">Nombre</th>
-                            <th scope="col">Categoria</th>
-                            <th scope="col">Precio</th>
-                            <th scope="col">Stock</th>
+                            <th style="width:2%"></th>
+                            <th scope="col" style="width: 12%">Codigo barra</th>
+                            <th scope="col" style="width: 10%">Imagen</th>
+                            <th scope="col" style="width: 35%">Nombre</th>
+                            <th scope="col" style="width: 10%">Categoria</th>
+                            <th scope="col" style="width: 5%">Precio</th>
+                            <th scope="col" style="width: 5%">Stock</th>
                             <th>*stockmin*</th>
                             <th>*stockmax*</th>
-                            <th scope="col">Prioridad</th>
-                            <th scope="col">Fecha creacion</th>
-                            <th scope="col">Acciones</th>
-                            <th scope="col">Informacion</th>
+                            <th scope="col" style="width: 5%">Prioridad</th>
+                            <th scope="col" style="width: 5%">Fecha creacion</th>
+                            <th scope="col" style="width: 9%">Acciones</th>
+                            <th scope="col" style="width: 4%">Avisos</th>
                         </tr>
                     </thead>
                 </table>
