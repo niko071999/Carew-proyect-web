@@ -36,9 +36,6 @@
                     </div>
                 </div>
                 <div class="col-6">
-
-                </div>
-                <div class="col-6">
                     <label id="text_nombre" class="form-label">Nombre</label>
                     @if (Model == null)
                     {
@@ -199,6 +196,7 @@
         let codigo = document.getElementById("codigo_barra").value;
         console.log(codigo);
         if (key === 13) {
+            playBeep();
             if (codigo != '') {
                 generarBarcode(codigo);
                 verificar(codigo);
@@ -299,6 +297,11 @@
             $('#codigoAdd').val(sessionStorage.codigo);
             sessionStorage.clear();
         }
+    }
+
+    function playBeep() {
+        let audio = document.getElementById("audio_beep");
+        audio.play();
     }
 </script>
 <script type="text/javascript" title="cleave">

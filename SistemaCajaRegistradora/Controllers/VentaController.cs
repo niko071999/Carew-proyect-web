@@ -159,8 +159,57 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("finalizarVenta")]
         public JsonResult finalizarVenta(Venta venta)
         {
+            using ( var db1 = new ModelData())
+            {
+                using (var transaction =  db1.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        if (venta != null)
+                        {
+                            Usuario user = (Usuario)Session["User"];
+                            long length = db.Ventas.ToArray().Length + 1;
+
+                            venta.fecha_creacion = DateTime.Now;
+                            venta.cajeroid = user.id;
+                            venta.num_boleta = length; //Generar el num de la boleta
+                            db.Ventas.Add(venta);
+
+
+                            db.SaveChanges();
+                            transaction.Commit();
+                            Session["ventaid"] = venta.id;
+                            return Json(new
+                            {
+                                data = venta
+                            }, JsonRequestBehavior.AllowGet);
+                        }
+                        else
+                        {
+                            transaction.Rollback();
+                            return Json(new
+                            {
+                                data = "",
+                                mensaje = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina"
+                            }, JsonRequestBehavior.AllowGet);
+                        }
+                    }
+                    catch (Exception)
+                    {
+
+                        transaction.Rollback();
+                        return Json(new
+                        {
+                            data = "",
+                            mensaje = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina"
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+
+                }
+            }
+           /*
             DbContextTransaction transaction = db.Database.BeginTransaction();
-            transaction.Commit();
+           // transaction.Commit();
             bool error;
             try
             {
@@ -173,28 +222,27 @@ namespace SistemaCajaRegistradora.Controllers
                     venta.cajeroid = user.id;
                     venta.num_boleta = length; //Generar el num de la boleta
                     db.Ventas.Add(venta);
+
+                    
                     db.SaveChanges();
+                    transaction.Commit();
                     Session["ventaid"] = venta.id;
-                    error = false;
+                    return Json(new
+                    {
+                        data = venta
+                    }, JsonRequestBehavior.AllowGet);
                 }
                 else
                 {
-                    error = true;
-
+                    transaction.Rollback();
+                    return Json(new
+                    {
+                        data = "",
+                        mensaje = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina"
+                    }, JsonRequestBehavior.AllowGet);
                 }
             }
-            catch (Exception) { error = true; }
-
-            if (!error)
-            {
-                transaction.Commit();
-                return Json(new
-                {
-                    data = venta
-                }, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
+            catch (Exception) {
                 transaction.Rollback();
                 return Json(new
                 {
@@ -202,6 +250,26 @@ namespace SistemaCajaRegistradora.Controllers
                     mensaje = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina"
                 }, JsonRequestBehavior.AllowGet);
             }
+
+            //if (!error)
+            //{
+            //    transaction.Commit();
+            //    return Json(new
+            //    {
+            //        data = venta
+            //    }, JsonRequestBehavior.AllowGet);
+            //}
+            //else
+            //{
+            //    transaction.Rollback();
+            //    return Json(new
+            //    {
+            //        data = "",
+            //        mensaje = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina"
+            //    }, JsonRequestBehavior.AllowGet);
+            //}
+
+            */
         }
 
         [HttpPost]
@@ -228,29 +296,54 @@ namespace SistemaCajaRegistradora.Controllers
                             producto.stock = producto.stock - detalle.total_cantidad_producto;
                             db.Entry(producto).State = EntityState.Modified;
                             n = db.SaveChanges();
-                            error = false;
+                            transaction.Commit();
                             throw new Exception("Error");
+                            return Json(n, JsonRequestBehavior.AllowGet);
                         }
                     }
-                    else { error = true; }    
+                    else {
+                        transaction.Rollback();
+                        error = true;
+                        return Json(new
+                        {
+                            data = "",
+                            mensaje = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina"
+                        }, JsonRequestBehavior.AllowGet);
+                    }
                 }
-                else { error = true; }
+                else {
+                    transaction.Rollback();
+                    error = true;
+                    return Json(new
+                    {
+                        data = "",
+                        mensaje = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina"
+                    }, JsonRequestBehavior.AllowGet);
+                }
             }
-            catch (Exception) { error = true; }
-            
-            if (!error)
-            {
-                transaction.Commit();
-                return Json(n, JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
+            catch (Exception) {
                 transaction.Rollback();
-                long id = (long)Session["ventaid"];
-                var venta = db.Ventas.Find(id);
-                db.Ventas.Remove(venta);
-                return Json(n, JsonRequestBehavior.AllowGet);
+                error = true;
+                return Json(new
+                {
+                    data = "",
+                    mensaje = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina"
+                }, JsonRequestBehavior.AllowGet);
             }
+            
+            //if (!error)
+            //{
+            //    transaction.Commit();
+            //    return Json(n, JsonRequestBehavior.AllowGet);
+            //}
+            //else
+            //{
+            //    transaction.Rollback();
+            //    long id = (long)Session["ventaid"];
+            //    var venta = db.Ventas.Find(id);
+            //    db.Ventas.Remove(venta);
+            //    return Json(n, JsonRequestBehavior.AllowGet);
+            //}
         }
 
         [HttpGet]

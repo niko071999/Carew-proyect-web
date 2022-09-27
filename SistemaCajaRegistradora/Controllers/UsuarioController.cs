@@ -8,6 +8,8 @@ using System.Data.Entity;
 using System.Text.RegularExpressions;
 using System.Text;
 using SistemaCajaRegistradora.Filters;
+using System.Security.Claims;
+using System.Threading;
 
 namespace SistemaCajaRegistradora.Controllers
 {
@@ -32,8 +34,6 @@ namespace SistemaCajaRegistradora.Controllers
         [Autorizacion(idoperacion: 13)]
         public PartialViewResult AgregarForms()
         {
-            var roles = db.Roles.ToList();
-            ViewBag.rolesId = new SelectList(roles, "id", "rol");
             return PartialView("_formsUsuario");
         }
 
@@ -43,10 +43,24 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult AgregarUsuario(Usuario usuario)
         {
             int n = 0;
-            usuario.clave = Encrypt.GetSHA256(usuario.clave);
-            usuario.rutaImg = "./../Assets/images/blank-profile.png";
-            db.Usuarios.Add(usuario);
-            n = db.SaveChanges();
+            if (usuario.rolid == 1)
+            {
+                //Verificar si existe un administrador en el sistema
+                var user = db.Usuarios.Where(u => u.rolid == 1).FirstOrDefault();
+                if (user == null)
+                {
+                    usuario.rolid = 2; //Asignamos el rol de cajero
+                    usuario.clave = Encrypt.GetSHA256(usuario.clave);
+                    usuario.rutaImg = "./../Assets/images/blank-profile.png";
+                    usuario.fecha_creacion = DateTime.UtcNow;
+                    usuario.fecha_modificacion = usuario.fecha_creacion;
+                    db.Usuarios.Add(usuario);
+                    n = db.SaveChanges();
+                    return Json(n, JsonRequestBehavior.AllowGet);
+                }
+                //Si existe un administrador, enviar -1 que significa error de creacion de usuario
+                return Json(-1, JsonRequestBehavior.AllowGet);
+            }
             return Json(n, JsonRequestBehavior.AllowGet);
         }
 
@@ -69,6 +83,7 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult editarUsuario(Usuario usuario)
         {
             int n = 0;
+            usuario.fecha_modificacion = DateTime.UtcNow;
             db.Entry(usuario).State = EntityState.Modified;
             n = db.SaveChanges();
             return Json(n, JsonRequestBehavior.AllowGet);
@@ -100,10 +115,9 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("formsCambiarPass")]
         public PartialViewResult formsCambiarPass()
         {
-            Usuario user = null;
             if (Session["User"] != null)
             {
-                user = (Usuario)Session["User"];
+                Usuario user = (Usuario)Session["User"];
                 return PartialView("_formsCambiarPass", user);
             }
             else

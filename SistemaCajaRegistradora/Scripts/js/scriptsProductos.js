@@ -32,6 +32,15 @@ $("#text_preciomax").change(function () {
 let coreModal = document.getElementById('coreModal');
 coreModal.addEventListener('shown.bs.modal', function () {
     var codigo_barra = $('#codigo_barra').val();
+    if (codigo_barra.trim() != '') {
+        $("#barcode").show();
+        JsBarcode("#barcode", codigo_barra.trim(), {
+            format: "EAN13",
+            lastChar: ">",
+            width: 3,
+        });
+        $("#texto_infocodigobarra").hide();
+    }
     sessionStorage.codigobarrainit = codigo_barra.trim();
 });
 

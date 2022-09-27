@@ -22,6 +22,9 @@
                 @Html.HiddenFor(model => model.id)
                 @Html.HiddenFor(model => model.rutaImg)
                 @Html.HiddenFor(model => model.solrespass)
+                @Html.HiddenFor(model => model.rolid)
+                @Html.HiddenFor(model => model.fecha_creacion)
+                @Html.HiddenFor(model => model.fecha_modificacion)
                 <div class="col-6">
                     <label id="text_nombre" class="form-label">Nombre</label>
                     @Html.TextBoxFor(model => model.nombre, new
@@ -51,11 +54,6 @@
                        @placeholder = "Ingrese nombre de usuario",
                        maxlength = 50
                    })
-                </div>
-                <div class="col-6">
-                    <label id="text_rol" class="form-label">Rol de usuario</label>
-                    @Html.DropDownList("rolesId", null, "Seleccione rol de usuario",
-                    htmlAttributes: new { @class = "form-select" })
                 </div>
                 @if (Model == null)
                 {
@@ -130,7 +128,7 @@
         } else {
             $("#inputapellido").val('');
         }
-    });;
+    });
 
     $("#nombreUsuario").keyup(function () {
         let text = $("#nombreUsuario").val();
@@ -227,13 +225,6 @@
             editarUsuario('@Url.Action("editarUsuario","Usuario")');
         }
 
-    }
-    function cuantasVecesAparece(cadena, caracter) {
-        var indices = [];
-        for (var i = 0; i < cadena.length; i++) {
-            if (cadena[i] === caracter) indices.push(i);
-        }
-        return indices.length;
     }
     function cuantasVecesAparece(cadena, caracter) {
         var indices = [];

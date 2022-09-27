@@ -64,20 +64,7 @@ function finalizarVenta() {
         "monto_ingresado": $("#input_montoRecibido").val().replace(/[$.]/g, ''),
         "num_boleta": ""
     }
-    const insert = new Promise((resolve, reject) => {
-        $.post('/Venta/finalizarVenta', venta, function (data) {
-            if (data.data != '') {
-                resolve(data);
-            } else {
-                reject(data.mensaje);
-            }
-        });
-    });
-    insert.then(venta => {
-        agregarDetalleVenta(venta);
-    }).catch(error => {
-        showMenssage('error', error, true);
-    });
+
 }
 
 function agregarDetalleVenta(venta) {

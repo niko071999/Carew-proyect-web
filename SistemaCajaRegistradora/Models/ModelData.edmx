@@ -57,7 +57,7 @@
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="codigo_barra" Type="nchar" MaxLength="15" Nullable="false" />
+          <Property Name="codigo_barra" Type="nchar" MaxLength="13" Nullable="false" />
           <Property Name="nombre" Type="nchar" MaxLength="100" Nullable="false" />
           <Property Name="precio" Type="int" />
           <Property Name="stock" Type="int" />
@@ -95,6 +95,8 @@
           <Property Name="rutaImg" Type="nchar" MaxLength="255" />
           <Property Name="rolid" Type="int" Nullable="false" />
           <Property Name="solrespass" Type="bit" />
+          <Property Name="fecha_creacion" Type="datetime" />
+          <Property Name="fecha_modificacion" Type="datetime" />
         </EntityType>
         <EntityType Name="Ventas">
           <Key>
@@ -350,7 +352,7 @@
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="codigo_barra" Type="String" MaxLength="15" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="codigo_barra" Type="String" MaxLength="13" FixedLength="true" Unicode="true" Nullable="false" />
           <Property Name="nombre" Type="String" MaxLength="100" FixedLength="true" Unicode="true" Nullable="false" />
           <Property Name="precio" Type="Int32" />
           <Property Name="stock" Type="Int32" />
@@ -397,6 +399,8 @@
           <Property Name="solrespass" Type="Boolean" />
           <NavigationProperty Name="Role" Relationship="Self.FK_Usuarios_Roles" FromRole="Usuarios" ToRole="Roles" />
           <NavigationProperty Name="Ventas" Relationship="Self.FK_Ventas_Usuarios" FromRole="Usuarios" ToRole="Ventas" />
+          <Property Name="fecha_creacion" Type="DateTime" Precision="3" />
+          <Property Name="fecha_modificacion" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="Venta">
           <Key>
@@ -687,6 +691,8 @@
           <EntitySetMapping Name="Usuarios">
             <EntityTypeMapping TypeName="CarewModel.Usuario">
               <MappingFragment StoreEntitySet="Usuarios">
+                <ScalarProperty Name="fecha_modificacion" ColumnName="fecha_modificacion" />
+                <ScalarProperty Name="fecha_creacion" ColumnName="fecha_creacion" />
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="nombreUsuario" ColumnName="nombreUsuario" />
                 <ScalarProperty Name="clave" ColumnName="clave" />

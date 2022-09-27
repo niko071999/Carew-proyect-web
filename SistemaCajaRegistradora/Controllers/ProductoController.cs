@@ -79,7 +79,7 @@ namespace SistemaCajaRegistradora.Controllers
             int n = 0;
             //Se define una imagen por defecto
             producto.rutaImg = "./../Assets/images/productos/default-product-image.png";
-            producto.fecha_creacion = DateTime.Now;
+            producto.fecha_creacion = DateTime.UtcNow;
             db.Productos.Add(producto);
             n = db.SaveChanges();
             return Json(n,JsonRequestBehavior.AllowGet);

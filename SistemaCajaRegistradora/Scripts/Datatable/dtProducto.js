@@ -75,10 +75,7 @@ function generarTabla1() {
     });
     let table = $("#tablaProducto").DataTable({
         responsive: true,
-        lengthMenu: [
-            [5, 10, -1],
-            [5, 10, 'All'],
-        ],
+        dom: '<"toolbar">frtp',
         ajax: {
             'url': '/Producto/getProductos',
             'type': 'GET',
@@ -317,7 +314,6 @@ function generarTabla1() {
             url: 'https://cdn.datatables.net/plug-ins/1.12.0/i18n/es-ES.json',
         }
     });
-
     // Event listener to the two range filtering inputs to redraw on input
     $('#text_preciomin, #text_preciomax').keyup(function () {
         table.draw();
@@ -339,6 +335,7 @@ function generarTabla1() {
             console.log(data[i]);
         }
         initTooltip();
+        table.page.len(5).draw();
     });
 }
 

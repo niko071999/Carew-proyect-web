@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Data.Entity;
+using System.Text;
 
 namespace SistemaCajaRegistradora.Controllers
 {
@@ -13,7 +14,13 @@ namespace SistemaCajaRegistradora.Controllers
         ModelData db = new ModelData();
         public ActionResult Login()
         {
-
+            var usuarios = db.Usuarios.ToArray();
+            //Verificar si existen usuarios en el sistema
+            if (usuarios.Length == 0)
+            {
+                //Si no existen enviar a la vista de bienvenida y creacion de usuarios administrador
+                return RedirectToAction("AgregarUsuarioAdmin");
+            }
             Usuario user;
             if (Session["User"] != null)
             {
@@ -80,6 +87,13 @@ namespace SistemaCajaRegistradora.Controllers
         }
 
         [HttpGet]
+        [ActionName("AgregarUsuarioAdmin")]
+        public ActionResult AgregarUsuarioAdmin()
+        {
+            return View();
+        }
+
+        [HttpGet]
         [ActionName("SignOut")]
         public ActionResult SignOut()
         {
@@ -127,6 +141,44 @@ namespace SistemaCajaRegistradora.Controllers
                 return View();
             }
             return View();
+        }
+
+        //Metodo para agregar el usuario administrador del sistema
+        [HttpPost]
+        [ActionName("AgregarUsuarioAdmin")]
+        public ActionResult AgregarUsuarioAdmin(string firstname, string secondname, string nameuser, string clave, string clave2)
+        {
+            if (!clave.Equals(clave2))
+            {
+                ViewBag.Error = "Asegurese que las claves ingresadas sean las mismas";
+                return View();
+            }
+            
+            Usuario usuario = new Usuario()
+            {
+                nombre = firstname,
+                apellido = secondname,
+                nombreUsuario = nameuser,
+                clave = Encrypt.GetSHA256(clave),
+                rolid = 1,
+                rutaImg = "./../Assets/images/blank-profile.png",
+                solrespass = false,
+                fecha_creacion = DateTime.UtcNow,
+                fecha_modificacion = DateTime.UtcNow
+            };
+            db.Usuarios.Add(usuario);
+            int n = db.SaveChanges();
+            
+            if (n > 0)
+            {
+                Session["User"] = usuario;
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                ViewBag.Error = "Ocurrio un error al guardar el usuario, intentelo de nuevo o mas tarde";
+                return View();
+            }
         }
     }
 }

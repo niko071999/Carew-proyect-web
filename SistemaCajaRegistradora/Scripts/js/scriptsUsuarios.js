@@ -9,12 +9,11 @@ function AgregarUsuario(urlAgregar) {
     var apellido = $('#inputapellido').val();
     var nombreUsuario = $('#nombreUsuario').val();
     var clave = $('#clave').val();
-    var rolid = $('#rolesId').val();
     var rutaImg = '';
     var solrespass = false;
 
     let isValidCampo = true;
-    isValidCampo = validarCampos(nombre, apellido, nombreUsuario, clave, rolid);
+    isValidCampo = validarCampos(nombre, apellido, nombreUsuario, clave);
 
     if (isValidCampo) {
         var usuario = {
@@ -24,8 +23,10 @@ function AgregarUsuario(urlAgregar) {
             "nombreUsuario": nombreUsuario,
             "clave": clave,
             "rutaImg": rutaImg,
-            "rolid": rolid,
-            "solrespass": solrespass
+            "rolid": null,
+            "solrespass": solrespass,
+            "fecha_creacion": null,
+            "fecha_modifiacion": null
         }
         $.post(urlAgregar + '/', usuario, function (data) {
             if (data > 0) {
@@ -33,6 +34,9 @@ function AgregarUsuario(urlAgregar) {
                 sessionStorage.nombre = usuario.nombreUsuario;
                 sessionStorage.mensaje = 'Usuario creado correctamente: ';
                 location = location.href;
+            } else if (data == -1) {
+                mensaje = "Error: Solo se puede crear 1 administrador en el sistema. Ya existe un usuario en el sistema";
+                showMenssage('error', mensaje, true);
             } else {
                 mensaje = "Error: Ocurrio un error en el servidor, intentelo nuevamente";
                 showMenssage('error', mensaje, true);
@@ -55,12 +59,12 @@ function editarUsuario(urlEditar) {
     var apellido = $('#inputapellido').val();
     var nombreUsuario = $('#nombreUsuario').val();
     var clave = $('#clave').val();
-    var rolid = $('#rolesId').val();
+    var rolid = $('#rolid').val();
     var rutaImg = $('#rutaImg').val();
     var solrespass = $('#solrespass').val();
 
     let isValidCampo = true;
-    isValidCampo = validarCampos(nombre, apellido, nombreUsuario, clave, rolid);
+    isValidCampo = validarCampos(nombre, apellido, nombreUsuario, clave);
 
     if (isValidCampo) {
         var usuario = {
@@ -71,7 +75,9 @@ function editarUsuario(urlEditar) {
             "clave": clave,
             "rutaImg": rutaImg,
             "rolid": rolid,
-            "solrespass": solrespass
+            "solrespass": solrespass,
+            "fecha_creacion": null,
+            "fecha_modifiacion": null
         }
         $.post(urlEditar + '/', usuario, function (data) {
             if (data > 0) {
@@ -114,7 +120,10 @@ function cambiarClave(urlChange, pass) {
         "nombreUsuario": 'new',
         "clave": pass,
         "rutaImg": 'r',
-        "rolid": 0
+        "rolid": 0,
+        "solrespass": solrespass,
+        "fecha_creacion": null,
+        "fecha_modifiacion": null
     }
     $.post(urlChange+'/', usuario, function (data) {
         if (data > 0) {
@@ -168,7 +177,7 @@ const abrirModal = (data) => {
         });
     }
 }
-const validarCampos = (nombre, apellido, nombreUsuario, clave, rolid) =>  {
+const validarCampos = (nombre, apellido, nombreUsuario, clave) =>  {
     let valid = true;
     let atr = '';
     let pass = clave.trim();
