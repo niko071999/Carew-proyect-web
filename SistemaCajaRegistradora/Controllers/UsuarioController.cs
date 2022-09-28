@@ -146,7 +146,8 @@ namespace SistemaCajaRegistradora.Controllers
         public PartialViewResult formsImagen(int? id)
         {
             Session["idUser"] = id;
-            return PartialView("_formsImagen");
+            var usuario = db.Usuarios.Where(u => u.id == id).FirstOrDefault();
+            return PartialView("_formsImagenUsuario", usuario);
         }
 
         [HttpPost]

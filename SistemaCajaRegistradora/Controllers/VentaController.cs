@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Data.Entity;
 using SistemaCajaRegistradora.Filters;
+using System.Transactions;
 
 namespace SistemaCajaRegistradora.Controllers
 {
@@ -157,232 +158,109 @@ namespace SistemaCajaRegistradora.Controllers
 
         [HttpPost]
         [ActionName("finalizarVenta")]
-        public JsonResult finalizarVenta(Venta venta)
+        public JsonResult finalizarVenta(vmVentaDetalle ventaDetalle)
         {
-            using ( var db1 = new ModelData())
+            using (TransactionScope scope = new TransactionScope())
             {
-                using (var transaction =  db1.Database.BeginTransaction())
+                using (var db1 = new ModelData())
                 {
+                    string msgError = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina";
+                    string msgSuccess = "Venta creada correctamente";
                     try
                     {
-                        if (venta != null)
+                        if (ventaDetalle != null)
                         {
                             Usuario user = (Usuario)Session["User"];
                             long length = db.Ventas.ToArray().Length + 1;
 
-                            venta.fecha_creacion = DateTime.Now;
-                            venta.cajeroid = user.id;
-                            venta.num_boleta = length; //Generar el num de la boleta
-                            db.Ventas.Add(venta);
+                            //Insercion de los datos de la venta a la base de datos
+                            ventaDetalle.venta.fecha_creacion = DateTime.Now;
+                            ventaDetalle.venta.cajeroid = user.id;
+                            ventaDetalle.venta.num_boleta = length; //Generar el num de la boleta
+                            db.Ventas.Add(ventaDetalle.venta);
+                            int n = db.SaveChanges();
+                            //Si ocurre un error realizar un rollback
+                            if (n == 0)
+                            {
+                                throw new Exception(msgError);
+                            }
 
+                            //Insercion de los datos del detalle a la base de datos
+                            long idVenta = ventaDetalle.venta.id;
+                            for (int i = 0; i < ventaDetalle.dV.Count; i++)
+                            {
+                                ventaDetalle.dV[i].ventaid = idVenta;
+                                db.DetalleVentas.Add(ventaDetalle.dV[i]);
+                                int stockProd = ventaDetalle.dV[i].total_cantidad_producto;
+                                int idprod = ventaDetalle.dV[i].productoid;
 
-                            db.SaveChanges();
-                            transaction.Commit();
-                            Session["ventaid"] = venta.id;
+                                var producto = db.Productos.Find(idprod);
+                                producto.stock = producto.stock - stockProd;
+                                db.Entry(producto).State = EntityState.Modified;
+                            }
+                            n = db.SaveChanges();
+                            
+                            //throw new Exception(msgError);//EXCEPCION
+                                                        
+                            if (n == 0)
+                            {
+                                throw new Exception(msgError);
+                            }
+
+                            scope.Complete();//transaction commit 
+
+                            //Proceso finalizado correctamente
                             return Json(new
                             {
-                                data = venta
+                                data = "OK",
+                                msg = msgSuccess
                             }, JsonRequestBehavior.AllowGet);
                         }
                         else
                         {
-                            transaction.Rollback();
-                            return Json(new
-                            {
-                                data = "",
-                                mensaje = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina"
-                            }, JsonRequestBehavior.AllowGet);
+                            throw new Exception(msgError);
                         }
                     }
                     catch (Exception)
                     {
-
-                        transaction.Rollback();
                         return Json(new
                         {
                             data = "",
-                            mensaje = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina"
+                            msg = msgError
                         }, JsonRequestBehavior.AllowGet);
                     }
-
-                }
-            }
-           /*
-            DbContextTransaction transaction = db.Database.BeginTransaction();
-           // transaction.Commit();
-            bool error;
-            try
-            {
-                if (venta != null)
-                {
-                    Usuario user = (Usuario)Session["User"];
-                    long length = db.Ventas.ToArray().Length + 1;
-
-                    venta.fecha_creacion = DateTime.Now;
-                    venta.cajeroid = user.id;
-                    venta.num_boleta = length; //Generar el num de la boleta
-                    db.Ventas.Add(venta);
-
                     
-                    db.SaveChanges();
-                    transaction.Commit();
-                    Session["ventaid"] = venta.id;
-                    return Json(new
-                    {
-                        data = venta
-                    }, JsonRequestBehavior.AllowGet);
-                }
-                else
-                {
-                    transaction.Rollback();
-                    return Json(new
-                    {
-                        data = "",
-                        mensaje = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina"
-                    }, JsonRequestBehavior.AllowGet);
                 }
             }
-            catch (Exception) {
-                transaction.Rollback();
-                return Json(new
-                {
-                    data = "",
-                    mensaje = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina"
-                }, JsonRequestBehavior.AllowGet);
-            }
-
-            //if (!error)
-            //{
-            //    transaction.Commit();
-            //    return Json(new
-            //    {
-            //        data = venta
-            //    }, JsonRequestBehavior.AllowGet);
-            //}
-            //else
-            //{
-            //    transaction.Rollback();
-            //    return Json(new
-            //    {
-            //        data = "",
-            //        mensaje = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina"
-            //    }, JsonRequestBehavior.AllowGet);
-            //}
-
-            */
-        }
-
-        [HttpPost]
-        [ActionName("agregarDetalleVenta")]
-        public JsonResult agregarDetalleVenta(DetalleVenta detalle)
-        {
-            DbContextTransaction transaction = db.Database.BeginTransaction();
-            transaction.Commit();
-            int n = 0;
-            bool error;
-            try
-            {
-                if (detalle != null)
-                {
-                    detalle.ventaid = (long)Session["ventaid"];
-                    db.DetalleVentas.Add(detalle);
-                    n = db.SaveChanges();
-                    throw new Exception("Error");
-                    if (n > 0)
-                    {
-                        var producto = db.Productos.Where(p => p.id == detalle.productoid).FirstOrDefault();
-                        if (producto!=null)
-                        {
-                            producto.stock = producto.stock - detalle.total_cantidad_producto;
-                            db.Entry(producto).State = EntityState.Modified;
-                            n = db.SaveChanges();
-                            transaction.Commit();
-                            throw new Exception("Error");
-                            return Json(n, JsonRequestBehavior.AllowGet);
-                        }
-                    }
-                    else {
-                        transaction.Rollback();
-                        error = true;
-                        return Json(new
-                        {
-                            data = "",
-                            mensaje = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina"
-                        }, JsonRequestBehavior.AllowGet);
-                    }
-                }
-                else {
-                    transaction.Rollback();
-                    error = true;
-                    return Json(new
-                    {
-                        data = "",
-                        mensaje = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina"
-                    }, JsonRequestBehavior.AllowGet);
-                }
-            }
-            catch (Exception) {
-                transaction.Rollback();
-                error = true;
-                return Json(new
-                {
-                    data = "",
-                    mensaje = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina"
-                }, JsonRequestBehavior.AllowGet);
-            }
-            
-            //if (!error)
-            //{
-            //    transaction.Commit();
-            //    return Json(n, JsonRequestBehavior.AllowGet);
-            //}
-            //else
-            //{
-            //    transaction.Rollback();
-            //    long id = (long)Session["ventaid"];
-            //    var venta = db.Ventas.Find(id);
-            //    db.Ventas.Remove(venta);
-            //    return Json(n, JsonRequestBehavior.AllowGet);
-            //}
         }
 
         [HttpGet]
         [ActionName("viewBoletaVenta")]
         public PartialViewResult viewBoletaVenta(long? id)
         {
-            DbContextTransaction transaction = db.Database.BeginTransaction();
-            transaction.Commit();
-            try
+            if (id != null)
             {
-                if (id != null)
+                if (id == 0)
                 {
-                    if (id == 0)
-                    {
-                        long ventaid = (long)Session["ventaid"];
-                        var detailVentas = db.DetalleVentas
-                                                .Include(vp => vp.Producto)
-                                                .Include(vp => vp.Venta)
-                                                .Where(vp => vp.ventaid == ventaid).ToList();
-                        return PartialView("_boletaVenta", detailVentas);
-                    }
-                    else
-                    {
-                        var detailVentas = db.DetalleVentas
+                    long ventaid = (long)Session["ventaid"];
+                    var detailVentas = db.DetalleVentas
                                             .Include(vp => vp.Producto)
                                             .Include(vp => vp.Venta)
-                                            .Where(vp => vp.ventaid == id);
-                        return PartialView("_boletaVenta", detailVentas.ToList());
-                    }
-                    
+                                            .Where(vp => vp.ventaid == ventaid).ToList();
+                    return PartialView("_boletaVenta", detailVentas);
                 }
                 else
                 {
-                    return PartialView(null);
+                    var detailVentas = db.DetalleVentas
+                                        .Include(vp => vp.Producto)
+                                        .Include(vp => vp.Venta)
+                                        .Where(vp => vp.ventaid == id);
+                    return PartialView("_boletaVenta", detailVentas.ToList());
                 }
+
             }
-            catch (Exception)
+            else
             {
-                transaction.Rollback();
                 return PartialView(null);
             }
 

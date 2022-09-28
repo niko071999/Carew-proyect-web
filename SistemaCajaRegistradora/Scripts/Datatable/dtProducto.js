@@ -2,12 +2,13 @@
     let tabla1 = !!document.getElementById('tablaProducto');
     let tabla2 = !!document.getElementById('findTable');
 
-    if (tabla2) {
-        generarTabla2();
-    }
     if (tabla1) {
         generarTabla1();
     }
+    if (tabla2) {
+        generarTabla2();
+    }
+    
 });
 
 function generarTabla1() {

@@ -55,6 +55,8 @@ function confirmacionFinalizarVenta() {
     });
 }
 function finalizarVenta() {
+    let dV = [];
+    //Creo el objeto Venta, con sus atributos correspondientes
     var venta = {
         "total_venta": $("#precioTotalPagar").html().replace(/[$.]/g, ''),
         "fecha_creacion": "",
@@ -64,11 +66,38 @@ function finalizarVenta() {
         "monto_ingresado": $("#input_montoRecibido").val().replace(/[$.]/g, ''),
         "num_boleta": ""
     }
+    //Creo un array con los datos de detalle venta
+    for (var i = 0; i < listaVenta.length; i++) {
+        detalleVenta = {
+            "id": '',
+            "productoid": listaVenta[i].id,
+            "ventaid": '',
+            "total_precio_producto": listaVenta[i].preciototal,
+            "total_cantidad_producto": listaVenta[i].cantidad
+        }
+        dV.push(detalleVenta);
+    }
+    
+    var ventaDetalle = {
+        venta,
+        dV
+    }
 
+    console.log(ventaDetalle);
+
+    $.ajax({
+        url: '/Venta/finalizarVenta',
+        contentType: "application/json",
+        dataType: 'json',
+        data: JSON.stringify(ventaDetalle),
+        type: 'POST',
+        success: function (data) {
+            alert(data);
+        }
+    })
 }
 
 function agregarDetalleVenta(venta) {
-    let n = 0;
     let s = 0;
     for (var i = 0; i < listaVenta.length; i++) {
         var detalleVenta = {

@@ -59,6 +59,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -193,6 +194,7 @@
     </Compile>
     <Compile Include="Models\ViewModels\vmProducto.cs" />
     <Compile Include="Models\ViewModels\vmVenta.cs" />
+    <Compile Include="Models\ViewModels\vmVentaDetalle.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -2081,7 +2083,7 @@
     <Content Include="Views\Error\ErrorAutorizacion.cshtml" />
     <Content Include="Views\Error\Error404.cshtml" />
     <Content Include="Views\Usuario\_formsEliminar.cshtml" />
-    <Content Include="Views\Usuario\_formsImagen.cshtml" />
+    <Content Include="Views\Usuario\_formsImagenUsuario.cshtml" />
     <Content Include="Views\Usuario\_formsCambiarPass.cshtml" />
     <Content Include="Views\Sesion\SolicitarResPass.cshtml" />
     <Content Include="Views\Venta\Listar.cshtml" />
