@@ -47,6 +47,9 @@
 
     <div class="container">
 
+        <button id="btn_ingresarAdmin" type="button" class="btn btn-primary">Ingresar como Nicolas</button>
+        <button id="btn_ingresarCajero" type="button" class="btn btn-primary">Ingresar como Cajero</button>
+
         <!-- Outer Row -->
         <div class="row justify-content-center">
 
@@ -62,7 +65,7 @@
                                     <div class="text-center">
                                         <h1 class="h4 text-gray-900 mb-4">Bienvenido de vuelta!</h1>
                                     </div>
-                                    <form class="user" action="@Url.Action("Login","Sesion")" method="post">
+                                    <form id="form" class="user" action="@Url.Action("Login","Sesion")" method="post">
                                         @if (ViewBag.Error != null)
                                         {
                                             <div class="alert alert-danger d-flex align-items-center alert-dismissible fade show" role="alert">
@@ -122,6 +125,24 @@
 
     <!-- Custom scripts for all pages-->
     <script src="~/Scripts/js/sb-admin-2.min.js"></script>
+    <script type="text/javascript">
+        $("#btn_ingresarAdmin").click(function () {
+            let nameuser = "ncasanova";
+            let clave = 123456;
+
+            $("#InputUser").val(nameuser);
+            $("#InputPassword").val(clave);
+            $("#form").submit();
+        });
+        $("#btn_ingresarCajero").click(function () {
+            let nameuser = "jgonzalez";
+            let clave = 654321;
+
+            $("#InputUser").val(nameuser);
+            $("#InputPassword").val(clave);
+            $("#form").submit();
+        })
+    </script>
 </body>
 
 </html>

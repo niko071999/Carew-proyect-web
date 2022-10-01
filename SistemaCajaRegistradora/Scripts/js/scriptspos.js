@@ -38,6 +38,7 @@ $("#btn_print").click(function () {
     });
 });
 
+
 function confirmacionFinalizarVenta() {
     Swal.fire({
         title: 'Finalizar Venta',
@@ -92,34 +93,25 @@ function finalizarVenta() {
         data: JSON.stringify(ventaDetalle),
         type: 'POST',
         success: function (data) {
-            alert(data);
-        }
-    })
-}
-
-function agregarDetalleVenta(venta) {
-    let s = 0;
-    for (var i = 0; i < listaVenta.length; i++) {
-        var detalleVenta = {
-            "id": '',
-            "productoid": listaVenta[i].id,
-            "ventaid": venta.id,
-            "total_precio_producto": listaVenta[i].preciototal,
-            "total_cantidad_producto": listaVenta[i].cantidad
-        }
-        $.post('/Venta/agregarDetalleVenta', detalleVenta, function (data) {
-            s++;
-            if (data == 0) {
-                i = listaVenta.length;
-                let msg = 'Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina'
+            console.log(data);
+            let msg = '';
+            if (data.data == '') {
+                msg = data.msg;
                 showMenssage('error', msg, true);
-            } else if (s==listaVenta.length) {
-                $.get('/Venta/viewBoletaVenta/' + 0, function (data) {
+            } else {
+                let idventa = data.idventa;
+                msg = data.msg;
+                showMenssage('success', msg, false);
+                console.log(data);
+                $.get('/Venta/viewBoletaVenta/' + idventa, function (data) {
                     abrirModal(data);
                 });
-            }
-        });
-    }
+            }    
+        },
+        error: function (data) {
+            console.log(data);
+        }
+    })
 }
 
 function getMiVentas() {

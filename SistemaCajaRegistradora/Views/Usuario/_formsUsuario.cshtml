@@ -76,7 +76,13 @@
                 else
                 {
                     @Html.HiddenFor(model => model.clave)
+                    <div class="col-6">
+                        <label id="text_clave" class="form-label">Rol</label>
+                        <br />
+                        <span class="align-middle fw-bold pt-3">@Model.Role.rol</span>
+                    </div>
                 }
+
             </div>
         </div>
         <div class="modal-footer">

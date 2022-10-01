@@ -8,6 +8,8 @@ using System.Web.Mvc;
 using System.Data.Entity;
 using SistemaCajaRegistradora.Filters;
 using System.Transactions;
+using Microsoft.Ajax.Utilities;
+using Newtonsoft.Json;
 
 namespace SistemaCajaRegistradora.Controllers
 {
@@ -194,9 +196,9 @@ namespace SistemaCajaRegistradora.Controllers
                                 int stockProd = ventaDetalle.dV[i].total_cantidad_producto;
                                 int idprod = ventaDetalle.dV[i].productoid;
 
-                                var producto = db.Productos.Find(idprod);
-                                producto.stock = producto.stock - stockProd;
-                                db.Entry(producto).State = EntityState.Modified;
+                                //var producto = db.Productos.Find(idprod);
+                                //producto.stock = producto.stock - stockProd;
+                                //db.Entry(producto).State = EntityState.Modified;
                             }
                             n = db.SaveChanges();
                             
@@ -213,7 +215,8 @@ namespace SistemaCajaRegistradora.Controllers
                             return Json(new
                             {
                                 data = "OK",
-                                msg = msgSuccess
+                                msg = msgSuccess,
+                                idventa = ventaDetalle.venta.id
                             }, JsonRequestBehavior.AllowGet);
                         }
                         else
