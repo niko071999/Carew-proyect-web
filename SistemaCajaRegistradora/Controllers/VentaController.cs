@@ -15,7 +15,7 @@ namespace SistemaCajaRegistradora.Controllers
 {
     public class VentaController : Controller
     {
-        private readonly ModelData db = new ModelData();
+        private readonly Model db = new Model();
      
         // GET: Venta
         [HttpGet]
@@ -164,7 +164,7 @@ namespace SistemaCajaRegistradora.Controllers
         {
             using (TransactionScope scope = new TransactionScope())
             {
-                using (var db1 = new ModelData())
+                using (Model db1 = new Model())
                 {
                     string msgError = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina";
                     string msgSuccess = "Venta creada correctamente";

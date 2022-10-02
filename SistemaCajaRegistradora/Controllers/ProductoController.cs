@@ -12,7 +12,7 @@ namespace SistemaCajaRegistradora.Controllers
 {
     public class ProductoController : Controller
     {
-        private readonly ModelData db = new ModelData();
+        private readonly Model db = new Model();
 
         // GET: Producto
         [HttpGet]

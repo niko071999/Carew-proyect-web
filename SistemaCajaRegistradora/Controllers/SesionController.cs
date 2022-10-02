@@ -11,7 +11,7 @@ namespace SistemaCajaRegistradora.Controllers
 {
     public class SesionController : Controller
     {
-        ModelData db = new ModelData();
+        Model db = new Model();
         public ActionResult Login()
         {
             var usuarios = db.Usuarios.ToArray();

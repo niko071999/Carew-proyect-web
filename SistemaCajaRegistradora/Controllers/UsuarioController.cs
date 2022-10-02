@@ -16,7 +16,7 @@ namespace SistemaCajaRegistradora.Controllers
     [HandleError]
     public class UsuarioController : Controller
     {
-        ModelData db = new ModelData();
+        Model db = new Model();
 
         [HttpGet]
         [ActionName("Listar")]
