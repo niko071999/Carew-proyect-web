@@ -10,6 +10,7 @@ using System.Text;
 using SistemaCajaRegistradora.Filters;
 using System.Security.Claims;
 using System.Threading;
+using System.Web.WebPages;
 
 namespace SistemaCajaRegistradora.Controllers
 {
@@ -43,25 +44,20 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult AgregarUsuario(Usuario usuario)
         {
             int n = 0;
-            if (usuario.rolid == 1)
+            if (usuario.rolid != 1)
             {
-                //Verificar si existe un administrador en el sistema
-                var user = db.Usuarios.Where(u => u.rolid == 1).FirstOrDefault();
-                if (user == null)
-                {
-                    usuario.rolid = 2; //Asignamos el rol de cajero
-                    usuario.clave = Encrypt.GetSHA256(usuario.clave);
-                    usuario.rutaImg = "./../Assets/images/blank-profile.png";
-                    usuario.fecha_creacion = DateTime.UtcNow;
-                    usuario.fecha_modificacion = usuario.fecha_creacion;
-                    db.Usuarios.Add(usuario);
-                    n = db.SaveChanges();
-                    return Json(n, JsonRequestBehavior.AllowGet);
-                }
-                //Si existe un administrador, enviar -1 que significa error de creacion de usuario
-                return Json(-1, JsonRequestBehavior.AllowGet);
+                usuario.rolid = 2; //Asignamos el rol de cajero
+                usuario.clave = Encrypt.GetSHA256(usuario.clave);
+                usuario.rutaImg = "./../Assets/images/blank-profile.png";
+                usuario.fecha_creacion = DateTime.UtcNow;
+                usuario.fecha_modificacion = usuario.fecha_creacion;
+                db.Usuarios.Add(usuario);
+                n = db.SaveChanges();
+                return Json(n, JsonRequestBehavior.AllowGet);
             }
-            return Json(n, JsonRequestBehavior.AllowGet);
+            //Si existe un administrador, enviar -1 que significa error de creacion de usuario
+            return Json(-1, JsonRequestBehavior.AllowGet);
+            
         }
 
         [HttpGet]
@@ -197,6 +193,22 @@ namespace SistemaCajaRegistradora.Controllers
             db.Entry(usuario).State = EntityState.Modified;
             n = db.SaveChanges();
             return RedirectToAction("Listar", "Usuario");
+        }
+
+        [HttpGet]
+        [ActionName("obtenerBarcodeUser")]
+        public PartialViewResult obtenerBarcodeUser(int? id)
+        {
+            if (id != null)
+            {
+                var usuario = db.Usuarios.Where(u => u.id == id).FirstOrDefault();
+                if (usuario != null)
+                {
+                    return PartialView("_formObtenerBarcode", usuario);
+                }
+                return PartialView(null);
+            }
+            return PartialView(null);
         }
 
         [HttpPost]

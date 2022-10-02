@@ -2091,6 +2091,7 @@
     <Content Include="Views\Venta\POS.cshtml" />
     <Content Include="Views\Venta\_boletaVenta.cshtml" />
     <Content Include="Views\Sesion\AgregarUsuarioAdmin.cshtml" />
+    <Content Include="Views\Usuario\_formObtenerBarcode.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

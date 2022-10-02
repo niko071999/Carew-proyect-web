@@ -1,4 +1,11 @@
-﻿function AgregarForms(urlForms) {
+﻿var coreModal = document.getElementById('coreModal');
+coreModal.addEventListener('shown.bs.modal', function () {
+    var nombreusuario = $("#nombreUsuario").val();
+    sessionStorage.nombreusuarioactual = nombreusuario;
+    console.log(sessionStorage.nombreusuarioactual + ';');
+});
+
+function AgregarForms(urlForms) {
     $.get(urlForms + '/', function (data) {
         abrirModal(data);
     })
@@ -121,7 +128,7 @@ function cambiarClave(urlChange, pass) {
         "clave": pass,
         "rutaImg": 'r',
         "rolid": 0,
-        "solrespass": solrespass,
+        "solrespass": null,
         "fecha_creacion": null,
         "fecha_modifiacion": null
     }
@@ -163,6 +170,52 @@ function subirImagenU(urlSubirIMG) {
             showMenssage('error', mensaje);
         },
     });
+}
+function restablecerClave(user) {
+    const swal = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-success',
+            cancelButton: 'btn btn-secundary'
+        },
+        buttonsStyling: false
+    });
+    swal.fire({
+        title: 'Importante',
+        text: 'La contraseña se restablecerá a "cajero". ¿Desea continuar con el proceso?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Si',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            try {
+                $.ajax({
+                    url: '/Usuario/RestablecerPass',
+                    type: 'POST',
+                    contentType: 'application/json;',
+                    data: JSON.stringify({ user: user, clave: 'cajero' }),
+                    success: function (res) {
+                        sessionStorage.clear();
+                        sessionStorage.mensaje = 'Contraseña restablecida con exito';
+                        location = location.href;
+                    }
+                });
+            } catch (e) {
+                mensaje = "Error: Ocurrio un error en el servidor, intentelo nuevamente";
+                showMenssage('error', mensaje, true);
+            }
+        }
+        return;
+    });
+}
+function obtenerCodigoBarra(id) {
+    console.log(id);
+    $.get('/Usuario/obtenerBarcodeUser/' + id, function (data) {
+        if (data != null) {
+            abrirModal(data);
+        }
+    })
 }
 
 const abrirModal = (data) => {

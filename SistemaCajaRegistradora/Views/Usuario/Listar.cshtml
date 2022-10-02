@@ -78,26 +78,28 @@
                                 <td class="align-middle">@u.nombreUsuario</td>
                                 <td class="align-middle">@u.Role.rol</td>
                                 <td class="align-middle">
-                                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                                        <button class="btn btn-warning btn-icon-split" type="button" onclick="formsEditar('@Url.Action("formsEditar", "Usuario")',@u.id)">
-                                            <span class="icon text-white-50"><i class="fas fa-pen float-left"></i></span>
-                                            <span class="text">Editar</span>
+                                    <button class="btn btn-warning" type="button" onclick="formsEditar('@Url.Action("formsEditar", "Usuario")',@u.id)"
+                                            data-bs-toggle="tooltip" title="Editar usuario">
+                                        <i class="fas fa-pen float-left"></i>
+                                    </button>
+                                    <button class="btn btn-secondary" type="button" onclick="obtenerCodigoBarra('@u.id')"
+                                            data-bs-toggle="tooltip" title="Obtener codigo de barra de acceso">
+                                        <i class="fas fa-barcode float-left"></i>
+                                    </button>
+                                    @if (!u.nombreUsuario.Equals(ViewBag.nombreUser))
+                                    {
+                                        <button class="btn btn-danger" type="button" onclick="formsEliminar('@Url.Action("formsEliminar", "Usuario")', @u.id)"
+                                                data-bs-toggle="tooltip" title="Eliminar usuario">
+                                            <i class="fas fa-trash float-left"></i>
                                         </button>
-                                        @if (!u.nombreUsuario.Equals(ViewBag.nombreUser))
-                                        {
-                                            <button class="btn btn-danger btn-icon-split" type="button" onclick="formsEliminar('@Url.Action("formsEliminar", "Usuario")', @u.id)">
-                                                <span class="icon text-white-50"><i class="fas fa-trash float-left"></i></span>
-                                                <span class="text">Eliminar</span>
-                                            </button>
-                                        }
-                                        @if (u.solrespass == true)
-                                        {
-                                            <button onclick="restablecerClave('@u.nombreUsuario.Trim()')" class="btn btn-dark btn-icon-split" type="button">
-                                                <span class="icon text-white-50"><i class="fas fa-key float-left"></i></span>
-                                                <span class="text">Restablecer Clave</span>
-                                            </button>
-                                        }
-                                    </div>
+                                    }
+                                    @if (u.solrespass == true)
+                                    {
+                                        <button onclick="restablecerClave('@u.nombreUsuario.Trim()')" class="btn btn-dark" type="button"
+                                                data-bs-toggle="tooltip" title="Restablecer clave de acceso">
+                                            <i class="fas fa-key float-left"></i>
+                                        </button>
+                                    }
                                 </td>
                             </tr>
 
@@ -116,49 +118,5 @@
 </div>
 
 <script type="text/javascript" title="main">
-    var coreModal = document.getElementById('coreModal');
-    coreModal.addEventListener('shown.bs.modal', function () {
-        var nombreusuario = $("#nombreUsuario").val();
-        sessionStorage.nombreusuarioactual = nombreusuario;
-        console.log(sessionStorage.nombreusuarioactual + ';');
-    });
-
-    function restablecerClave(user) {
-        const swal = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-success',
-                cancelButton: 'btn btn-secundary'
-            },
-            buttonsStyling: false
-        });
-        swal.fire({
-            title: 'Importante',
-            text: 'La contraseña se restablecerá a "cajero". ¿Desea continuar con el proceso?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Si',
-            cancelButtonText: 'Cancelar',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                try {
-                    $.ajax({
-                        url: '/Usuario/RestablecerPass',
-                        type: 'POST',
-                        contentType: 'application/json;',
-                        data: JSON.stringify({ user: user, clave: 'cajero' }),
-                        success: function (res) {
-                            sessionStorage.clear();
-                            sessionStorage.mensaje = 'Contraseña restablecida con exito';
-                            location = location.href;
-                        }
-                    });
-                } catch (e) {
-                    mensaje = "Error: Ocurrio un error en el servidor, intentelo nuevamente";
-                    showMenssage('error', mensaje, true);
-                }
-            }
-            return;
-        });   
-    }
+    
 </script>

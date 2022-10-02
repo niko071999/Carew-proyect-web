@@ -126,6 +126,17 @@
     <!-- Custom scripts for all pages-->
     <script src="~/Scripts/js/sb-admin-2.min.js"></script>
     <script type="text/javascript">
+        let text = '';
+        $(document).keyup(function (e) {
+            text = text + e.key;
+            console.log(text);
+            setTimeout(eliminarText, 1000);
+        })
+
+        function eliminarText() {
+            text = '';
+        }
+
         $("#btn_ingresarAdmin").click(function () {
             let nameuser = "ncasanova";
             let clave = 123456;
