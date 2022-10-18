@@ -1,18 +1,25 @@
-﻿using SistemaCajaRegistradora.Filters;
+﻿using Firebase.Storage;
+using Firebase.Auth;
+using SistemaCajaRegistradora.Filters;
 using SistemaCajaRegistradora.Models;
 using SistemaCajaRegistradora.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
+using System.Threading;
+using System.Transactions;
 
 namespace SistemaCajaRegistradora.Controllers
 {
     public class ProductoController : Controller
     {
-        private readonly Model db = new Model();
+        private readonly CarewEntidad db = new CarewEntidad();
 
         // GET: Producto
         [HttpGet]
@@ -29,7 +36,10 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult getProductos()
         {
             db.Configuration.LazyLoadingEnabled = false;
-            var result = db.Productos.Include(p => p.Categoria).Include(p => p.Prioridade).ToArray();
+            var result = db.Productos.Include(p => p.Categoria)
+                                    .Include(p => p.Prioridade)
+                                    .Include(p => p.Imagen)
+                                    .ToArray();
 
             List<vmProducto> productos = new List<vmProducto>();
 
@@ -41,7 +51,7 @@ namespace SistemaCajaRegistradora.Controllers
                 producto.nombre = item.nombre.Trim();
                 producto.categoria = item.Categoria.nombre.Trim();
                 producto.prioridad = item.Prioridade.prioridad.Trim();
-                producto.rutaimg = item.rutaImg.Trim();
+                producto.rutaimg = item.Imagen.ruta.Trim();
                 producto.precio = (int)item.precio;
                 producto.stock = (int)item.stock;
                 producto.stockmin = (int)item.stockmin;
@@ -78,7 +88,7 @@ namespace SistemaCajaRegistradora.Controllers
             validarValoresNull(producto);
             int n = 0;
             //Se define una imagen por defecto
-            producto.rutaImg = "./../Assets/images/productos/default-product-image.png";
+            producto.imagenid = 1;
             producto.fecha_creacion = DateTime.UtcNow;
             db.Productos.Add(producto);
             n = db.SaveChanges();
@@ -91,9 +101,11 @@ namespace SistemaCajaRegistradora.Controllers
         public PartialViewResult formsEditar(int? id)
         {   
             var producto = db.Productos.Include(p => p.Categoria)
-                .Include(p => p.Prioridade).Where(p => p.id == id).FirstOrDefault();
+                .Include(p => p.Prioridade).Include(p => p.Imagen).Where(p => p.id == id).FirstOrDefault();
             producto.codigo_barra = producto.codigo_barra.Trim();
             producto.nombre = producto.nombre.Trim();
+            producto.Imagen.ruta = producto.Imagen.ruta.Trim();
+            producto.Imagen.nombre = producto.Imagen.nombre.Trim();
             var categorias = db.Categorias.ToList();
             var prioridades = db.Prioridades.ToList();
             ViewBag.categoriaId = new SelectList(categorias, "id", "nombre",producto.categoriaid);
@@ -126,38 +138,75 @@ namespace SistemaCajaRegistradora.Controllers
         [HttpPost]
         [ActionName("subirImagen")]
         [Autorizacion(idoperacion: 6)]
-        public JsonResult subirImagen(HttpPostedFileBase archivo)
+        public JsonResult subirImagen(string downloadURL, string nameFile)
         {
-            try
+            using (TransactionScope scope = new TransactionScope())
             {
-                if (archivo != null)
+                using (CarewEntidad db1 = new CarewEntidad())
                 {
-                    string path = Server.MapPath("~/Assets/images/productos/");
-                    if (!System.IO.Directory.Exists(path))
+                    string msgSuccess = "Imagen subida correctamente";
+                    string msgError = "Error de subida de archivo";
+                    try
                     {
-                        System.IO.Directory.CreateDirectory(path);
-                    };
-                    archivo.SaveAs(path + System.IO.Path.GetFileName(archivo.FileName));
+                        if (downloadURL.Equals(string.Empty) && nameFile.Equals(string.Empty))
+                            throw new Exception(msgError);
 
-                    int idProducto = (int)Session["idProducto"];
-                    var producto = db.Productos.Find(idProducto);
-                    producto.rutaImg = "./../Assets/images/productos/" + archivo.FileName;
-                    db.Entry(producto).State = EntityState.Modified;
-                    db.SaveChanges();
-                    return Json(
-                    new { mensaje = "Imagen subida correctamente" }, JsonRequestBehavior.AllowGet); ;
+                        Imagen img = new Imagen()
+                        {
+                            nombre = nameFile,
+                            ruta = downloadURL,
+                        };
+
+                        db1.Imagens.Add(img);
+                        int n = db1.SaveChanges();
+
+                        if (n == 0)
+                            throw new Exception(msgError);
+
+                        int idProducto = (int)Session["idProducto"];
+
+                        var producto = db1.Productos.Find(idProducto);
+
+                        string nombreImg = producto.Imagen.nombre;
+                        int idimg = producto.imagenid;
+                        
+                        producto.imagenid = img.id;
+                        db1.Entry(producto).State = EntityState.Modified;
+                        n = db1.SaveChanges();
+                        if (n == 0)
+                            throw new Exception(msgError);
+
+                        //Borrar registro de la otra imagen
+                        if (idimg != 1)
+                        {
+                            var imagen = db1.Imagens.Find(idimg);
+                            db1.Imagens.Remove(imagen);
+                            db1.SaveChanges();
+                        }
+
+                        scope.Complete();
+
+                        return Json(new 
+                        { 
+                            status = "success", 
+                            mensaje = msgSuccess, 
+                            idimg = idimg,
+                            nombreImg = nombreImg
+                        }, 
+                            JsonRequestBehavior.AllowGet);
+                    }
+                    catch (Exception)
+                    {
+                        return Json(new
+                        {
+                            status = "error",
+                            msg = msgError,
+                            idimg = 0,
+                            nombreImg = ""
+                        }, JsonRequestBehavior.AllowGet);
+                    }
                 }
-                else
-                {
-                    return Json(
-                    new { mensaje = "Error de subida de archivo" }, JsonRequestBehavior.AllowGet);
-                }
-            }
-            catch (Exception)
-            {
-                return Json(
-                    new { mensaje = "Error de subida de archivo" }, JsonRequestBehavior.AllowGet);
-            }
+            }            
         }
 
         [HttpGet]
@@ -177,24 +226,40 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult eliminarProducto(int? id)
         {
             int n = 0;
+            string nameFile = string.Empty;
 
-            var producto = db.Productos.Find(id);
             try
             {
+                var producto = db.Productos.Find(id);
+                nameFile = producto.Imagen.nombre.Trim();
+                int idimg = producto.imagenid;
+                var imagen = db.Imagens.Find(idimg);
                 db.Productos.Remove(producto);
+                db.Imagens.Remove(imagen);
                 n = db.SaveChanges();
+                return Json(new
+                {
+                    n = n,
+                    nameFile = nameFile,
+                    idimg = idimg
+                }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception)
             {
-                return Json(n, JsonRequestBehavior.AllowGet);
+                return Json(new
+                {
+                    n = n,
+                    nameFile = nameFile,
+                    idimg = 0
+                }, JsonRequestBehavior.AllowGet);
             }
-            return Json(n, JsonRequestBehavior.AllowGet);
+            
         }
 
         [HttpPost]
         [ActionName("addExistencias")]
         [Autorizacion(idoperacion: 7)]
-        public JsonResult addExistencias(Producto producto)
+        public JsonResult addExistencias(vmAddExistenciaProduct producto)
         {
             if (producto != null)
             {
@@ -226,10 +291,10 @@ namespace SistemaCajaRegistradora.Controllers
         [HttpPost]
         [ActionName("aplicarExistencias")]
         [Autorizacion(idoperacion: 7)]
-        public JsonResult aplicarExistencias(Producto producto)
+        public JsonResult aplicarExistencias(vmAddExistenciaProduct producto)
         {
             int n = 0;
-            var resulProducto = db.Productos.Include(p => p.Categoria).Include(p => p.Prioridade)
+            var resulProducto = db.Productos.Include(p => p.Categoria).Include(p => p.Prioridade).Include(p=>p.Imagen)
                 .Where(p => p.codigo_barra == producto.codigo_barra).FirstOrDefault();
             if (resulProducto!=null)
             {
@@ -267,3 +332,15 @@ namespace SistemaCajaRegistradora.Controllers
 
     }
 }
+
+//Subir imagen de forma local
+//string path = Server.MapPath("~/Assets/images/productos/");
+//if (!System.IO.Directory.Exists(path))
+//{
+//    System.IO.Directory.CreateDirectory(path);
+//};
+//archivo.SaveAs(path + System.IO.Path.GetFileName(archivo.FileName));
+
+//Stream stream = archivo.InputStream;
+//string nombre = DateTime.UtcNow.ToString() + "_producto";
+//string urlimagen = subirImagenStorage(stream,nombre).Result;

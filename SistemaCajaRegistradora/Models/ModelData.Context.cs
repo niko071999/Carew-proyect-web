@@ -13,10 +13,10 @@ namespace SistemaCajaRegistradora.Models
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class Model : DbContext
+    public partial class CarewEntidad : DbContext
     {
-        public Model()
-            : base("name=Model")
+        public CarewEntidad()
+            : base("name=CarewEntidad")
         {
         }
     
@@ -27,6 +27,7 @@ namespace SistemaCajaRegistradora.Models
     
         public virtual DbSet<Categoria> Categorias { get; set; }
         public virtual DbSet<DetalleVenta> DetalleVentas { get; set; }
+        public virtual DbSet<Imagen> Imagens { get; set; }
         public virtual DbSet<MetodoPago> MetodoPagos { get; set; }
         public virtual DbSet<Modulo> Modulos { get; set; }
         public virtual DbSet<Operacione> Operaciones { get; set; }

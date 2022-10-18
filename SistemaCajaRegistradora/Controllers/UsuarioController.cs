@@ -11,13 +11,14 @@ using SistemaCajaRegistradora.Filters;
 using System.Security.Claims;
 using System.Threading;
 using System.Web.WebPages;
+using System.Transactions;
 
 namespace SistemaCajaRegistradora.Controllers
 {
     [HandleError]
     public class UsuarioController : Controller
     {
-        Model db = new Model();
+        private readonly CarewEntidad db = new CarewEntidad();
 
         [HttpGet]
         [ActionName("Listar")]
@@ -48,7 +49,7 @@ namespace SistemaCajaRegistradora.Controllers
             {
                 usuario.rolid = 2; //Asignamos el rol de cajero
                 usuario.clave = Encrypt.GetSHA256(usuario.clave);
-                usuario.rutaImg = "./../Assets/images/blank-profile.png";
+                usuario.imagenid = 2; //Se define una imagen por defecto
                 usuario.fecha_creacion = DateTime.UtcNow;
                 usuario.fecha_modificacion = usuario.fecha_creacion;
                 db.Usuarios.Add(usuario);
@@ -101,10 +102,33 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult eliminarUsuario(int? id)
         {
             int n = 0;
-            var usuario = db.Usuarios.Find(id);
-            db.Usuarios.Remove(usuario);
-            n = db.SaveChanges();
-            return Json(n, JsonRequestBehavior.AllowGet);
+            string nameFile = string.Empty;
+
+            try
+            {
+                var usuario = db.Usuarios.Include(u => u.Imagen)
+                .Where(u => u.id == id).FirstOrDefault();
+                nameFile = usuario.Imagen.nombre.Trim();
+                int idimg = usuario.imagenid;
+                db.Usuarios.Remove(usuario);
+                n = db.SaveChanges();
+                return Json(new
+                {
+                    n = n,
+                    nameFile = nameFile,
+                    idimg = idimg
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception)
+            {
+                return Json(new
+                {
+                    n = n,
+                    nameFile = nameFile,
+                    idimg = 0
+                }, JsonRequestBehavior.AllowGet);
+            }
+            
         }
 
         [HttpGet]
@@ -149,34 +173,79 @@ namespace SistemaCajaRegistradora.Controllers
         [HttpPost]
         [ActionName("subirImagen")]
         [Autorizacion(idoperacion:16)]
-        public JsonResult subirImagen(HttpPostedFileBase archivo)
+        public JsonResult subirImagen(string downloadURL, string nameFile)
         {
-            try
+            using (TransactionScope scope = new TransactionScope())
             {
-                if (archivo != null)
+                using (CarewEntidad db1 = new CarewEntidad())
                 {
-                    string path = Server.MapPath("~/Assets/images/usuarios/");
-                    if (!System.IO.Directory.Exists(path))
+                    string msgSuccess = "Imagen subida correctamente";
+                    string msgError = "Error de subida de archivo";
+                    try
                     {
-                        System.IO.Directory.CreateDirectory(path);
-                    }
-                    archivo.SaveAs(path + System.IO.Path.GetFileName(archivo.FileName));
+                        if (downloadURL.Equals(string.Empty) && nameFile.Equals(string.Empty))
+                            throw new Exception(msgError);
 
-                    int iduser = (int)Session["idUser"];
-                    var usuario = db.Usuarios.Find(iduser);
-                    usuario.rutaImg = "./../Assets/images/usuarios/" + archivo.FileName;
-                    db.Entry(usuario).State = EntityState.Modified;
-                    db.SaveChanges();
-                    return Json(new { mensaje = "Archivo subido correctamente" }, JsonRequestBehavior.AllowGet);
+                        Imagen img = new Imagen()
+                        {
+                            nombre = nameFile,
+                            ruta = downloadURL,
+                        };
+                        db1.Imagens.Add(img);
+                        int n = db1.SaveChanges();
+
+                        if (n == 0)
+                            throw new Exception(msgError);
+
+                        int idUsuario = (int)Session["idUser"];
+
+                        //Cambiar la imagen a la variable de session
+                        var user = (Usuario)Session["User"];
+                        if (user.id == idUsuario)
+                        {
+                            user.imagenid = img.id;
+                            Session["User"] = user;
+                        }
+
+                        var usuario = db1.Usuarios.Find(idUsuario);
+                        string nombreImg = usuario.Imagen.nombre;
+                        int idimg = usuario.imagenid;
+
+                        usuario.imagenid = img.id;
+                        db1.Entry(usuario).State = EntityState.Modified;
+                        n = db1.SaveChanges();
+                        if (n == 0)
+                            throw new Exception(msgError);
+
+                        //Borrar registro de la otra imagen
+                        if (idimg != 2)
+                        {
+                            var imagen = db1.Imagens.Find(idimg);
+                            db1.Imagens.Remove(imagen);
+                            db1.SaveChanges();
+                        }
+
+                        scope.Complete();
+
+                        return Json(new
+                        {
+                            status = "success",
+                            msg = msgSuccess,
+                            idimg = idimg,
+                            nombreImg = nombreImg
+                        },JsonRequestBehavior.AllowGet);
+                    }
+                    catch (Exception)
+                    {
+                        return Json(new
+                        {
+                            status = "error",
+                            msg = msgError,
+                            idimg = 0,
+                            nombreImg = ""
+                        },JsonRequestBehavior.AllowGet);
+                    }
                 }
-                else
-                {
-                    return Json(new { mensaje = "Error de subida de archivo" }, JsonRequestBehavior.AllowGet);
-                }
-            }
-            catch (Exception)
-            {
-                return Json(new { mensaje = "Error de subida de archivo" }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -204,6 +273,7 @@ namespace SistemaCajaRegistradora.Controllers
                 var usuario = db.Usuarios.Where(u => u.id == id).FirstOrDefault();
                 if (usuario != null)
                 {
+                    ViewBag.code = Encrypt.GetSHA256(usuario.fecha_creacion.Value.Ticks.ToString());
                     return PartialView("_formObtenerBarcode", usuario);
                 }
                 return PartialView(null);
@@ -283,13 +353,13 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("getSesion")]
         public JsonResult getSesion()
         {
-            Usuario user = (Usuario)Session["User"];
+            var user = (Usuario)Session["User"];
             if (user != null)
             {
                 return Json(new
                 {
                     nombreuser = user.nombre.Trim() + ' ' + user.apellido.Trim() + " (" + user.nombreUsuario.Trim() + ")",
-                    imgruta = user.rutaImg.Trim()
+                    imgruta = user.Imagen.ruta.Trim()
                 }, JsonRequestBehavior.AllowGet);
             }
             else
@@ -300,7 +370,7 @@ namespace SistemaCajaRegistradora.Controllers
         private void quitarEspaciosVacios(Usuario usuario)
         {
             usuario.nombreUsuario = usuario.nombreUsuario.Trim();
-            usuario.rutaImg = usuario.rutaImg.Trim();
+            usuario.Imagen.ruta = usuario.Imagen.ruta.Trim();
             usuario.nombre = usuario.nombre.Trim();
             usuario.apellido = usuario.apellido.Trim();
         }

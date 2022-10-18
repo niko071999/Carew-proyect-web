@@ -11,7 +11,7 @@ namespace SistemaCajaRegistradora.Controllers
 {
     public class SesionController : Controller
     {
-        Model db = new Model();
+        private readonly CarewEntidad db = new CarewEntidad();
         public ActionResult Login()
         {
             var usuarios = db.Usuarios.ToArray();
@@ -50,7 +50,7 @@ namespace SistemaCajaRegistradora.Controllers
 
             try
             {
-                var usuario = db.Usuarios.Where(u => u.nombreUsuario == user && u.clave == clave).FirstOrDefault();
+                var usuario = db.Usuarios.Include(u => u.Imagen).Where(u => u.nombreUsuario == user && u.clave == clave).FirstOrDefault();
                 if (usuario == null)
                 {
                     ViewBag.Error = "El nombre de usuario y/o contraseña son erroneos";
@@ -161,7 +161,7 @@ namespace SistemaCajaRegistradora.Controllers
                 nombreUsuario = nameuser,
                 clave = Encrypt.GetSHA256(clave),
                 rolid = 1,
-                rutaImg = "./../Assets/images/blank-profile.png",
+                imagenid = 2,
                 solrespass = false,
                 fecha_creacion = DateTime.UtcNow,
                 fecha_modificacion = DateTime.UtcNow

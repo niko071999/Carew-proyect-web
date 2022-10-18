@@ -1,6 +1,6 @@
 ﻿@model SistemaCajaRegistradora.Models.Producto
 
-<div class="modal-dialog modal-lg" role="document">
+<div class="modal-dialog modal-lg modal-fullscreen-md-down" role="document">
     <div class="modal-content">
         <div class="modal-header">
             @* Condicion que verifica si esta editando o agregando *@
@@ -20,7 +20,7 @@
             <div class="row g-2">
                 <div class="col-12">
                     @Html.HiddenFor(model => model.id)
-                    @Html.HiddenFor(model => model.rutaImg)
+                    @Html.HiddenFor(model => model.imagenid)
                     @Html.HiddenFor(model => model.fecha_creacion)
                     <label id="text_codigo" class="form-label">Codigo de barra</label>
                     <div class="input-group mb-3">

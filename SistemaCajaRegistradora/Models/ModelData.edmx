@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="ModelData.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="ModelData.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Categorias">
           <Key>
             <PropertyRef Name="id" />
@@ -22,6 +22,14 @@
           <Property Name="ventaid" Type="bigint" Nullable="false" />
           <Property Name="total_precio_producto" Type="int" Nullable="false" />
           <Property Name="total_cantidad_producto" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Imagen">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ruta" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="nombre" Type="nvarchar(max)" Nullable="false" />
         </EntityType>
         <EntityType Name="MetodoPagos">
           <Key>
@@ -64,7 +72,7 @@
           <Property Name="stockmin" Type="int" />
           <Property Name="stockmax" Type="int" />
           <Property Name="fecha_creacion" Type="date" Nullable="false" />
-          <Property Name="rutaImg" Type="nchar" MaxLength="255" Nullable="false" />
+          <Property Name="imagenid" Type="bigint" Nullable="false" />
           <Property Name="prioridadid" Type="int" Nullable="false" />
           <Property Name="categoriaid" Type="int" Nullable="false" />
         </EntityType>
@@ -92,7 +100,7 @@
           <Property Name="clave" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="nombre" Type="nchar" MaxLength="30" Nullable="false" />
           <Property Name="apellido" Type="nchar" MaxLength="30" Nullable="false" />
-          <Property Name="rutaImg" Type="nchar" MaxLength="255" />
+          <Property Name="imagenid" Type="bigint" Nullable="false" />
           <Property Name="rolid" Type="int" Nullable="false" />
           <Property Name="solrespass" Type="bit" />
           <Property Name="fecha_creacion" Type="datetime" />
@@ -111,18 +119,6 @@
           <Property Name="monto_ingresado" Type="int" Nullable="false" />
           <Property Name="num_boleta" Type="bigint" Nullable="false" />
         </EntityType>
-        <Association Name="FK_DetalleVenta_Productos">
-          <End Role="Productos" Type="Self.Productos" Multiplicity="1" />
-          <End Role="DetalleVenta" Type="Self.DetalleVenta" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Productos">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="DetalleVenta">
-              <PropertyRef Name="productoid" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_DetalleVenta_Ventas">
           <End Role="Ventas" Type="Self.Ventas" Multiplicity="1" />
           <End Role="DetalleVenta" Type="Self.DetalleVenta" Multiplicity="*" />
@@ -156,6 +152,18 @@
             </Principal>
             <Dependent Role="Productos">
               <PropertyRef Name="categoriaid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Productos_Imagen">
+          <End Role="Imagen" Type="Self.Imagen" Multiplicity="1" />
+          <End Role="Productos" Type="Self.Productos" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Imagen">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Productos">
+              <PropertyRef Name="imagenid" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -199,6 +207,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Usuarios_Imagen">
+          <End Role="Imagen" Type="Self.Imagen" Multiplicity="1" />
+          <End Role="Usuarios" Type="Self.Usuarios" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Imagen">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Usuarios">
+              <PropertyRef Name="imagenid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Usuarios_Roles">
           <End Role="Roles" Type="Self.Roles" Multiplicity="1" />
           <End Role="Usuarios" Type="Self.Usuarios" Multiplicity="*" />
@@ -238,6 +258,7 @@
         <EntityContainer Name="ModelDataStoreContainer">
           <EntitySet Name="Categorias" EntityType="Self.Categorias" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DetalleVenta" EntityType="Self.DetalleVenta" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Imagen" EntityType="Self.Imagen" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="MetodoPagos" EntityType="Self.MetodoPagos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Modulos" EntityType="Self.Modulos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Operaciones" EntityType="Self.Operaciones" Schema="dbo" store:Type="Tables" />
@@ -247,10 +268,6 @@
           <EntitySet Name="Roles" EntityType="Self.Roles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Usuarios" EntityType="Self.Usuarios" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Ventas" EntityType="Self.Ventas" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK_DetalleVenta_Productos" Association="Self.FK_DetalleVenta_Productos">
-            <End Role="Productos" EntitySet="Productos" />
-            <End Role="DetalleVenta" EntitySet="DetalleVenta" />
-          </AssociationSet>
           <AssociationSet Name="FK_DetalleVenta_Ventas" Association="Self.FK_DetalleVenta_Ventas">
             <End Role="Ventas" EntitySet="Ventas" />
             <End Role="DetalleVenta" EntitySet="DetalleVenta" />
@@ -261,6 +278,10 @@
           </AssociationSet>
           <AssociationSet Name="FK_Productos_Categorias" Association="Self.FK_Productos_Categorias">
             <End Role="Categorias" EntitySet="Categorias" />
+            <End Role="Productos" EntitySet="Productos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Productos_Imagen" Association="Self.FK_Productos_Imagen">
+            <End Role="Imagen" EntitySet="Imagen" />
             <End Role="Productos" EntitySet="Productos" />
           </AssociationSet>
           <AssociationSet Name="FK_Productos_Prioridades" Association="Self.FK_Productos_Prioridades">
@@ -275,6 +296,10 @@
             <End Role="Roles" EntitySet="Roles" />
             <End Role="rol_operacion" EntitySet="rol_operacion" />
           </AssociationSet>
+          <AssociationSet Name="FK_Usuarios_Imagen" Association="Self.FK_Usuarios_Imagen">
+            <End Role="Imagen" EntitySet="Imagen" />
+            <End Role="Usuarios" EntitySet="Usuarios" />
+          </AssociationSet>
           <AssociationSet Name="FK_Usuarios_Roles" Association="Self.FK_Usuarios_Roles">
             <End Role="Roles" EntitySet="Roles" />
             <End Role="Usuarios" EntitySet="Usuarios" />
@@ -288,8 +313,7 @@
             <End Role="Ventas" EntitySet="Ventas" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="ModelData" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -313,6 +337,16 @@
           <Property Name="total_cantidad_producto" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Producto" Relationship="Self.FK_DetalleVenta_Productos" FromRole="DetalleVenta" ToRole="Productos" />
           <NavigationProperty Name="Venta" Relationship="Self.FK_DetalleVenta_Ventas" FromRole="DetalleVenta" ToRole="Ventas" />
+        </EntityType>
+        <EntityType Name="Imagen">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="ruta" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="nombre" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Productos" Relationship="Self.FK_Productos_Imagen" FromRole="Imagen" ToRole="Productos" />
+          <NavigationProperty Name="Usuarios" Relationship="Self.FK_Usuarios_Imagen" FromRole="Imagen" ToRole="Usuarios" />
         </EntityType>
         <EntityType Name="MetodoPago">
           <Key>
@@ -360,11 +394,12 @@
           <Property Name="stockmin" Type="Int32" />
           <Property Name="stockmax" Type="Int32" />
           <Property Name="fecha_creacion" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="rutaImg" Type="String" MaxLength="255" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="imagenid" Type="Int32" Nullable="false" />
           <Property Name="prioridadid" Type="Int32" Nullable="false" />
           <Property Name="categoriaid" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Categoria" Relationship="Self.FK_Productos_Categorias" FromRole="Productos" ToRole="Categorias" />
           <NavigationProperty Name="DetalleVentas" Relationship="Self.FK_DetalleVenta_Productos" FromRole="Productos" ToRole="DetalleVenta" />
+          <NavigationProperty Name="Imagen" Relationship="Self.FK_Productos_Imagen" FromRole="Productos" ToRole="Imagen" />
           <NavigationProperty Name="Prioridade" Relationship="Self.FK_Productos_Prioridades" FromRole="Productos" ToRole="Prioridades" />
         </EntityType>
         <EntityType Name="rol_operacion">
@@ -395,11 +430,12 @@
           <Property Name="clave" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="nombre" Type="String" MaxLength="30" FixedLength="true" Unicode="true" Nullable="false" />
           <Property Name="apellido" Type="String" MaxLength="30" FixedLength="true" Unicode="true" Nullable="false" />
-          <Property Name="rutaImg" Type="String" MaxLength="255" FixedLength="true" Unicode="true" />
+          <Property Name="imagenid" Type="Int32" Nullable="false" />
           <Property Name="rolid" Type="Int32" Nullable="false" />
           <Property Name="solrespass" Type="Boolean" />
           <Property Name="fecha_creacion" Type="DateTime" Precision="3" />
           <Property Name="fecha_modificacion" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Imagen" Relationship="Self.FK_Usuarios_Imagen" FromRole="Usuarios" ToRole="Imagen" />
           <NavigationProperty Name="Role" Relationship="Self.FK_Usuarios_Roles" FromRole="Usuarios" ToRole="Roles" />
           <NavigationProperty Name="Ventas" Relationship="Self.FK_Ventas_Usuarios" FromRole="Usuarios" ToRole="Ventas" />
         </EntityType>
@@ -452,6 +488,30 @@
             </Principal>
             <Dependent Role="DetalleVenta">
               <PropertyRef Name="ventaid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Productos_Imagen">
+          <End Role="Imagen" Type="Self.Imagen" Multiplicity="1" />
+          <End Role="Productos" Type="Self.Producto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Imagen">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Productos">
+              <PropertyRef Name="imagenid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Usuarios_Imagen">
+          <End Role="Imagen" Type="Self.Imagen" Multiplicity="1" />
+          <End Role="Usuarios" Type="Self.Usuario" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Imagen">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Usuarios">
+              <PropertyRef Name="imagenid" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -543,9 +603,10 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="Model" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="CarewEntidad" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Categorias" EntityType="Self.Categoria" />
           <EntitySet Name="DetalleVentas" EntityType="Self.DetalleVenta" />
+          <EntitySet Name="Imagens" EntityType="Self.Imagen" />
           <EntitySet Name="MetodoPagos" EntityType="Self.MetodoPago" />
           <EntitySet Name="Modulos" EntityType="Self.Modulo" />
           <EntitySet Name="Operaciones" EntityType="Self.Operacione" />
@@ -566,6 +627,14 @@
           <AssociationSet Name="FK_DetalleVenta_Ventas" Association="Self.FK_DetalleVenta_Ventas">
             <End Role="Ventas" EntitySet="Ventas" />
             <End Role="DetalleVenta" EntitySet="DetalleVentas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Productos_Imagen" Association="Self.FK_Productos_Imagen">
+            <End Role="Imagen" EntitySet="Imagens" />
+            <End Role="Productos" EntitySet="Productos" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Usuarios_Imagen" Association="Self.FK_Usuarios_Imagen">
+            <End Role="Imagen" EntitySet="Imagens" />
+            <End Role="Usuarios" EntitySet="Usuarios" />
           </AssociationSet>
           <AssociationSet Name="FK_Ventas_MetodoPagos" Association="Self.FK_Ventas_MetodoPagos">
             <End Role="MetodoPagos" EntitySet="MetodoPagos" />
@@ -601,7 +670,7 @@
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="ModelDataStoreContainer" CdmEntityContainer="Model">
+        <EntityContainerMapping StorageEntityContainer="ModelDataStoreContainer" CdmEntityContainer="CarewEntidad">
           <EntitySetMapping Name="Categorias">
             <EntityTypeMapping TypeName="ModelData.Categoria">
               <MappingFragment StoreEntitySet="Categorias">
@@ -619,6 +688,15 @@
                 <ScalarProperty Name="ventaid" ColumnName="ventaid" />
                 <ScalarProperty Name="total_precio_producto" ColumnName="total_precio_producto" />
                 <ScalarProperty Name="total_cantidad_producto" ColumnName="total_cantidad_producto" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Imagens">
+            <EntityTypeMapping TypeName="ModelData.Imagen">
+              <MappingFragment StoreEntitySet="Imagen">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="ruta" ColumnName="ruta" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -666,7 +744,7 @@
                 <ScalarProperty Name="stockmin" ColumnName="stockmin" />
                 <ScalarProperty Name="stockmax" ColumnName="stockmax" />
                 <ScalarProperty Name="fecha_creacion" ColumnName="fecha_creacion" />
-                <ScalarProperty Name="rutaImg" ColumnName="rutaImg" />
+                <ScalarProperty Name="imagenid" ColumnName="imagenid" />
                 <ScalarProperty Name="prioridadid" ColumnName="prioridadid" />
                 <ScalarProperty Name="categoriaid" ColumnName="categoriaid" />
               </MappingFragment>
@@ -697,7 +775,7 @@
                 <ScalarProperty Name="clave" ColumnName="clave" />
                 <ScalarProperty Name="nombre" ColumnName="nombre" />
                 <ScalarProperty Name="apellido" ColumnName="apellido" />
-                <ScalarProperty Name="rutaImg" ColumnName="rutaImg" />
+                <ScalarProperty Name="imagenid" ColumnName="imagenid" />
                 <ScalarProperty Name="rolid" ColumnName="rolid" />
                 <ScalarProperty Name="solrespass" ColumnName="solrespass" />
                 <ScalarProperty Name="fecha_creacion" ColumnName="fecha_creacion" />

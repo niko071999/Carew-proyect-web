@@ -1,9 +1,12 @@
 ﻿var coreModal = document.getElementById('coreModal');
+var storageRef;
 coreModal.addEventListener('shown.bs.modal', function () {
     var nombreusuario = $("#nombreUsuario").val();
     sessionStorage.nombreusuarioactual = nombreusuario;
     console.log(sessionStorage.nombreusuarioactual + ';');
 });
+
+initialFirebase();
 
 function AgregarForms(urlForms) {
     $.get(urlForms + '/', function (data) {
@@ -109,7 +112,18 @@ function formsEliminar(urlFormsEliminar, id) {
 }
 function eliminarUsuario(urlEliminar, id) {
     $.post(urlEliminar + '/' + id, function (data) {
-        if (data > 0) {
+        if (data.n > 0) {
+            if (data.nameFile != '') {
+                if (data.idimg != 2) {
+                    eliminarImagenStorageU(data.nameFile);
+                    sessionStorage.clear();
+                    sessionStorage.mensaje = 'Usuario eliminado correctamente';
+                    location = location.href;
+                }
+                sessionStorage.clear();
+                sessionStorage.mensaje = 'Usuario eliminado correctamente';
+                location = location.href;
+            }
             sessionStorage.clear();
             sessionStorage.mensaje = 'Usuario eliminado correctamente';
             location = location.href;
@@ -151,24 +165,99 @@ function formsImagenU(urlImagen,id) {
 function subirImagenU(urlSubirIMG) {
     var inputArchivoId = document.getElementById('idArchivo');
     var archivo = inputArchivoId.files[0];
-    var dataForm = new FormData();
-    dataForm.append('archivo', archivo);
+    let nameFile = Date.now().toString() + '_usuario';
 
-    $.ajax({
-        url: urlSubirIMG,
-        type: 'POST',
-        data: dataForm,
-        contentType: false,
-        processData: false,
-        success: function (data) {
-            sessionStorage.clear();
-            sessionStorage.mensaje = data.mensaje;
-            location = location.href;
+    // Create a root reference
+    storageRef = firebase.storage().ref();
+
+    // Create a reference
+    var uploadTask = storageRef.child('usuarios')
+        .child(nameFile)
+        .put(archivo);
+
+    uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
+        (snapshot) => {
+            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log('Upload is ' + progress + '% done');
+            switch (snapshot.state) {
+                case firebase.storage.TaskState.PAUSED: // or 'paused'
+                    console.log('Upload is paused');
+                    break;
+                case firebase.storage.TaskState.RUNNING: // or 'running'
+                    console.log('Upload is running');
+                    break;
+            }
         },
-        error: function (data) {
-            mensaje = data.mensaje;
-            showMenssage('error', mensaje);
+        (error) => {
+            switch (error.code) {
+                case 'storage/canceled':
+                    console.error('La carga a sido cancelada')
+                    break;
+                case 'storage/unknown':
+                    console.error('A ocurrido un error desconocido')
+                    break;
+            }
         },
+        () => {
+            // Upload completed successfully, now we can get the download URL
+            uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                console.log('File available at', downloadURL);
+                var dataForm = new FormData();
+                dataForm.append('downloadURL', downloadURL);
+                dataForm.append('nameFile', nameFile);
+                $.ajax({
+                    url: urlSubirIMG,
+                    type: 'POST',
+                    data: dataForm,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        console.log(data);
+                        switch (data.status) {
+                            case 'success':
+                                if (data.idimg != 2) {
+                                    eliminarImagenStorageU(data.nombreImg);
+
+                                    sessionStorage.clear();
+                                    sessionStorage.mensaje = data.mensaje;
+                                    location = location.href;
+                                } else {
+                                    sessionStorage.clear();
+                                    sessionStorage.mensaje = data.mensaje;
+                                    location = location.href;
+                                }                                
+                                break;
+                            case 'error':
+                                //Mostra un mensaje cuando llegue un error y eliminar la imagen de Firebase
+                                showMenssage('error', data.mensaje, true);
+                                eliminarImagenStorageU(nameFile);
+                        }
+                    },
+                    error: function (data) {
+                        console.log(data);
+                        data.mensaje = "Error: La imagen no se a cambiado o no se a subido al servidor";
+                        showMenssage('error', mensaje, true);
+                        eliminarImagenStorageU(nameFile);
+                    },
+                });
+            });
+        }
+    );    
+}
+function eliminarImagenStorageU(namefile) {
+    if (storageRef == undefined) {
+        storageRef = firebase.storage().ref();
+    }
+    var usuariosRef = storageRef.child('usuarios');
+    var usuarioRef = usuariosRef.child(namefile);
+    usuarioRef.delete().then(() => {
+        //Success
+    }).catch((error) => {
+        // Uh-oh, an error occurred!
+        console.error(error);
+        let mensaje = 'Ocurrio un error al eliminar la imagen';
+        showMenssage('error', mensaje, true);
     });
 }
 function restablecerClave(user) {
@@ -216,6 +305,18 @@ function obtenerCodigoBarra(id) {
             abrirModal(data);
         }
     })
+}
+function initialFirebase() {
+    const firebaseConfig = {
+        apiKey: "AIzaSyDaMMADA0YUdGIt1AVXAp1Z_PQYIYcOBQY",
+        authDomain: "carewservices-0799.firebaseapp.com",
+        projectId: "carewservices-0799",
+        storageBucket: "carewservices-0799.appspot.com",
+        messagingSenderId: "836513019982",
+        appId: "1:836513019982:web:5d75e528d15578998eab1f"
+    };
+
+    firebase.initializeApp(firebaseConfig);
 }
 
 const abrirModal = (data) => {

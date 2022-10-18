@@ -1,7 +1,4 @@
 ﻿@model SistemaCajaRegistradora.Models.Usuario
-    @{ 
-        long timestapcreate = Model.fecha_creacion.Value.Ticks;
-    }
 
 <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
@@ -26,10 +23,6 @@
 </div>
 
 <script type="text/javascript">
-    let time = `@Ajax.JavaScriptStringEncode(timestapcreate.ToString())`;
-    let user = `@Ajax.JavaScriptStringEncode(Model.nombreUsuario.Trim())`;
-    let pass = `@Ajax.JavaScriptStringEncode(Model.clave.Trim())`;
-
-    let gencod = time +','+ user +','+ pass;
+    let gencod = `@Ajax.JavaScriptStringEncode(ViewBag.code)`;
     JsBarcode("#barcode", gencod, { format: "CODE128", displayValue: false });
 </script>

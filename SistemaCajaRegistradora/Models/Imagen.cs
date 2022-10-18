@@ -12,30 +12,22 @@ namespace SistemaCajaRegistradora.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Producto
+    public partial class Imagen
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Producto()
+        public Imagen()
         {
-            this.DetalleVentas = new HashSet<DetalleVenta>();
+            this.Productos = new HashSet<Producto>();
+            this.Usuarios = new HashSet<Usuario>();
         }
     
         public int id { get; set; }
-        public string codigo_barra { get; set; }
+        public string ruta { get; set; }
         public string nombre { get; set; }
-        public Nullable<int> precio { get; set; }
-        public Nullable<int> stock { get; set; }
-        public Nullable<int> stockmin { get; set; }
-        public Nullable<int> stockmax { get; set; }
-        public System.DateTime fecha_creacion { get; set; }
-        public int imagenid { get; set; }
-        public int prioridadid { get; set; }
-        public int categoriaid { get; set; }
     
-        public virtual Categoria Categoria { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<DetalleVenta> DetalleVentas { get; set; }
-        public virtual Imagen Imagen { get; set; }
-        public virtual Prioridade Prioridade { get; set; }
+        public virtual ICollection<Producto> Productos { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Usuario> Usuarios { get; set; }
     }
 }

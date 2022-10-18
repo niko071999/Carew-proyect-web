@@ -69,7 +69,7 @@
                             <tr>
                                 <td>
                                     <a href="javascript:void(0);" onclick="formsImagenU('@Url.Action("formsImagen", "Usuario")',@u.id)">
-                                        <img class="rounded mx-auto d-block" src="@u.rutaImg" alt="Imagen del usuario"
+                                        <img class="rounded mx-auto d-block" src="@u.Imagen.ruta" alt="Imagen del usuario"
                                              style="width: 80px; min-width: 50px; min-height: 50px; height: 80px;" />
                                     </a>
                                 </td>
@@ -117,6 +117,4 @@
 
 </div>
 
-<script type="text/javascript" title="main">
-    
-</script>
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-storage.js"></script>

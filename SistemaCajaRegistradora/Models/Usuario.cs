@@ -25,12 +25,13 @@ namespace SistemaCajaRegistradora.Models
         public string clave { get; set; }
         public string nombre { get; set; }
         public string apellido { get; set; }
-        public string rutaImg { get; set; }
+        public int imagenid { get; set; }
         public int rolid { get; set; }
         public Nullable<bool> solrespass { get; set; }
         public Nullable<System.DateTime> fecha_creacion { get; set; }
         public Nullable<System.DateTime> fecha_modificacion { get; set; }
     
+        public virtual Imagen Imagen { get; set; }
         public virtual Role Role { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Venta> Ventas { get; set; }

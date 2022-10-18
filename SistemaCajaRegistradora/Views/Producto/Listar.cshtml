@@ -20,7 +20,7 @@
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <span id="text_nameuser" class="mr-2 d-none d-md-inline text-gray-600 fw-bold">Cargando...</span>
                 <img id="img_user" class="img-profile rounded-circle img-fluid"
-                     src="~/Assets/images/blank-profile.png">
+                     src="~/Assets/images/loading.gif">
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                 <li><a id="linksChangePass" class="dropdown-item" href="javascript:;">Cambiar contraseña</a></li>
@@ -118,7 +118,7 @@
         <!-- table -->
         <div class="row mb-2">
             <div class="col-12 table-responsive overflow-auto">
-                <table id="tablaProducto" class="table table-sm table-bordered table-hover">
+                <table id="tablaProducto" class="table table-sm table-bordered table-hover w-100">
                     <thead>
                         <tr>
                             <th style="width:2%"></th>
@@ -159,12 +159,12 @@
         </div>
     }
 </div>
-<!-- /.container-fluid -->
 <!-- Modal core base-->
-<div class="modal fade" id="coreModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+<div class="modal fade" id="coreModal" tabindex="-1" aria-labelledby="exampleModalLabel"
      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
 
 </div>
 
-<script src="~/Scripts/js/scriptsProductos.js"></script>
-<script src="~/Scripts/Datatable/dtProducto.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-storage.js"></script>
+<script src="~/Scripts/js/scriptsProductos.js" type="text/javascript"></script>
+<script src="~/Scripts/Datatable/dtProducto.js" type="text/javascript"></script>

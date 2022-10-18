@@ -15,7 +15,7 @@ namespace SistemaCajaRegistradora.Controllers
 {
     public class VentaController : Controller
     {
-        private readonly Model db = new Model();
+        private readonly CarewEntidad db = new CarewEntidad();
      
         // GET: Venta
         [HttpGet]
@@ -164,7 +164,7 @@ namespace SistemaCajaRegistradora.Controllers
         {
             using (TransactionScope scope = new TransactionScope())
             {
-                using (Model db1 = new Model())
+                using (CarewEntidad db1 = new CarewEntidad())
                 {
                     string msgError = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina";
                     string msgSuccess = "Venta creada correctamente";
@@ -232,7 +232,6 @@ namespace SistemaCajaRegistradora.Controllers
                             msg = msgError
                         }, JsonRequestBehavior.AllowGet);
                     }
-                    
                 }
             }
         }
