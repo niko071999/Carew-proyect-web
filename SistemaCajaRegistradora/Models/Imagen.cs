@@ -21,7 +21,7 @@ namespace SistemaCajaRegistradora.Models
             this.Usuarios = new HashSet<Usuario>();
         }
     
-        public int id { get; set; }
+        public long id { get; set; }
         public string ruta { get; set; }
         public string nombre { get; set; }
     

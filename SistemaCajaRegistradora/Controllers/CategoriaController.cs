@@ -11,7 +11,7 @@ namespace SistemaCajaRegistradora.Controllers
 {
     public class CategoriaController : Controller
     {
-        private readonly CarewEntidad db = new CarewEntidad();
+        private readonly CarewEntities db = new CarewEntities();
 
         [HttpGet]
         [ActionName("Listar")]

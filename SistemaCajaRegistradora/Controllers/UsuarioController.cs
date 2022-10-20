@@ -18,7 +18,7 @@ namespace SistemaCajaRegistradora.Controllers
     [HandleError]
     public class UsuarioController : Controller
     {
-        private readonly CarewEntidad db = new CarewEntidad();
+        private readonly CarewEntities db = new CarewEntities();
 
         [HttpGet]
         [ActionName("Listar")]
@@ -44,7 +44,6 @@ namespace SistemaCajaRegistradora.Controllers
         [Autorizacion(idoperacion: 13)]
         public JsonResult AgregarUsuario(Usuario usuario)
         {
-            int n = 0;
             if (usuario.rolid != 1)
             {
                 usuario.rolid = 2; //Asignamos el rol de cajero
@@ -53,7 +52,7 @@ namespace SistemaCajaRegistradora.Controllers
                 usuario.fecha_creacion = DateTime.UtcNow;
                 usuario.fecha_modificacion = usuario.fecha_creacion;
                 db.Usuarios.Add(usuario);
-                n = db.SaveChanges();
+                int n = db.SaveChanges();
                 return Json(n, JsonRequestBehavior.AllowGet);
             }
             //Si existe un administrador, enviar -1 que significa error de creacion de usuario
@@ -79,10 +78,9 @@ namespace SistemaCajaRegistradora.Controllers
         [Autorizacion(idoperacion: 15)]
         public JsonResult editarUsuario(Usuario usuario)
         {
-            int n = 0;
             usuario.fecha_modificacion = DateTime.UtcNow;
             db.Entry(usuario).State = EntityState.Modified;
-            n = db.SaveChanges();
+            int n = db.SaveChanges();
             return Json(n, JsonRequestBehavior.AllowGet);
         }
 
@@ -109,22 +107,22 @@ namespace SistemaCajaRegistradora.Controllers
                 var usuario = db.Usuarios.Include(u => u.Imagen)
                 .Where(u => u.id == id).FirstOrDefault();
                 nameFile = usuario.Imagen.nombre.Trim();
-                int idimg = usuario.imagenid;
+                long idimg = usuario.imagenid;
                 db.Usuarios.Remove(usuario);
                 n = db.SaveChanges();
                 return Json(new
                 {
-                    n = n,
-                    nameFile = nameFile,
-                    idimg = idimg
+                    n,
+                    nameFile,
+                    idimg
                 }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception)
             {
                 return Json(new
                 {
-                    n = n,
-                    nameFile = nameFile,
+                    n,
+                    nameFile,
                     idimg = 0
                 }, JsonRequestBehavior.AllowGet);
             }
@@ -177,7 +175,7 @@ namespace SistemaCajaRegistradora.Controllers
         {
             using (TransactionScope scope = new TransactionScope())
             {
-                using (CarewEntidad db1 = new CarewEntidad())
+                using (CarewEntities db1 = new CarewEntities())
                 {
                     string msgSuccess = "Imagen subida correctamente";
                     string msgError = "Error de subida de archivo";
@@ -209,7 +207,7 @@ namespace SistemaCajaRegistradora.Controllers
 
                         var usuario = db1.Usuarios.Find(idUsuario);
                         string nombreImg = usuario.Imagen.nombre;
-                        int idimg = usuario.imagenid;
+                        long idimg = usuario.imagenid;
 
                         usuario.imagenid = img.id;
                         db1.Entry(usuario).State = EntityState.Modified;
@@ -231,8 +229,8 @@ namespace SistemaCajaRegistradora.Controllers
                         {
                             status = "success",
                             msg = msgSuccess,
-                            idimg = idimg,
-                            nombreImg = nombreImg
+                            idimg,
+                            nombreImg
                         },JsonRequestBehavior.AllowGet);
                     }
                     catch (Exception)
@@ -320,7 +318,7 @@ namespace SistemaCajaRegistradora.Controllers
                     else
                     {
                         int numero = new Random().Next(10, 100);
-                        usuario.nombreUsuario = usuario.nombreUsuario + numero;
+                        usuario.nombreUsuario += numero;
                         user = db.Usuarios.Where(u => u.nombreUsuario == usuario.nombreUsuario).FirstOrDefault();
                         valid = false;
                     }

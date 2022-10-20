@@ -24,5 +24,8 @@
 
 <script type="text/javascript">
     let gencod = `@Ajax.JavaScriptStringEncode(ViewBag.code)`;
+    let img = document.getElementById('barcode');
     JsBarcode("#barcode", gencod, { format: "CODE128", displayValue: false });
+    //var url = img.src.replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+    //location.href = url;
 </script>

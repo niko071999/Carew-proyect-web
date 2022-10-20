@@ -5,6 +5,13 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="ModelData.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Cajas">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="num_caja" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="Categorias">
           <Key>
             <PropertyRef Name="id" />
@@ -45,6 +52,20 @@
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="nombre" Type="nchar" MaxLength="30" Nullable="false" />
         </EntityType>
+        <EntityType Name="MovimientosCajas">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="fecha_apertura" Type="datetime" Nullable="false" />
+          <Property Name="monto_apertura" Type="int" Nullable="false" />
+          <Property Name="cajeroid" Type="int" Nullable="false" />
+          <Property Name="cajaid" Type="int" Nullable="false" />
+          <Property Name="total_venta_diaria" Type="int" />
+          <Property Name="total_caja_real" Type="int" />
+          <Property Name="diferencia_caja" Type="int" />
+          <Property Name="fecha_cierre" Type="datetime" />
+        </EntityType>
         <EntityType Name="Operaciones">
           <Key>
             <PropertyRef Name="id" />
@@ -71,7 +92,8 @@
           <Property Name="stock" Type="int" />
           <Property Name="stockmin" Type="int" />
           <Property Name="stockmax" Type="int" />
-          <Property Name="fecha_creacion" Type="date" Nullable="false" />
+          <Property Name="fecha_creacion" Type="datetime" Nullable="false" />
+          <Property Name="fecha_ultima_edicion" Type="datetime" />
           <Property Name="imagenid" Type="bigint" Nullable="false" />
           <Property Name="prioridadid" Type="int" Nullable="false" />
           <Property Name="categoriaid" Type="int" Nullable="false" />
@@ -112,13 +134,26 @@
           </Key>
           <Property Name="id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="total_venta" Type="int" Nullable="false" />
-          <Property Name="fecha_creacion" Type="date" Nullable="false" />
+          <Property Name="fecha_creacion" Type="datetime" Nullable="false" />
           <Property Name="vuelto" Type="int" Nullable="false" />
           <Property Name="cajeroid" Type="int" Nullable="false" />
+          <Property Name="movimientocajaid" Type="int" Nullable="false" />
           <Property Name="metodo_pagoid" Type="int" Nullable="false" />
           <Property Name="monto_ingresado" Type="int" Nullable="false" />
           <Property Name="num_boleta" Type="bigint" Nullable="false" />
         </EntityType>
+        <Association Name="FK_DetalleVenta_Productos">
+          <End Role="Productos" Type="Self.Productos" Multiplicity="1" />
+          <End Role="DetalleVenta" Type="Self.DetalleVenta" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Productos">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="DetalleVenta">
+              <PropertyRef Name="productoid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_DetalleVenta_Ventas">
           <End Role="Ventas" Type="Self.Ventas" Multiplicity="1" />
           <End Role="DetalleVenta" Type="Self.DetalleVenta" Multiplicity="*" />
@@ -128,6 +163,30 @@
             </Principal>
             <Dependent Role="DetalleVenta">
               <PropertyRef Name="ventaid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MovimientosCajas_Cajas">
+          <End Role="Cajas" Type="Self.Cajas" Multiplicity="1" />
+          <End Role="MovimientosCajas" Type="Self.MovimientosCajas" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Cajas">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="MovimientosCajas">
+              <PropertyRef Name="cajaid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MovimientosCajas_Usuarios">
+          <End Role="Usuarios" Type="Self.Usuarios" Multiplicity="1" />
+          <End Role="MovimientosCajas" Type="Self.MovimientosCajas" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Usuarios">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="MovimientosCajas">
+              <PropertyRef Name="cajeroid" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -243,6 +302,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Ventas_MovimientosCajas">
+          <End Role="MovimientosCajas" Type="Self.MovimientosCajas" Multiplicity="1" />
+          <End Role="Ventas" Type="Self.Ventas" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MovimientosCajas">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Ventas">
+              <PropertyRef Name="movimientocajaid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Ventas_Usuarios">
           <End Role="Usuarios" Type="Self.Usuarios" Multiplicity="1" />
           <End Role="Ventas" Type="Self.Ventas" Multiplicity="*" />
@@ -256,11 +327,13 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="ModelDataStoreContainer">
+          <EntitySet Name="Cajas" EntityType="Self.Cajas" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Categorias" EntityType="Self.Categorias" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DetalleVenta" EntityType="Self.DetalleVenta" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Imagen" EntityType="Self.Imagen" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="MetodoPagos" EntityType="Self.MetodoPagos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Modulos" EntityType="Self.Modulos" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MovimientosCajas" EntityType="Self.MovimientosCajas" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Operaciones" EntityType="Self.Operaciones" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Prioridades" EntityType="Self.Prioridades" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Productos" EntityType="Self.Productos" Schema="dbo" store:Type="Tables" />
@@ -268,9 +341,21 @@
           <EntitySet Name="Roles" EntityType="Self.Roles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Usuarios" EntityType="Self.Usuarios" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Ventas" EntityType="Self.Ventas" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_DetalleVenta_Productos" Association="Self.FK_DetalleVenta_Productos">
+            <End Role="Productos" EntitySet="Productos" />
+            <End Role="DetalleVenta" EntitySet="DetalleVenta" />
+          </AssociationSet>
           <AssociationSet Name="FK_DetalleVenta_Ventas" Association="Self.FK_DetalleVenta_Ventas">
             <End Role="Ventas" EntitySet="Ventas" />
             <End Role="DetalleVenta" EntitySet="DetalleVenta" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MovimientosCajas_Cajas" Association="Self.FK_MovimientosCajas_Cajas">
+            <End Role="Cajas" EntitySet="Cajas" />
+            <End Role="MovimientosCajas" EntitySet="MovimientosCajas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MovimientosCajas_Usuarios" Association="Self.FK_MovimientosCajas_Usuarios">
+            <End Role="Usuarios" EntitySet="Usuarios" />
+            <End Role="MovimientosCajas" EntitySet="MovimientosCajas" />
           </AssociationSet>
           <AssociationSet Name="FK_Operaciones_Modulos" Association="Self.FK_Operaciones_Modulos">
             <End Role="Modulos" EntitySet="Modulos" />
@@ -308,6 +393,10 @@
             <End Role="MetodoPagos" EntitySet="MetodoPagos" />
             <End Role="Ventas" EntitySet="Ventas" />
           </AssociationSet>
+          <AssociationSet Name="FK_Ventas_MovimientosCajas" Association="Self.FK_Ventas_MovimientosCajas">
+            <End Role="MovimientosCajas" EntitySet="MovimientosCajas" />
+            <End Role="Ventas" EntitySet="Ventas" />
+          </AssociationSet>
           <AssociationSet Name="FK_Ventas_Usuarios" Association="Self.FK_Ventas_Usuarios">
             <End Role="Usuarios" EntitySet="Usuarios" />
             <End Role="Ventas" EntitySet="Ventas" />
@@ -317,6 +406,14 @@
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="ModelData" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Caja">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="num_caja" Nullable="false" Type="Int32" />
+          <NavigationProperty Name="MovimientosCajas" Relationship="Self.FK_MovimientosCajas_Cajas" FromRole="Cajas" ToRole="MovimientosCajas" />
+        </EntityType>
         <EntityType Name="Categoria">
           <Key>
             <PropertyRef Name="id" />
@@ -342,7 +439,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="ruta" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="nombre" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="Productos" Relationship="Self.FK_Productos_Imagen" FromRole="Imagen" ToRole="Productos" />
@@ -363,6 +460,23 @@
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="nombre" Type="String" MaxLength="30" FixedLength="true" Unicode="true" Nullable="false" />
           <NavigationProperty Name="Operaciones" Relationship="Self.FK_Operaciones_Modulos" FromRole="Modulos" ToRole="Operaciones" />
+        </EntityType>
+        <EntityType Name="MovimientosCaja">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="fecha_apertura" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="monto_apertura" Type="Int32" Nullable="false" />
+          <Property Name="cajeroid" Type="Int32" Nullable="false" />
+          <Property Name="cajaid" Type="Int32" Nullable="false" />
+          <Property Name="total_venta_diaria" Type="Int32" />
+          <Property Name="total_caja_real" Type="Int32" />
+          <Property Name="diferencia_caja" Type="Int32" />
+          <Property Name="fecha_cierre" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Caja" Relationship="Self.FK_MovimientosCajas_Cajas" FromRole="MovimientosCajas" ToRole="Cajas" />
+          <NavigationProperty Name="Usuario" Relationship="Self.FK_MovimientosCajas_Usuarios" FromRole="MovimientosCajas" ToRole="Usuarios" />
+          <NavigationProperty Name="Ventas" Relationship="Self.FK_Ventas_MovimientosCajas" FromRole="MovimientosCajas" ToRole="Ventas" />
         </EntityType>
         <EntityType Name="Operacione">
           <Key>
@@ -393,8 +507,9 @@
           <Property Name="stock" Type="Int32" />
           <Property Name="stockmin" Type="Int32" />
           <Property Name="stockmax" Type="Int32" />
-          <Property Name="fecha_creacion" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="imagenid" Type="Int32" Nullable="false" />
+          <Property Name="fecha_creacion" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="fecha_ultima_edicion" Type="DateTime" Precision="3" />
+          <Property Name="imagenid" Type="Int64" Nullable="false" />
           <Property Name="prioridadid" Type="Int32" Nullable="false" />
           <Property Name="categoriaid" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Categoria" Relationship="Self.FK_Productos_Categorias" FromRole="Productos" ToRole="Categorias" />
@@ -430,12 +545,13 @@
           <Property Name="clave" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="nombre" Type="String" MaxLength="30" FixedLength="true" Unicode="true" Nullable="false" />
           <Property Name="apellido" Type="String" MaxLength="30" FixedLength="true" Unicode="true" Nullable="false" />
-          <Property Name="imagenid" Type="Int32" Nullable="false" />
+          <Property Name="imagenid" Type="Int64" Nullable="false" />
           <Property Name="rolid" Type="Int32" Nullable="false" />
           <Property Name="solrespass" Type="Boolean" />
           <Property Name="fecha_creacion" Type="DateTime" Precision="3" />
           <Property Name="fecha_modificacion" Type="DateTime" Precision="3" />
           <NavigationProperty Name="Imagen" Relationship="Self.FK_Usuarios_Imagen" FromRole="Usuarios" ToRole="Imagen" />
+          <NavigationProperty Name="MovimientosCajas" Relationship="Self.FK_MovimientosCajas_Usuarios" FromRole="Usuarios" ToRole="MovimientosCajas" />
           <NavigationProperty Name="Role" Relationship="Self.FK_Usuarios_Roles" FromRole="Usuarios" ToRole="Roles" />
           <NavigationProperty Name="Ventas" Relationship="Self.FK_Ventas_Usuarios" FromRole="Usuarios" ToRole="Ventas" />
         </EntityType>
@@ -445,16 +561,30 @@
           </Key>
           <Property Name="id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="total_venta" Type="Int32" Nullable="false" />
-          <Property Name="fecha_creacion" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="fecha_creacion" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="vuelto" Type="Int32" Nullable="false" />
           <Property Name="cajeroid" Type="Int32" Nullable="false" />
+          <Property Name="movimientocajaid" Type="Int32" Nullable="false" />
           <Property Name="metodo_pagoid" Type="Int32" Nullable="false" />
           <Property Name="monto_ingresado" Type="Int32" Nullable="false" />
           <Property Name="num_boleta" Type="Int64" Nullable="false" />
           <NavigationProperty Name="DetalleVentas" Relationship="Self.FK_DetalleVenta_Ventas" FromRole="Ventas" ToRole="DetalleVenta" />
           <NavigationProperty Name="MetodoPago" Relationship="Self.FK_Ventas_MetodoPagos" FromRole="Ventas" ToRole="MetodoPagos" />
+          <NavigationProperty Name="MovimientosCaja" Relationship="Self.FK_Ventas_MovimientosCajas" FromRole="Ventas" ToRole="MovimientosCajas" />
           <NavigationProperty Name="Usuario" Relationship="Self.FK_Ventas_Usuarios" FromRole="Ventas" ToRole="Usuarios" />
         </EntityType>
+        <Association Name="FK_MovimientosCajas_Cajas">
+          <End Role="Cajas" Type="Self.Caja" Multiplicity="1" />
+          <End Role="MovimientosCajas" Type="Self.MovimientosCaja" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Cajas">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="MovimientosCajas">
+              <PropertyRef Name="cajaid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Productos_Categorias">
           <End Role="Categorias" Type="Self.Categoria" Multiplicity="1" />
           <End Role="Productos" Type="Self.Producto" Multiplicity="*" />
@@ -539,6 +669,30 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_MovimientosCajas_Usuarios">
+          <End Role="Usuarios" Type="Self.Usuario" Multiplicity="1" />
+          <End Role="MovimientosCajas" Type="Self.MovimientosCaja" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Usuarios">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="MovimientosCajas">
+              <PropertyRef Name="cajeroid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ventas_MovimientosCajas">
+          <End Role="MovimientosCajas" Type="Self.MovimientosCaja" Multiplicity="1" />
+          <End Role="Ventas" Type="Self.Venta" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MovimientosCajas">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Ventas">
+              <PropertyRef Name="movimientocajaid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_rol_operacion_Operaciones">
           <End Role="Operaciones" Type="Self.Operacione" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -603,12 +757,14 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="CarewEntidad" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="CarewEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Cajas" EntityType="Self.Caja" />
           <EntitySet Name="Categorias" EntityType="Self.Categoria" />
           <EntitySet Name="DetalleVentas" EntityType="Self.DetalleVenta" />
           <EntitySet Name="Imagens" EntityType="Self.Imagen" />
           <EntitySet Name="MetodoPagos" EntityType="Self.MetodoPago" />
           <EntitySet Name="Modulos" EntityType="Self.Modulo" />
+          <EntitySet Name="MovimientosCajas" EntityType="Self.MovimientosCaja" />
           <EntitySet Name="Operaciones" EntityType="Self.Operacione" />
           <EntitySet Name="Prioridades" EntityType="Self.Prioridade" />
           <EntitySet Name="Productos" EntityType="Self.Producto" />
@@ -616,6 +772,10 @@
           <EntitySet Name="Roles" EntityType="Self.Role" />
           <EntitySet Name="Usuarios" EntityType="Self.Usuario" />
           <EntitySet Name="Ventas" EntityType="Self.Venta" />
+          <AssociationSet Name="FK_MovimientosCajas_Cajas" Association="Self.FK_MovimientosCajas_Cajas">
+            <End Role="Cajas" EntitySet="Cajas" />
+            <End Role="MovimientosCajas" EntitySet="MovimientosCajas" />
+          </AssociationSet>
           <AssociationSet Name="FK_Productos_Categorias" Association="Self.FK_Productos_Categorias">
             <End Role="Categorias" EntitySet="Categorias" />
             <End Role="Productos" EntitySet="Productos" />
@@ -644,6 +804,14 @@
             <End Role="Modulos" EntitySet="Modulos" />
             <End Role="Operaciones" EntitySet="Operaciones" />
           </AssociationSet>
+          <AssociationSet Name="FK_MovimientosCajas_Usuarios" Association="Self.FK_MovimientosCajas_Usuarios">
+            <End Role="Usuarios" EntitySet="Usuarios" />
+            <End Role="MovimientosCajas" EntitySet="MovimientosCajas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ventas_MovimientosCajas" Association="Self.FK_Ventas_MovimientosCajas">
+            <End Role="MovimientosCajas" EntitySet="MovimientosCajas" />
+            <End Role="Ventas" EntitySet="Ventas" />
+          </AssociationSet>
           <AssociationSet Name="FK_rol_operacion_Operaciones" Association="Self.FK_rol_operacion_Operaciones">
             <End Role="Operaciones" EntitySet="Operaciones" />
             <End Role="rol_operacion" EntitySet="rol_operacion" />
@@ -670,7 +838,15 @@
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="ModelDataStoreContainer" CdmEntityContainer="CarewEntidad">
+        <EntityContainerMapping StorageEntityContainer="ModelDataStoreContainer" CdmEntityContainer="CarewEntities">
+          <EntitySetMapping Name="Cajas">
+            <EntityTypeMapping TypeName="ModelData.Caja">
+              <MappingFragment StoreEntitySet="Cajas">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="num_caja" ColumnName="num_caja" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Categorias">
             <EntityTypeMapping TypeName="ModelData.Categoria">
               <MappingFragment StoreEntitySet="Categorias">
@@ -716,6 +892,21 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="MovimientosCajas">
+            <EntityTypeMapping TypeName="ModelData.MovimientosCaja">
+              <MappingFragment StoreEntitySet="MovimientosCajas">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="fecha_apertura" ColumnName="fecha_apertura" />
+                <ScalarProperty Name="monto_apertura" ColumnName="monto_apertura" />
+                <ScalarProperty Name="cajeroid" ColumnName="cajeroid" />
+                <ScalarProperty Name="cajaid" ColumnName="cajaid" />
+                <ScalarProperty Name="total_venta_diaria" ColumnName="total_venta_diaria" />
+                <ScalarProperty Name="total_caja_real" ColumnName="total_caja_real" />
+                <ScalarProperty Name="diferencia_caja" ColumnName="diferencia_caja" />
+                <ScalarProperty Name="fecha_cierre" ColumnName="fecha_cierre" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Operaciones">
             <EntityTypeMapping TypeName="ModelData.Operacione">
               <MappingFragment StoreEntitySet="Operaciones">
@@ -744,6 +935,7 @@
                 <ScalarProperty Name="stockmin" ColumnName="stockmin" />
                 <ScalarProperty Name="stockmax" ColumnName="stockmax" />
                 <ScalarProperty Name="fecha_creacion" ColumnName="fecha_creacion" />
+                <ScalarProperty Name="fecha_ultima_edicion" ColumnName="fecha_ultima_edicion" />
                 <ScalarProperty Name="imagenid" ColumnName="imagenid" />
                 <ScalarProperty Name="prioridadid" ColumnName="prioridadid" />
                 <ScalarProperty Name="categoriaid" ColumnName="categoriaid" />
@@ -791,6 +983,7 @@
                 <ScalarProperty Name="fecha_creacion" ColumnName="fecha_creacion" />
                 <ScalarProperty Name="vuelto" ColumnName="vuelto" />
                 <ScalarProperty Name="cajeroid" ColumnName="cajeroid" />
+                <ScalarProperty Name="movimientocajaid" ColumnName="movimientocajaid" />
                 <ScalarProperty Name="metodo_pagoid" ColumnName="metodo_pagoid" />
                 <ScalarProperty Name="monto_ingresado" ColumnName="monto_ingresado" />
                 <ScalarProperty Name="num_boleta" ColumnName="num_boleta" />

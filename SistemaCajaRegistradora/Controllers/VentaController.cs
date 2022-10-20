@@ -10,21 +10,20 @@ using SistemaCajaRegistradora.Filters;
 using System.Transactions;
 using Microsoft.Ajax.Utilities;
 using Newtonsoft.Json;
+using System.Text.RegularExpressions;
+using System.Web.WebPages;
 
 namespace SistemaCajaRegistradora.Controllers
 {
     public class VentaController : Controller
     {
-        private readonly CarewEntidad db = new CarewEntidad();
-     
+        private readonly CarewEntities db = new CarewEntities();
+
         // GET: Venta
         [HttpGet]
         [Autorizacion(idoperacion: 21)]
         [ActionName("Listar")]
-        public ActionResult Listar()
-        {
-            return View();
-        }
+        public ActionResult Listar() => View();
 
         [HttpGet]
         [Autorizacion(idoperacion: 22)]
@@ -38,12 +37,14 @@ namespace SistemaCajaRegistradora.Controllers
 
             foreach (var item in result)
             {
-                vmVenta venta = new vmVenta();
-                venta.id = item.id;
-                venta.cajero = item.Usuario.nombre.Trim() + " " + item.Usuario.apellido.Trim();
-                venta.metodoPago = item.MetodoPago.metodo_pago.Trim();
-                venta.totalVenta = item.total_venta;
-                venta.fecha = item.fecha_creacion.ToShortDateString();
+                vmVenta venta = new vmVenta
+                {
+                    id = item.id,
+                    cajero = item.Usuario.nombre.Trim() + " " + item.Usuario.apellido.Trim(),
+                    metodoPago = item.MetodoPago.metodo_pago.Trim(),
+                    totalVenta = item.total_venta,
+                    fecha = item.fecha_creacion.ToShortDateString()
+                };
 
                 ventas.Add(venta);
             }
@@ -76,7 +77,63 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("POS")]
         public ActionResult POS()
         {
+            int day = DateTime.UtcNow.Day;
+            int month = DateTime.UtcNow.Month;
+            int year = DateTime.UtcNow.Year;
+            var usuario = (Usuario)Session["User"];
+            var movcaja = db.MovimientosCajas.Include(mc => mc.Usuario)
+                    .Where(mc => mc.cajeroid == usuario.id 
+                                && mc.fecha_apertura.Day == day
+                                && mc.fecha_apertura.Month == month
+                                && mc.fecha_apertura.Year == year).ToArray();
+
+            if (movcaja.Length == 0)
+            {
+                return RedirectToAction("AbrirCaja");
+            }
             return View();
+        }
+
+        [HttpGet]
+        [ActionName("AbrirCaja")]
+        public ActionResult AbrirCaja()
+        {
+            Usuario user = (Usuario)Session["User"];
+            var cajero = db.Usuarios.Where(u => u.id == user.id).FirstOrDefault();
+            string nombreCajero = cajero.nombre.Trim() + " " + cajero.apellido.Trim();
+            var cajas = db.Cajas.ToList();
+            ViewBag.cajero = nombreCajero;
+            ViewBag.cajas = new SelectList(cajas, "id", "num_caja");
+            return View();
+        }
+
+        [HttpPost]
+        [ActionName("AbrirCaja")]
+        public ActionResult AbrirCaja(DateTime fecha, string monto, int cajas)
+        {
+            if (fecha == null && monto.IsEmpty())
+            {
+                return RedirectToAction("AbrirCajas");
+            }
+            Usuario user = (Usuario)Session["User"];
+            monto = monto.Replace(".","");
+            int montoapertura = Convert.ToInt32(monto);
+
+            MovimientosCaja mc = new MovimientosCaja()
+            {
+                fecha_apertura = fecha,
+                monto_apertura = montoapertura,
+                cajaid = cajas,
+                cajeroid = user.id
+            };
+
+            db.MovimientosCajas.Add(mc);
+            int n = db.SaveChanges();
+            if (n==0)
+            {
+                return RedirectToAction("AbrirCajas");
+            }
+            return RedirectToAction("POS");
         }
 
         [HttpGet]
@@ -91,12 +148,14 @@ namespace SistemaCajaRegistradora.Controllers
 
             foreach (var item in result)
             {
-                vmVenta venta = new vmVenta();
-                venta.id = item.id;
-                venta.cajero = item.Usuario.nombre.Trim() + " " + item.Usuario.apellido.Trim();
-                venta.metodoPago = item.MetodoPago.metodo_pago.Trim();
-                venta.totalVenta = item.total_venta;
-                venta.fecha = item.fecha_creacion.ToShortDateString();
+                vmVenta venta = new vmVenta
+                {
+                    id = item.id,
+                    cajero = item.Usuario.nombre.Trim() + " " + item.Usuario.apellido.Trim(),
+                    metodoPago = item.MetodoPago.metodo_pago.Trim(),
+                    totalVenta = item.total_venta,
+                    fecha = item.fecha_creacion.ToShortDateString()
+                };
 
                 ventas.Add(venta);
             }
@@ -120,7 +179,7 @@ namespace SistemaCajaRegistradora.Controllers
                     {
                         return Json(new
                         {
-                            id = prod.id,
+                            prod.id,
                             codigobarra = prod.codigo_barra.Trim(),
                             nombre = prod.nombre.Trim(),
                             precio = prod.precio,
@@ -164,7 +223,7 @@ namespace SistemaCajaRegistradora.Controllers
         {
             using (TransactionScope scope = new TransactionScope())
             {
-                using (CarewEntidad db1 = new CarewEntidad())
+                using (CarewEntities db1 = new CarewEntities())
                 {
                     string msgError = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina";
                     string msgSuccess = "Venta creada correctamente";
@@ -196,9 +255,9 @@ namespace SistemaCajaRegistradora.Controllers
                                 int stockProd = ventaDetalle.dV[i].total_cantidad_producto;
                                 int idprod = ventaDetalle.dV[i].productoid;
 
-                                //var producto = db.Productos.Find(idprod);
-                                //producto.stock = producto.stock - stockProd;
-                                //db.Entry(producto).State = EntityState.Modified;
+                                var producto = db.Productos.Find(idprod);
+                                producto.stock = producto.stock - stockProd;
+                                db.Entry(producto).State = EntityState.Modified;
                             }
                             n = db.SaveChanges();
                             

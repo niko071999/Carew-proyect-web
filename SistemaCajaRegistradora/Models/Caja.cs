@@ -12,31 +12,18 @@ namespace SistemaCajaRegistradora.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Usuario
+    public partial class Caja
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Usuario()
+        public Caja()
         {
             this.MovimientosCajas = new HashSet<MovimientosCaja>();
-            this.Ventas = new HashSet<Venta>();
         }
     
         public int id { get; set; }
-        public string nombreUsuario { get; set; }
-        public string clave { get; set; }
-        public string nombre { get; set; }
-        public string apellido { get; set; }
-        public long imagenid { get; set; }
-        public int rolid { get; set; }
-        public Nullable<bool> solrespass { get; set; }
-        public Nullable<System.DateTime> fecha_creacion { get; set; }
-        public Nullable<System.DateTime> fecha_modificacion { get; set; }
+        public int num_caja { get; set; }
     
-        public virtual Imagen Imagen { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<MovimientosCaja> MovimientosCajas { get; set; }
-        public virtual Role Role { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Venta> Ventas { get; set; }
     }
 }

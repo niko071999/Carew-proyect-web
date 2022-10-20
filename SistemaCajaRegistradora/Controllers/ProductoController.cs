@@ -19,7 +19,7 @@ namespace SistemaCajaRegistradora.Controllers
 {
     public class ProductoController : Controller
     {
-        private readonly CarewEntidad db = new CarewEntidad();
+        private readonly CarewEntities db = new CarewEntities();
 
         // GET: Producto
         [HttpGet]
@@ -45,19 +45,20 @@ namespace SistemaCajaRegistradora.Controllers
 
             foreach (var item in result)
             {
-                vmProducto producto = new vmProducto();
-                producto.id = item.id;
-                producto.codigobarra = item.codigo_barra.Trim();
-                producto.nombre = item.nombre.Trim();
-                producto.categoria = item.Categoria.nombre.Trim();
-                producto.prioridad = item.Prioridade.prioridad.Trim();
-                producto.rutaimg = item.Imagen.ruta.Trim();
-                producto.precio = (int)item.precio;
-                producto.stock = (int)item.stock;
-                producto.stockmin = (int)item.stockmin;
-                producto.stockmax = (int)item.stockmax;
-                producto.fechacreacion = item.fecha_creacion;
-
+                vmProducto producto = new vmProducto
+                {
+                    id = item.id,
+                    codigobarra = item.codigo_barra.Trim(),
+                    nombre = item.nombre.Trim(),
+                    categoria = item.Categoria.nombre.Trim(),
+                    prioridad = item.Prioridade.prioridad.Trim(),
+                    rutaimg = item.Imagen.ruta.Trim(),
+                    precio = (int)item.precio,
+                    stock = (int)item.stock,
+                    stockmin = (int)item.stockmin,
+                    stockmax = (int)item.stockmax,
+                    fechacreacion = item.fecha_creacion
+                };
                 productos.Add(producto);
             }
 
@@ -86,12 +87,12 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult AgregarProducto(Producto producto)
         {
             validarValoresNull(producto);
-            int n = 0;
             //Se define una imagen por defecto
             producto.imagenid = 1;
             producto.fecha_creacion = DateTime.UtcNow;
+            producto.fecha_ultima_edicion = producto.fecha_creacion;
             db.Productos.Add(producto);
-            n = db.SaveChanges();
+            int n = db.SaveChanges();
             return Json(n,JsonRequestBehavior.AllowGet);
         }
 
@@ -120,6 +121,7 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult editarProducto(Producto producto)
         {
             validarValoresNull(producto);
+            producto.fecha_ultima_edicion = DateTime.UtcNow;
             db.Entry(producto).State = EntityState.Modified;
             int n = db.SaveChanges();
             return Json(n, JsonRequestBehavior.AllowGet);
@@ -142,7 +144,7 @@ namespace SistemaCajaRegistradora.Controllers
         {
             using (TransactionScope scope = new TransactionScope())
             {
-                using (CarewEntidad db1 = new CarewEntidad())
+                using (CarewEntities db1 = new CarewEntities())
                 {
                     string msgSuccess = "Imagen subida correctamente";
                     string msgError = "Error de subida de archivo";
@@ -168,7 +170,7 @@ namespace SistemaCajaRegistradora.Controllers
                         var producto = db1.Productos.Find(idProducto);
 
                         string nombreImg = producto.Imagen.nombre;
-                        int idimg = producto.imagenid;
+                        long idimg = producto.imagenid;
                         
                         producto.imagenid = img.id;
                         db1.Entry(producto).State = EntityState.Modified;
@@ -189,9 +191,9 @@ namespace SistemaCajaRegistradora.Controllers
                         return Json(new 
                         { 
                             status = "success", 
-                            mensaje = msgSuccess, 
-                            idimg = idimg,
-                            nombreImg = nombreImg
+                            mensaje = msgSuccess,
+                            idimg,
+                            nombreImg
                         }, 
                             JsonRequestBehavior.AllowGet);
                     }
@@ -232,24 +234,24 @@ namespace SistemaCajaRegistradora.Controllers
             {
                 var producto = db.Productos.Find(id);
                 nameFile = producto.Imagen.nombre.Trim();
-                int idimg = producto.imagenid;
+                long idimg = producto.imagenid;
                 var imagen = db.Imagens.Find(idimg);
                 db.Productos.Remove(producto);
                 db.Imagens.Remove(imagen);
                 n = db.SaveChanges();
                 return Json(new
                 {
-                    n = n,
-                    nameFile = nameFile,
-                    idimg = idimg
+                    n,
+                    nameFile,
+                    idimg
                 }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception)
             {
                 return Json(new
                 {
-                    n = n,
-                    nameFile = nameFile,
+                    n,
+                    nameFile,
                     idimg = 0
                 }, JsonRequestBehavior.AllowGet);
             }
@@ -270,7 +272,7 @@ namespace SistemaCajaRegistradora.Controllers
                     
                     return Json(new
                     {
-                        id = prod.id,
+                        prod.id,
                         codigobarra = prod.codigo_barra.Trim(),
                         nombre = prod.nombre.Trim(),
                         newstock = producto.stock,

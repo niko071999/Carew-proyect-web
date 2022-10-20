@@ -13,10 +13,10 @@ namespace SistemaCajaRegistradora.Models
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class CarewEntidad : DbContext
+    public partial class CarewEntities : DbContext
     {
-        public CarewEntidad()
-            : base("name=CarewEntidad")
+        public CarewEntities()
+            : base("name=CarewEntities")
         {
         }
     
@@ -25,11 +25,13 @@ namespace SistemaCajaRegistradora.Models
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<Caja> Cajas { get; set; }
         public virtual DbSet<Categoria> Categorias { get; set; }
         public virtual DbSet<DetalleVenta> DetalleVentas { get; set; }
         public virtual DbSet<Imagen> Imagens { get; set; }
         public virtual DbSet<MetodoPago> MetodoPagos { get; set; }
         public virtual DbSet<Modulo> Modulos { get; set; }
+        public virtual DbSet<MovimientosCaja> MovimientosCajas { get; set; }
         public virtual DbSet<Operacione> Operaciones { get; set; }
         public virtual DbSet<Prioridade> Prioridades { get; set; }
         public virtual DbSet<Producto> Productos { get; set; }

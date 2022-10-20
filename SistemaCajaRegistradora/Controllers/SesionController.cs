@@ -11,7 +11,7 @@ namespace SistemaCajaRegistradora.Controllers
 {
     public class SesionController : Controller
     {
-        private readonly CarewEntidad db = new CarewEntidad();
+        private readonly CarewEntities db = new CarewEntities();
         public ActionResult Login()
         {
             var usuarios = db.Usuarios.ToArray();

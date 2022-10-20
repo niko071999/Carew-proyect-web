@@ -28,7 +28,8 @@ namespace SistemaCajaRegistradora.Models
         public Nullable<int> stockmin { get; set; }
         public Nullable<int> stockmax { get; set; }
         public System.DateTime fecha_creacion { get; set; }
-        public int imagenid { get; set; }
+        public Nullable<System.DateTime> fecha_ultima_edicion { get; set; }
+        public long imagenid { get; set; }
         public int prioridadid { get; set; }
         public int categoriaid { get; set; }
     
