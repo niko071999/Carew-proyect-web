@@ -99,6 +99,7 @@ function generarTabla1() {
                 orderable: false,
                 visible: false
             },
+            { data: 'codigobarra' },
             {
                 data: 'codigobarra',
                 render: function (data) {
