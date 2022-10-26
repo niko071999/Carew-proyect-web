@@ -25,6 +25,7 @@ namespace SistemaCajaRegistradora.Models
         public System.DateTime fecha_creacion { get; set; }
         public int vuelto { get; set; }
         public int cajeroid { get; set; }
+        public int movimientocajaid { get; set; }
         public int metodo_pagoid { get; set; }
         public int monto_ingresado { get; set; }
         public long num_boleta { get; set; }
@@ -32,6 +33,7 @@ namespace SistemaCajaRegistradora.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<DetalleVenta> DetalleVentas { get; set; }
         public virtual MetodoPago MetodoPago { get; set; }
+        public virtual MovimientosCaja MovimientosCaja { get; set; }
         public virtual Usuario Usuario { get; set; }
     }
 }

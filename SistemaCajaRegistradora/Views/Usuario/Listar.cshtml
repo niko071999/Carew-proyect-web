@@ -1,5 +1,4 @@
-﻿@model IEnumerable<SistemaCajaRegistradora.Models.Usuario>
-@{
+﻿@{
     ViewBag.Title = "Listado de usuarios";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -48,65 +47,23 @@
             </div>
         </div>
     </div>
-    @if (Model.Count() > 0)
-    {
-        <div class="row">
-            <div class="col-12 table-responsive">
-                <table id="table" class="table table-bordered table-hover display table-sm">
-                    <thead>
-                        <tr>
-                            <th scope="col">Foto usuario</th>
-                            <th scope="col">Nombre</th>
-                            <th scope="col">Apellido</th>
-                            <th scope="col">Nombre de usuario</th>
-                            <th scope="col">Rol</th>
-                            <th scope="col">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var u in Model)
-                        {
-                            <tr>
-                                <td>
-                                    <a href="javascript:void(0);" onclick="formsImagenU('@Url.Action("formsImagen", "Usuario")',@u.id)">
-                                        <img class="rounded mx-auto d-block" src="@u.rutaImg" alt="Imagen del usuario"
-                                             style="width: 80px; min-width: 50px; min-height: 50px; height: 80px;" />
-                                    </a>
-                                </td>
-                                <td class="align-middle">@u.nombre</td>
-                                <td class="align-middle">@u.apellido</td>
-                                <td class="align-middle">@u.nombreUsuario</td>
-                                <td class="align-middle">@u.Role.rol</td>
-                                <td class="align-middle">
-                                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                                        <button class="btn btn-warning btn-icon-split" type="button" onclick="formsEditar('@Url.Action("formsEditar", "Usuario")',@u.id)">
-                                            <span class="icon text-white-50"><i class="fas fa-pen float-left"></i></span>
-                                            <span class="text">Editar</span>
-                                        </button>
-                                        @if (!u.nombreUsuario.Equals(ViewBag.nombreUser))
-                                        {
-                                            <button class="btn btn-danger btn-icon-split" type="button" onclick="formsEliminar('@Url.Action("formsEliminar", "Usuario")', @u.id)">
-                                                <span class="icon text-white-50"><i class="fas fa-trash float-left"></i></span>
-                                                <span class="text">Eliminar</span>
-                                            </button>
-                                        }
-                                        @if (u.solrespass == true)
-                                        {
-                                            <button onclick="restablecerClave('@u.nombreUsuario.Trim()')" class="btn btn-dark btn-icon-split" type="button">
-                                                <span class="icon text-white-50"><i class="fas fa-key float-left"></i></span>
-                                                <span class="text">Restablecer Clave</span>
-                                            </button>
-                                        }
-                                    </div>
-                                </td>
-                            </tr>
-
-                        }
-                    </tbody>
-                </table>
-            </div>
+    <div class="row">
+        <div class="col-12 table-responsive overflow-auto">
+            <table id="tableUsuario" class="table table-bordered table-hover table-sm w-100">
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th scope="col">Foto usuario</th>
+                        <th scope="col">Nombre y apellido</th>
+                        <th scope="col">Nombre de usuario</th>
+                        <th scope="col">Rol</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
-    }
+    </div>
 </div>
 
 <!-- Modal core base-->
@@ -115,50 +72,5 @@
 
 </div>
 
-<script type="text/javascript" title="main">
-    var coreModal = document.getElementById('coreModal');
-    coreModal.addEventListener('shown.bs.modal', function () {
-        var nombreusuario = $("#nombreUsuario").val();
-        sessionStorage.nombreusuarioactual = nombreusuario;
-        console.log(sessionStorage.nombreusuarioactual + ';');
-    });
-
-    function restablecerClave(user) {
-        const swal = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-success',
-                cancelButton: 'btn btn-secundary'
-            },
-            buttonsStyling: false
-        });
-        swal.fire({
-            title: 'Importante',
-            text: 'La contraseña se restablecerá a "cajero". ¿Desea continuar con el proceso?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Si',
-            cancelButtonText: 'Cancelar',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                try {
-                    $.ajax({
-                        url: '/Usuario/RestablecerPass',
-                        type: 'POST',
-                        contentType: 'application/json;',
-                        data: JSON.stringify({ user: user, clave: 'cajero' }),
-                        success: function (res) {
-                            sessionStorage.clear();
-                            sessionStorage.mensaje = 'Contraseña restablecida con exito';
-                            location = location.href;
-                        }
-                    });
-                } catch (e) {
-                    mensaje = "Error: Ocurrio un error en el servidor, intentelo nuevamente";
-                    showMenssage('error', mensaje, true);
-                }
-            }
-            return;
-        });   
-    }
-</script>
+<script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-storage.js"></script>
+<script type="text/javascript" src="~/Scripts/Datatable/dtUsuario.js"></script>

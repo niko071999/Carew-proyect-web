@@ -11,31 +11,46 @@ namespace SistemaCajaRegistradora.Controllers
 {
     public class SesionController : Controller
     {
-        ModelData db = new ModelData();
+        private readonly ModelData db = new ModelData();
         public ActionResult Login()
         {
-            var usuarios = db.Usuarios.ToArray();
+            var contextUsuarios = db.Usuarios.Include(u => u.Role);
+            var usuarios = contextUsuarios.ToArray();
             //Verificar si existen usuarios en el sistema
             if (usuarios.Length == 0)
             {
                 //Si no existen enviar a la vista de bienvenida y creacion de usuarios administrador
                 return RedirectToAction("AgregarUsuarioAdmin");
             }
-            Usuario user;
             if (Session["User"] != null)
             {
-                user = (Usuario)Session["User"];
+                Usuario user = (Usuario)Session["User"];
+                //CAMBIAR ATRIBUTO CONECTADO A TRUE
+                var usuario = contextUsuarios.Where(u => u.id == user.id).FirstOrDefault();
+                if (!(bool)usuario.conectado)
+                {
+                    usuario.conectado = true;
+                    db.Entry(usuario).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+
                 if (user.rolid == 1)
                 {
-                    return RedirectToAction("Index", "Home");
+                    if (usuario != null)
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
                 }
                 else if (user.rolid == 2)
                 {
-                    return RedirectToAction("POS", "Venta");
+                    if (usuario != null)
+                    {
+                        return RedirectToAction("POS", "Venta");
+                    }
                 }
                 else
                 {
-                    return Content("Error, Rol de id no existe");
+                    return Content("Error, Rol de id no existe o el usuario no existe");
                 }
             }
             return View();
@@ -50,7 +65,7 @@ namespace SistemaCajaRegistradora.Controllers
 
             try
             {
-                var usuario = db.Usuarios.Where(u => u.nombreUsuario == user && u.clave == clave).FirstOrDefault();
+                var usuario = db.Usuarios.Include(u => u.Imagen).Where(u => u.nombreUsuario == user && u.clave == clave).FirstOrDefault();
                 if (usuario == null)
                 {
                     ViewBag.Error = "El nombre de usuario y/o contraseña son erroneos";
@@ -63,6 +78,13 @@ namespace SistemaCajaRegistradora.Controllers
                     return View();
                 }
                 Session["User"] = usuario;
+                if (!(bool)usuario.conectado)
+                {
+                    //Cambiamos la variable conectado a true
+                    usuario.conectado = true;
+                    db.Entry(usuario).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
 
                 //Reedireccionamiento de los usuarios a los diferentes modulos
                 if (usuario.rolid == 1)
@@ -97,6 +119,17 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("SignOut")]
         public ActionResult SignOut()
         {
+            var user = (Usuario)Session["User"];
+            var contextUsuarios = db.Usuarios.Include(u => u.Role);
+            var usuario = contextUsuarios.Where(u => u.id == user.id).FirstOrDefault();
+            if (usuario != null && (bool)usuario.conectado)
+            {
+                //Cambiamos la variable conectado a false
+                usuario.conectado = false;
+                db.Entry(usuario).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+
             Session["User"] = null;
             TempData["logout"] = "Sesion finalizada";
             return Redirect("~/Sesion/Login");
@@ -153,7 +186,7 @@ namespace SistemaCajaRegistradora.Controllers
                 ViewBag.Error = "Asegurese que las claves ingresadas sean las mismas";
                 return View();
             }
-            
+
             Usuario usuario = new Usuario()
             {
                 nombre = firstname,
@@ -161,10 +194,12 @@ namespace SistemaCajaRegistradora.Controllers
                 nombreUsuario = nameuser,
                 clave = Encrypt.GetSHA256(clave),
                 rolid = 1,
-                rutaImg = "./../Assets/images/blank-profile.png",
+                imagenid = 2,
                 solrespass = false,
                 fecha_creacion = DateTime.UtcNow,
-                fecha_modificacion = DateTime.UtcNow
+                fecha_modificacion = DateTime.UtcNow,
+                conectado = true
+
             };
             db.Usuarios.Add(usuario);
             int n = db.SaveChanges();

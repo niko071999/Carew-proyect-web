@@ -1,69 +1,84 @@
-﻿$(document).ready(function () {
-    obtenerPrecios();    
-});
-
-let mensaje = '';
+﻿let mensaje = '';
 let lista = [];
 let min = 0;
 let max = 0;
 
-let stockProd = document.getElementById('stockProd');
-let borrarCod = document.getElementById('btnBorrar');
-stockProd.addEventListener("change", verificarStock);
-borrarCod.addEventListener("click", borrarCodigo);
+if (!!document.getElementById('stockProd')) {
+    $(document).ready(function () {
+        obtenerPrecios();
+    });
 
-$("#btnAplicar").attr('disabled', true);
-$("#text_preciomin").change(function () {
-    let txt_min = parseInt($("#text_preciomin").val().replace(/[$.]/g, ''));
-    if (txt_min < min || txt_min > max) {
-        $("#text_preciomin").val(min);
-        formatearIputs();
-    }
-});
-$("#text_preciomax").change(function () {
-    let txt_max = parseInt($("#text_preciomax").val().replace(/[$.]/g, ''));
-    if (txt_max < min || txt_max > max) {
-        $("#text_preciomax").val(max);
-        formatearIputs();
-    }
-});
+    var storageRef;
 
-//listener modal
-let coreModal = document.getElementById('coreModal');
-coreModal.addEventListener('shown.bs.modal', function () {
-    var codigo_barra = $('#codigo_barra').val();
-    if (codigo_barra.trim() != '') {
-        $("#barcode").show();
-        JsBarcode("#barcode", codigo_barra.trim(), {
-            format: "EAN13",
-            lastChar: ">",
-            width: 3,
-        });
-        $("#texto_infocodigobarra").hide();
-    }
-    sessionStorage.codigobarrainit = codigo_barra.trim();
-});
+    //listener modal
+    let coreModal = document.getElementById('coreModal');
+    coreModal.addEventListener('shown.bs.modal', function () {
+        var codigo_barra = $('#codigo_barra').val();
+        if (!!document.getElementById('codigo_barra')) {
+            if (codigo_barra.trim() != '') {
+                $("#barcode").show();
+                JsBarcode("#barcode", codigo_barra.trim(), {
+                    format: "EAN13",
+                    lastChar: ">",
+                    width: 3,
+                });
+                $("#texto_infocodigobarra").hide();
+            }
+            sessionStorage.codigobarrainit = codigo_barra.trim();
+        }
+        
+    });
 
-let collapseStock = document.getElementById('accordionPanelsStayOpenExample')
-collapseStock.addEventListener('shown.bs.collapse', function () {
-    //Cargo por defecto el input de cantidad en 1
-    $('#stockProd').val(1);
-})
+    let stockProd = document.getElementById('stockProd');
+    let borrarCod = document.getElementById('btnBorrar');
 
-$('#codigoAdd').bind('keyup', function (e) {
-    var key = e.keyCode || e.which;
-    cargarExistencias(key);
-});
-$('#stockProd').bind('keyup', function (e) {
-    var key = e.keyCode || e.which;
-    cargarExistencias(key);
-});
+    stockProd.addEventListener("change", verificarStock);
+    borrarCod.addEventListener("click", borrarCodigo);
+    $("#btn_reset").click(function () {
+        let preciomin = parseInt($("#text_preciomin").val().replace(/[$.]/g, ''));
+        let preciomax = parseInt($("#text_preciomax").val().replace(/[$.]/g, ''));
+        if (preciomin != min || preciomax != max) {
+            $("#text_preciomin").val(min);
+            $("#text_preciomax").val(max);
+            formatearIputs();
+            resetTable1();
+        }
+    });
 
-function formatearIputs() {
-    $("#text_preciomin").val(parseFloat($("#text_preciomin").val().replace(/[$.]/g, ''))
-        .toLocaleString('es-CL'));
-    $("#text_preciomax").val(parseFloat($("#text_preciomax").val().replace(/[$.]/g, ''))
-        .toLocaleString('es-CL'));
+    $("#btnAplicar").attr('disabled', true);
+    $("#text_preciomin").change(function () {
+        let txt_min = parseInt($("#text_preciomin").val().replace(/[$.]/g, ''));
+        if (txt_min < min || txt_min > max) {
+            $("#text_preciomin").val(min);
+            formatearIputs();
+        } else {
+            formatearIputs();
+        }
+    });
+    $("#text_preciomax").change(function () {
+        let txt_max = parseInt($("#text_preciomax").val().replace(/[$.]/g, ''));
+        if (txt_max < min || txt_max > max) {
+            $("#text_preciomax").val(max);
+            formatearIputs();
+        } else {
+            formatearIputs();
+        }
+    });
+
+    let collapseStock = document.getElementById('accordionPanelsStayOpenExample')
+    collapseStock.addEventListener('shown.bs.collapse', function () {
+        //Cargo por defecto el input de cantidad en 1
+        $('#stockProd').val(1);
+    })
+
+    $('#codigoAdd').bind('keyup', function (e) {
+        var key = e.keyCode || e.which;
+        cargarExistencias(key);
+    });
+    $('#stockProd').bind('keyup', function (e) {
+        var key = e.keyCode || e.which;
+        cargarExistencias(key);
+    });
 }
 function cargarExistencias(key) {
     var codigo = $('#codigoAdd').val();
@@ -71,15 +86,7 @@ function cargarExistencias(key) {
     var producto = {
         "id": 0,
         "codigo_barra": codigo,
-        "nombre": 'test',
-        "precio": 0,
         "stock": newStock,
-        "stockmin": 0,
-        "stockmax": 0,
-        "fecha_creacion": null,
-        "prioridadid": 0,
-        "categoriaid": 0,
-        "rutaImg": 'test'
     };
     if (key === 13 && codigo.trim() != '') {
         $.post('/Producto/addExistencias', producto, function (data) {
@@ -139,15 +146,7 @@ function aplicarExistencias() {
             var producto = {
                 "id": 0,
                 "codigo_barra": lista[i].codigobarra,
-                "nombre": 'test',
-                "precio": 0,
                 "stock": lista[i].newstock,
-                "stockmin": 0,
-                "stockmax": 0,
-                "fecha_creacion": null,
-                "prioridadid": 0,
-                "categoriaid": 0,
-                "rutaImg": 'test'
             };
             $.post('/Producto/aplicarExistencias', producto, function (data) {
                 if (data > 0) {
@@ -155,7 +154,7 @@ function aplicarExistencias() {
                 } else {
                     error = true;
                 }
-            });
+            }, 'json');
         }
     } else {
         mensaje = "Lista vacia, no existe ningun cambio en las existencias.";
@@ -200,9 +199,9 @@ function quitarItem(codigoItem) {
 }
 
 function AgregarForms(urlForms) {
-    $.get(urlForms+'/', function (data) {
+    $.get(urlForms + '/', function (data) {
         abrirModal(data);
-    })
+    });
 }
 function AgregarProducto(urlAgregar) {
     var idproducto = $('#id').val();
@@ -214,7 +213,7 @@ function AgregarProducto(urlAgregar) {
     var stockmax = $('#stockmax').val();
     var prioridadid = $('#prioridadId').val();
     var categoriaid = $('#categoriaId').val();
-    var rutaImg = $('#rutaImg').val();
+    var imagenid = $('#imagenid').val();
     var fecha_creacion = "";
 
     precio = quitarPuntoNumber(precio);
@@ -240,7 +239,7 @@ function AgregarProducto(urlAgregar) {
                     "fecha_creacion": fecha_creacion,
                     "prioridadid": prioridadid,
                     "categoriaid": categoriaid,
-                    "rutaImg": rutaImg
+                    "imagenid": imagenid
                 };
 
                 $.post(urlAgregar + '/', producto, function (data) {
@@ -251,7 +250,8 @@ function AgregarProducto(urlAgregar) {
                         sessionStorage.mensaje = 'Producto creado correctamente: ';
                         location = location.href;
                     } else {
-                        alert("Error");
+                        mensaje = "Error: Hubo un problema al ingresar el productos, intentelo de nuevo o mas tarde";
+                        showMenssage('error', mensaje, true);
                     }
                 });
             } else {
@@ -270,7 +270,7 @@ function AgregarProducto(urlAgregar) {
                 "fecha_creacion": fecha_creacion,
                 "prioridadid": prioridadid,
                 "categoriaid": categoriaid,
-                "rutaImg": rutaImg
+                "imagenid": imagenid
             };
 
             $.post(urlAgregar + '/', producto, function (data) {
@@ -306,7 +306,7 @@ function editarProducto(urlEditar) {
     var stockmax = $('#stockmax').val();
     var prioridadid = $('#prioridadId').val();
     var categoriaid = $('#categoriaId').val();
-    var rutaImg = $('#rutaImg').val();
+    var imagenid = $('#imagenid').val();
     var fecha_creacion = $('#fecha_creacion').val();
 
     precio = quitarPuntoNumber(precio);
@@ -334,7 +334,7 @@ function editarProducto(urlEditar) {
                         "fecha_creacion": fecha_creacion,
                         "prioridadid": prioridadid,
                         "categoriaid": categoriaid,
-                        "rutaImg": rutaImg
+                        "imagenid": imagenid
                     };
                     $.post(urlEditar + '/', producto, function (data) {
                         if (data > 0) {
@@ -364,7 +364,7 @@ function editarProducto(urlEditar) {
                     "fecha_creacion": fecha_creacion,
                     "prioridadid": prioridadid,
                     "categoriaid": categoriaid,
-                    "rutaImg": rutaImg
+                    "imagenid": imagenid
                 };
                 $.post(urlEditar + '/', producto, function (data) {
                     if (data > 0) {
@@ -392,24 +392,99 @@ function formsImagenP(urlFormsImagen, id) {
 function subirImagenP(url) {
     var inputArchivoId = document.getElementById('idArchivo');
     var archivo = inputArchivoId.files[0];
-    var dataForm = new FormData();
+    let nameFile = Date.now().toString() + '_producto';
 
-    dataForm.append('archivo', archivo);
-    $.ajax({
-        url: url,
-        type: 'POST',
-        data: dataForm,
-        contentType: false,
-        processData: false,
-        success: function (data) {
-            sessionStorage.clear();
-            sessionStorage.mensaje = 'Imagen subida correctamente';
-            location = location.href;
+    // Create a root reference
+    storageRef = firebase.storage().ref();
+
+    // Create a reference
+    var uploadTask = storageRef.child('productos')
+        .child(nameFile)
+        .put(archivo);
+
+    uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
+        (snapshot) => {
+            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log('Upload is ' + progress + '% done');
+            console.log(snapshot.state);
+            switch (snapshot.state) {
+                case firebase.storage.TaskState.PAUSED: // or 'paused'
+                    console.log('Upload is paused');
+                    break;
+                case firebase.storage.TaskState.RUNNING: // or 'running'
+                    console.log('Upload is running');
+                    break;
+            }
         },
-        error: function (data) {
-            mensaje = "Error: La imagen no se a cambiado o no se a subido al servidor";
-            showMenssage('error', mensaje);
+        (error) => {
+            switch (error.code) {
+                case 'storage/canceled':
+                    alert('Se ha cancelado la subida de imagen');
+                    console.error('La carga a sido cancelada');
+                    break;
+                case 'storage/unknown':
+                    alert('Ha ocurrido un error desconocido');
+                    console.error('A ocurrido un error desconocido');
+                    break;
+            }
         },
+        () => {
+            // Upload completed successfully, now we can get the download URL
+            uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                var dataForm = new FormData();
+                dataForm.append('downloadURL', downloadURL);
+                dataForm.append('nameFile', nameFile);
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: dataForm,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        console.log(data);
+                        switch (data.status) {
+                            case 'success':
+                                if (data.idimg != 1) {
+                                    eliminarImagenStorageP(data.nombreImg)
+                                    sessionStorage.clear();
+                                    sessionStorage.mensaje = data.mensaje;
+                                    location = location.href;
+                                } else {
+                                    sessionStorage.clear();
+                                    sessionStorage.mensaje = data.mensaje;
+                                    location = location.href;
+                                }
+                                break;
+                            case 'error':
+                                //Mostra un mensaje cuando llegue un error y eliminar la imagen de Firebase
+                                showMenssage('error', data.mensaje, true);
+                                eliminarImagenStorageP(nameFile);
+                            default:
+                        }
+                    },
+                    error: function (data) {
+                        data.mensaje = "Error: La imagen no se a cambiado o no se a subido al servidor";
+                        showMenssage('error', mensaje, true);
+                        eliminarImagenStorageP(nameFile);
+                    },
+                });
+            });
+        }
+    );
+}
+function eliminarImagenStorageP(namefile) {
+    if (storageRef == undefined) {
+        storageRef = firebase.storage().ref();
+    }
+    var productosRef = storageRef.child('productos');
+    var productoRef = productosRef.child(namefile);
+    productoRef.delete().then(() => {
+        //Success
+    }).catch((error) => {
+        console.error(error);
+        let mensaje = 'Ocurrio un error al eliminar la imagen';
+        showMenssage('error', mensaje, true);
     });
 }
 function formsEliminar(urlFormsEliminar, id) {
@@ -419,7 +494,18 @@ function formsEliminar(urlFormsEliminar, id) {
 }
 function eliminarProducto(urlEliminar, id) {
     $.post(urlEliminar + '/' + id, function (data) {
-        if (data > 0 ) {
+        if (data.n > 0) {
+            if (data.nameFile != '') {
+                if (data.idimg != 1) {
+                    eliminarImagenStorageP(data.nameFile);
+                    sessionStorage.clear();
+                    sessionStorage.mensaje = 'Producto eliminado correctamente';
+                    location = location.href;
+                }
+                sessionStorage.clear();
+                sessionStorage.mensaje = 'Producto eliminado correctamente';
+                location = location.href;
+            }
             sessionStorage.clear();
             sessionStorage.mensaje = 'Producto eliminado correctamente';
             location = location.href;
@@ -427,7 +513,72 @@ function eliminarProducto(urlEliminar, id) {
             mensaje = "Error: El producto no se elimino, asegurese de que el producto no se ocupe en algun producto";
             showMenssage('error', mensaje, true);
         }
-    },'json');
+    }, 'json');
+}
+function cargarProdsForms(url) {
+    $.get(url, function (data) {
+        abrirModal(data);
+    });
+}
+function cargarProdsFile(urlLoadProds) {
+    var inputArchivoId = document.getElementById('idArchivo');
+    var archivo = inputArchivoId.files[0];
+    var dataForm = new FormData();
+    dataForm.append("csv", archivo);
+    let msgErrorProd = "Productos con errores en sus datos:\n";
+    let msgProdRep = "Productos con su codigo de barra ya registrados en la base de datos:\n"; 
+    $.ajax({
+        url: urlLoadProds,
+        type: 'POST',
+        data: dataForm,
+        contentType: false,
+        processData: false,
+        success: function (data) {
+            console.log(data);
+            if (data.errorProd.length > 0 || data.prodRepetidos.length > 0) {
+                for (var i = 0; i < data.errorProd.length; i++) {
+                    msgErrorProd = msgErrorProd + data.errorProd[i] + '\n';
+                }
+                for (var i = 0; i < data.prodRepetidos.length; i++) {
+                    msgProdRep = msgProdRep + data.prodRepetidos[i] + '\n';
+                }
+                Swal.fire({
+                    title: 'Hubieron errores con los siguientes productos',
+                    text: msgErrorProd+msgProdRep,
+                    icon: 'info',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Esta bien',
+                    width: 900
+                }).then(() => {
+                    switch (data.status) {
+                        case 'success':
+                            sessionStorage.clear();
+                            sessionStorage.mensaje = data.msg;
+                            location = location.href;
+                            break;
+                        case 'error':
+                            showMenssage('error', data.msg, true);
+                        default:
+                    }
+                });
+            } else {
+                switch (data.status) {
+                    case 'success':
+                        sessionStorage.clear();
+                        sessionStorage.mensaje = data.msg;
+                        location = location.href;
+                        break;
+                    case 'error':
+                        showMenssage('error', data.msg, true);
+                    default:
+                }
+            }
+        },
+        error: function (data) {
+            data.mensaje = "Error: La imagen no se a cambiado o no se a subido al servidor";
+            showMenssage('error', mensaje, true);
+        },
+    });
 }
 
 const validarCamposPro = (codigo_barra, nombre, prioridadid, categoriaid) => {
@@ -501,7 +652,7 @@ function accion(cod, id) {
             formsEliminar('/Producto/formsEliminar/', id);
             break;
         case (3):
-            formsImagenP('/Producto/formsImagen/',id)
+            formsImagenP('/Producto/formsImagen/', id)
             break;
         default:
             mensaje = 'Se ha producido un error inesperado, intentelo nuevamente o recargue la pagina';
@@ -511,14 +662,21 @@ function accion(cod, id) {
 function desabilitar() {
     var inputArchivoId = document.getElementById('idArchivo');
     var btn = document.getElementById('btnSubir');
-    if (inputArchivoId.files[0] == undefined) {
+    if (inputArchivoId.files[0] == undefined) {//No hay imagenes
         btn.disabled = true;
-    } else {
+    } else {//Si hay imagenes
         btn.disabled = false;
     }
 }
+function formatearIputs() {
+    $("#text_preciomin").val(parseFloat($("#text_preciomin").val().replace(/[$.]/g, ''))
+        .toLocaleString('es-CL'));
+    $("#text_preciomax").val(parseFloat($("#text_preciomax").val().replace(/[$.]/g, ''))
+        .toLocaleString('es-CL'));
+}
+
 const quitarPuntoNumber = (number) => {
     return number.replace(',', '');
 }
-function borrarCodigo() { $('#codigo_barra').val(''); }
+
 

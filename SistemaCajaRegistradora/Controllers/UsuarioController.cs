@@ -10,23 +10,54 @@ using System.Text;
 using SistemaCajaRegistradora.Filters;
 using System.Security.Claims;
 using System.Threading;
+using System.Web.WebPages;
+using System.Transactions;
+using System.Web.Helpers;
+using SistemaCajaRegistradora.Models.ViewModels;
+using System.Collections;
 
 namespace SistemaCajaRegistradora.Controllers
 {
     [HandleError]
     public class UsuarioController : Controller
     {
-        ModelData db = new ModelData();
+        private readonly ModelData db = new ModelData();
 
         [HttpGet]
         [ActionName("Listar")]
         [Autorizacion(idoperacion:12)]
         public ActionResult Listar()
         {
-            Usuario usuario = (Usuario)Session["User"];
-            ViewBag.nombreUser = usuario.nombreUsuario;
-            var usuarios = db.Usuarios.Include(x => x.Role);
-            return View(usuarios.ToList());
+            return View();
+        }
+
+        [HttpGet]
+        [ActionName("getUsuarios")]
+        public JsonResult getUsuarios()
+        {
+            db.Configuration.LazyLoadingEnabled = false;
+            List<vmUsuario> usuariosList = new List<vmUsuario>();
+            vmUsuario vmUsuario;
+            var usuarios = db.Usuarios.Include(u => u.Imagen).Include(u => u.Role).ToArray();
+            foreach (var usuario in usuarios)
+            {
+                vmUsuario = new vmUsuario()
+                {
+                    id = usuario.id,
+                    nombreCajero = usuario.nombre.Trim() + " " + usuario.apellido.Trim(),
+                    nombreUsuario = usuario.nombreUsuario.Trim(),
+                    rutaImg = usuario.Imagen.ruta,
+                    rol = usuario.Role.rol.Trim(),
+                    stateConexion = usuario.conectado,
+                    solrespass = usuario.solrespass
+                };
+                usuariosList.Add(vmUsuario);
+            }
+
+            return Json(new
+            {
+                data = usuariosList
+            }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
@@ -42,26 +73,21 @@ namespace SistemaCajaRegistradora.Controllers
         [Autorizacion(idoperacion: 13)]
         public JsonResult AgregarUsuario(Usuario usuario)
         {
-            int n = 0;
-            if (usuario.rolid == 1)
+            if (usuario.rolid != 1)
             {
-                //Verificar si existe un administrador en el sistema
-                var user = db.Usuarios.Where(u => u.rolid == 1).FirstOrDefault();
-                if (user == null)
-                {
-                    usuario.rolid = 2; //Asignamos el rol de cajero
-                    usuario.clave = Encrypt.GetSHA256(usuario.clave);
-                    usuario.rutaImg = "./../Assets/images/blank-profile.png";
-                    usuario.fecha_creacion = DateTime.UtcNow;
-                    usuario.fecha_modificacion = usuario.fecha_creacion;
-                    db.Usuarios.Add(usuario);
-                    n = db.SaveChanges();
-                    return Json(n, JsonRequestBehavior.AllowGet);
-                }
-                //Si existe un administrador, enviar -1 que significa error de creacion de usuario
-                return Json(-1, JsonRequestBehavior.AllowGet);
+                usuario.rolid = 2; //Asignamos el rol de cajero
+                usuario.clave = Encrypt.GetSHA256(usuario.clave);
+                usuario.imagenid = 2; //Se define una imagen por defecto
+                usuario.fecha_creacion = DateTime.UtcNow;
+                usuario.fecha_modificacion = usuario.fecha_creacion;
+                usuario.conectado = false;
+                db.Usuarios.Add(usuario);
+                int n = db.SaveChanges();
+                return Json(n, JsonRequestBehavior.AllowGet);
             }
-            return Json(n, JsonRequestBehavior.AllowGet);
+            //Si existe un administrador, enviar -1 que significa error de creacion de usuario
+            return Json(-1, JsonRequestBehavior.AllowGet);
+            
         }
 
         [HttpGet]
@@ -82,10 +108,9 @@ namespace SistemaCajaRegistradora.Controllers
         [Autorizacion(idoperacion: 15)]
         public JsonResult editarUsuario(Usuario usuario)
         {
-            int n = 0;
             usuario.fecha_modificacion = DateTime.UtcNow;
             db.Entry(usuario).State = EntityState.Modified;
-            n = db.SaveChanges();
+            int n = db.SaveChanges();
             return Json(n, JsonRequestBehavior.AllowGet);
         }
 
@@ -105,10 +130,38 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult eliminarUsuario(int? id)
         {
             int n = 0;
-            var usuario = db.Usuarios.Find(id);
-            db.Usuarios.Remove(usuario);
-            n = db.SaveChanges();
-            return Json(n, JsonRequestBehavior.AllowGet);
+            string nameFile = string.Empty;
+
+            try
+            {
+                var usuario = db.Usuarios.Include(u => u.Imagen)
+                .Where(u => u.id == id).FirstOrDefault();
+                nameFile = usuario.Imagen.nombre.Trim();
+                long idimg = usuario.imagenid;
+                db.Imagens.Find(idimg);
+                db.Usuarios.Remove(usuario);
+                if (idimg != 2)
+                {
+                    db.Usuarios.Remove(usuario);
+                }
+                n = db.SaveChanges();
+                return Json(new
+                {
+                    n,
+                    nameFile,
+                    idimg
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception)
+            {
+                return Json(new
+                {
+                    n,
+                    nameFile,
+                    idimg = 0
+                }, JsonRequestBehavior.AllowGet);
+            }
+            
         }
 
         [HttpGet]
@@ -134,6 +187,7 @@ namespace SistemaCajaRegistradora.Controllers
             usuario.clave = Encrypt.GetSHA256(usuario.clave);
             var user = (Usuario)Session["User"];
             usuario.id = user.id;
+            usuario.fecha_modificacion = DateTime.Now;
             db.Usuarios.Attach(usuario);
             db.Entry(usuario).Property(u => u.clave).IsModified = true;
             n = db.SaveChanges();
@@ -153,34 +207,80 @@ namespace SistemaCajaRegistradora.Controllers
         [HttpPost]
         [ActionName("subirImagen")]
         [Autorizacion(idoperacion:16)]
-        public JsonResult subirImagen(HttpPostedFileBase archivo)
+        public JsonResult subirImagen(string downloadURL, string nameFile)
         {
-            try
+            using (TransactionScope scope = new TransactionScope())
             {
-                if (archivo != null)
+                using (ModelData db1 = new ModelData())
                 {
-                    string path = Server.MapPath("~/Assets/images/usuarios/");
-                    if (!System.IO.Directory.Exists(path))
+                    string msgSuccess = "Imagen subida correctamente";
+                    string msgError = "Error de subida de archivo";
+                    try
                     {
-                        System.IO.Directory.CreateDirectory(path);
-                    }
-                    archivo.SaveAs(path + System.IO.Path.GetFileName(archivo.FileName));
+                        if (downloadURL.Equals(string.Empty) && nameFile.Equals(string.Empty))
+                            throw new Exception(msgError);
 
-                    int iduser = (int)Session["idUser"];
-                    var usuario = db.Usuarios.Find(iduser);
-                    usuario.rutaImg = "./../Assets/images/usuarios/" + archivo.FileName;
-                    db.Entry(usuario).State = EntityState.Modified;
-                    db.SaveChanges();
-                    return Json(new { mensaje = "Archivo subido correctamente" }, JsonRequestBehavior.AllowGet);
+                        Imagen img = new Imagen()
+                        {
+                            nombre = nameFile,
+                            ruta = downloadURL,
+                        };
+                        db1.Imagens.Add(img);
+                        int n = db1.SaveChanges();
+
+                        if (n == 0)
+                            throw new Exception(msgError);
+
+                        int idUsuario = (int)Session["idUser"];
+
+                        //Cambiar la imagen a la variable de session
+                        var user = (Usuario)Session["User"];
+                        if (user.id == idUsuario)
+                        {
+                            user.imagenid = img.id;
+                            Session["User"] = user;
+                        }
+
+                        var usuario = db1.Usuarios.Find(idUsuario);
+                        string nombreImg = usuario.Imagen.nombre;
+                        long idimg = usuario.imagenid;
+
+                        usuario.imagenid = img.id;
+                        usuario.fecha_modificacion = DateTime.Now;
+                        db1.Entry(usuario).State = EntityState.Modified;
+                        n = db1.SaveChanges();
+                        if (n == 0)
+                            throw new Exception(msgError);
+
+                        //Borrar registro de la otra imagen
+                        if (idimg != 2)
+                        {
+                            var imagen = db1.Imagens.Find(idimg);
+                            db1.Imagens.Remove(imagen);
+                            db1.SaveChanges();
+                        }
+
+                        scope.Complete();
+
+                        return Json(new
+                        {
+                            status = "success",
+                            msg = msgSuccess,
+                            idimg,
+                            nombreImg
+                        },JsonRequestBehavior.AllowGet);
+                    }
+                    catch (Exception)
+                    {
+                        return Json(new
+                        {
+                            status = "error",
+                            msg = msgError,
+                            idimg = 0,
+                            nombreImg = ""
+                        },JsonRequestBehavior.AllowGet);
+                    }
                 }
-                else
-                {
-                    return Json(new { mensaje = "Error de subida de archivo" }, JsonRequestBehavior.AllowGet);
-                }
-            }
-            catch (Exception)
-            {
-                return Json(new { mensaje = "Error de subida de archivo" }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -194,9 +294,27 @@ namespace SistemaCajaRegistradora.Controllers
             usuario.solrespass = false;
             usuario.clave = clave;
             usuario.clave = Encrypt.GetSHA256(usuario.clave);
+            usuario.fecha_modificacion = DateTime.Now;
             db.Entry(usuario).State = EntityState.Modified;
             n = db.SaveChanges();
-            return RedirectToAction("Listar", "Usuario");
+            return RedirectToAction("Listar");
+        }
+
+        [HttpGet]
+        [ActionName("obtenerBarcodeUser")]
+        public PartialViewResult obtenerBarcodeUser(int? id)
+        {
+            if (id != null)
+            {
+                var usuario = db.Usuarios.Where(u => u.id == id).FirstOrDefault();
+                if (usuario != null)
+                {
+                    ViewBag.code = Encrypt.GetSHA256(usuario.fecha_creacion.Value.Ticks.ToString());
+                    return PartialView("_formObtenerBarcode", usuario);
+                }
+                return PartialView(null);
+            }
+            return PartialView(null);
         }
 
         [HttpPost]
@@ -238,7 +356,7 @@ namespace SistemaCajaRegistradora.Controllers
                     else
                     {
                         int numero = new Random().Next(10, 100);
-                        usuario.nombreUsuario = usuario.nombreUsuario + numero;
+                        usuario.nombreUsuario += numero;
                         user = db.Usuarios.Where(u => u.nombreUsuario == usuario.nombreUsuario).FirstOrDefault();
                         valid = false;
                     }
@@ -271,13 +389,13 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("getSesion")]
         public JsonResult getSesion()
         {
-            Usuario user = (Usuario)Session["User"];
+            var user = (Usuario)Session["User"];
             if (user != null)
             {
                 return Json(new
                 {
                     nombreuser = user.nombre.Trim() + ' ' + user.apellido.Trim() + " (" + user.nombreUsuario.Trim() + ")",
-                    imgruta = user.rutaImg.Trim()
+                    imgruta = user.Imagen.ruta.Trim()
                 }, JsonRequestBehavior.AllowGet);
             }
             else
@@ -288,7 +406,7 @@ namespace SistemaCajaRegistradora.Controllers
         private void quitarEspaciosVacios(Usuario usuario)
         {
             usuario.nombreUsuario = usuario.nombreUsuario.Trim();
-            usuario.rutaImg = usuario.rutaImg.Trim();
+            usuario.Imagen.ruta = usuario.Imagen.ruta.Trim();
             usuario.nombre = usuario.nombre.Trim();
             usuario.apellido = usuario.apellido.Trim();
         }

@@ -1,0 +1,27 @@
+﻿<div class="modal-dialog">
+    <div class="modal-content">
+        <form enctype="multipart/form-data">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Subir archivo CSV</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h5 class="fw-bold">Descargue la plantilla para poder subir varios productos</h5>
+                <a id="enlace" href="https://is.gd/CnVwFH" class="btn btn-success">
+                    <i class="fas fa-file-excel"></i>
+                    Plantilla Excel para agregar productos
+                </a>
+                <p>
+                    Una vez descargado, rellenas la tabla con los datos de los productos y
+                    guardas el documento en formato .csv
+                </p>
+                <label for="idArchivo" class="form-label">Seleccione archivo. (Formato CSV)</label>
+                <input class="form-control form-control-sm" accept=".csv" id="idArchivo" type="file">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button id="btn_load" type="button" class="btn btn-success" onclick="cargarProdsFile('@Url.Action("SubirProductosCSV","Producto")')">Agregar productos</button>
+            </div>
+        </form>
+    </div>
+</div>

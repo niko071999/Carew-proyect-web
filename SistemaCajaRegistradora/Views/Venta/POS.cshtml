@@ -38,6 +38,22 @@
         <div class="col-4">
             <h1 class="h3 mb-4 text-gray-800">@ViewBag.Title</h1>
         </div>
+        <div class="col-4">
+            <div class="d-grid gap-2 mb-2">
+                <button id="btn_printLastSales" type="button" class="btn btn-secondary">
+                    <i class="fas fa-print"></i>
+                    Imprimir la ultima venta
+                </button>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="d-grid gap-2 mb-2">
+                <a class="btn btn-outline-danger" href="@Url.Action("CerrarCaja","Venta")">
+                    <i class="far fa-times-circle"></i>
+                    Cerrar caja
+                </a>
+            </div>
+        </div>
     </div>
     <div class="input-group mb-3">
         <span class="input-group-text">Codigo Barra</span>
@@ -81,6 +97,15 @@
                 <tbody id="bodyTable">
                 </tbody>
             </table>
+            @{
+                if (TempData["msgError"] != null)
+                {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @TempData["msgError"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                }
+            }
         </div>
         <div class="col col-4">
             <div class="card">
@@ -136,7 +161,7 @@
                                     <td class="h4 fw-bold">
                                         <input id="input_montoRecibido"
                                                class="form-control form-control-lg text-end" type="text"
-                                               placeholder="Monto">
+                                               placeholder="Monto" list="montos">
                                     </td>
                                 </tr>
                                 <tr>
@@ -147,10 +172,34 @@
                                 </tr>
                             </tbody>
                         </table>
+                    @* Datalist de monto recibido *@
+                    <datalist id="montos">
+                        <option value="500">
+                        <option value="1000">
+                        <option value="2000">
+                        <option value="3000">
+                        <option value="4000">
+                        <option value="5000">
+                        <option value="6000">
+                        <option value="7000">
+                        <option value="8000">
+                        <option value="9000">
+                        <option value="10000">
+                        <option value="11000">
+                        <option value="12000">
+                        <option value="13000">
+                        <option value="14000">
+                        <option value="15000">
+                        <option value="16000">
+                        <option value="17000">
+                        <option value="18000">
+                        <option value="19000">
+                        <option value="20000">
+                    </datalist>
                     </div>
                     <div class="d-grid gap-2">
-                        <button id="btn_finalizarventa" class="btn btn-success btn-lg" type="button">Finalizar Venta</button>
-                        <button id="btn_cancelarventa" class="btn btn-outline-secondary" type="button">Cancelar</button>
+                        <button id="btn_finalizarventa" class="btn btn-success btn-sales" type="button">Finalizar Venta</button>
+                        <button id="btn_cancelarventa" class="btn btn-outline-secondary" type="button">Cancelar Venta</button>
                     </div>
                 </div>
             </div>

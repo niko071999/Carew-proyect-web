@@ -1,0 +1,71 @@
+﻿@{
+    ViewBag.Title = "Apertura de caja";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Topbar  -->
+<nav class="navbar navbar-expand navbar-light bg-white mb-4 topbar shadow">
+
+    <!-- Sidebar Toggle (Topbar) -->
+    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+        <i class="fa fa-bars"></i>
+    </button>
+
+    <!-- Topbar Navbar -->
+    <!-- Topbar Navbar -->
+    <ul class="navbar-nav ml-auto">
+
+        <!-- Nav Item - User Information -->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span id="text_nameuser" class="mr-2 d-none d-md-inline text-gray-600 fw-bold">Cargando...</span>
+                <img id="img_user" class="img-profile rounded-circle img-fluid"
+                     src="~/Assets/images/blank-profile.png">
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                <li><a id="linksChangePass" class="dropdown-item" href="javascript:;">Cambiar contraseña</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a id="linksignout" class="dropdown-item text-danger" href="javascript:;">Cerrar sesion</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>
+<!-- End of Topbar -->
+<div class="container-fluid">
+    <div class="row justify-content-between">
+        <div class="col-4">
+            <h1 class="h3 mb-4 text-gray-800">@ViewBag.Title</h1>
+        </div>
+    </div>
+    <form id="form_opencaja" action="@Url.Action("AbrirCaja","Venta")" method="post">
+        <div class="mb-3 row">
+            <label for="staticDate" class="col-sm-2 col-form-label">Fecha apertura:</label>
+            <div class="col-sm-10">
+                <input type="text" name="fecha" readonly class="form-control-plaintext" id="staticDate" value="@DateTime.Now">
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label for="staticCajero" class="col-sm-2 col-form-label">Nombre cajero:</label>
+            <div class="col-sm-10">
+                <input type="text" name="cajero" readonly class="form-control-plaintext" id="staticCajero" value="@ViewBag.cajero">
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label for="selectCaja" class="col-sm-2 col-form-label">Numero de caja:</label>
+            <div class="col-sm-10">
+                @Html.DropDownList("cajas", null, "Seleccione el numero de la caja",
+                        htmlAttributes: new { @class = "form-select", @required = "required" })
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label for="inputMonto" class="col-sm-2 col-form-label">Monto apertura:</label>
+            <div class="col-sm-10 input-group mb-3">
+                <span class="input-group-text">$</span>
+                <input type="text" class="form-control" name="monto" id="inputMonto" value="0">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mb-3">Abrir Caja</button>
+
+    </form>
+</div>
+<script type="text/javascript" src="~/Scripts/js/aperturacajascript.js"></script>

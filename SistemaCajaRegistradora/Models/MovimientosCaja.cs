@@ -12,31 +12,27 @@ namespace SistemaCajaRegistradora.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Usuario
+    public partial class MovimientosCaja
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Usuario()
+        public MovimientosCaja()
         {
-            this.MovimientosCajas = new HashSet<MovimientosCaja>();
             this.Ventas = new HashSet<Venta>();
         }
     
         public int id { get; set; }
-        public string nombreUsuario { get; set; }
-        public string clave { get; set; }
-        public string nombre { get; set; }
-        public string apellido { get; set; }
-        public long imagenid { get; set; }
-        public int rolid { get; set; }
-        public Nullable<bool> solrespass { get; set; }
-        public Nullable<System.DateTime> fecha_creacion { get; set; }
-        public Nullable<System.DateTime> fecha_modificacion { get; set; }
-        public Nullable<bool> conectado { get; set; }
+        public System.DateTime fecha_apertura { get; set; }
+        public int monto_apertura { get; set; }
+        public int cajeroid { get; set; }
+        public int cajaid { get; set; }
+        public Nullable<int> total_venta_diaria { get; set; }
+        public Nullable<int> total_caja_real_efectivo { get; set; }
+        public Nullable<int> total_caja_real_transferencia { get; set; }
+        public Nullable<int> diferencia_caja { get; set; }
+        public Nullable<System.DateTime> fecha_cierre { get; set; }
     
-        public virtual Imagen Imagen { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<MovimientosCaja> MovimientosCajas { get; set; }
-        public virtual Role Role { get; set; }
+        public virtual Caja Caja { get; set; }
+        public virtual Usuario Usuario { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Venta> Ventas { get; set; }
     }

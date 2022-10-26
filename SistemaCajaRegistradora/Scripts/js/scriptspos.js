@@ -9,6 +9,11 @@ let totalvuelto = 0;
 
 $("#stockProd").change(function () { verificarStockNegativo(); });
 $("#btnBorrar").click(function () { borrarCodigo(); });
+$("#btn_printLastSales").click(function () { imprimirLastSales() });
+//$("#btn_cerrarCaja").click(function () {
+//    $.get('/Venta/CerrarCaja/');
+//})
+
 
 let btn_finalizarventa = document.getElementById('btn_finalizarventa');
 let btn_cancelarventa = document.getElementById('btn_cancelarventa');
@@ -39,6 +44,24 @@ $("#btn_print").click(function () {
 });
 
 
+function imprimirLastSales() {
+    $.get('/Venta/ultimaVenta', function (data) {
+        console.log(data);
+        let msg = '';
+        if (data.data == 0) {
+            msg = data.msg;
+            showMenssage('error', msg, true);
+        } else {
+            let idventa = data.data;
+            msg = data.msg;
+            showMenssage('success', msg, false);
+            console.log(data);
+            $.get('/Venta/viewBoletaVenta/' + idventa, function (data) {
+                abrirModal(data);
+            });
+        }
+    });
+}
 function confirmacionFinalizarVenta() {
     Swal.fire({
         title: 'Finalizar Venta',
@@ -63,6 +86,7 @@ function finalizarVenta() {
         "fecha_creacion": "",
         "vuelto": $("#totalVuelto").html().replace(/[$.]/g, ''),
         "cajeroid": "",
+        "movimientocajaid": "",
         "metodo_pagoid": metodoPago,
         "monto_ingresado": $("#input_montoRecibido").val().replace(/[$.]/g, ''),
         "num_boleta": ""
@@ -84,8 +108,6 @@ function finalizarVenta() {
         dV
     }
 
-    console.log(ventaDetalle);
-
     $.ajax({
         url: '/Venta/finalizarVenta',
         contentType: "application/json",
@@ -104,14 +126,15 @@ function finalizarVenta() {
                 showMenssage('success', msg, false);
                 console.log(data);
                 $.get('/Venta/viewBoletaVenta/' + idventa, function (data) {
+                    sessionStorage.print = true;
                     abrirModal(data);
                 });
-            }    
+            }
         },
         error: function (data) {
             console.log(data);
         }
-    })
+    });
 }
 
 function getMiVentas() {
@@ -144,10 +167,12 @@ document.getElementById('coreModal').addEventListener('hide.bs.modal', function 
     location = location.href;
 });
 document.getElementById('coreModal').addEventListener('shown.bs.modal', function (event) {
-    $(".modal-body").printThis({
-        importCSS: true,
-        importStyle: true,
-    });
+    if (sessionStorage.print) {
+        $(".modal-body").printThis({
+            importCSS: true,
+            importStyle: true,
+        });
+    }
 });
 $('#codigoAdd').bind('keyup', function (e) {
     var key = e.keyCode || e.which;

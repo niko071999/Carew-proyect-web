@@ -28,13 +28,15 @@ namespace SistemaCajaRegistradora.Models
         public Nullable<int> stockmin { get; set; }
         public Nullable<int> stockmax { get; set; }
         public System.DateTime fecha_creacion { get; set; }
-        public string rutaImg { get; set; }
+        public Nullable<System.DateTime> fecha_ultima_edicion { get; set; }
+        public long imagenid { get; set; }
         public int prioridadid { get; set; }
         public int categoriaid { get; set; }
     
         public virtual Categoria Categoria { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<DetalleVenta> DetalleVentas { get; set; }
+        public virtual Imagen Imagen { get; set; }
         public virtual Prioridade Prioridade { get; set; }
     }
 }

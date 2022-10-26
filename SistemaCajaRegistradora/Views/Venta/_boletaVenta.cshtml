@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<SistemaCajaRegistradora.Models.DetalleVenta>
 
-<div class="modal-dialog">
+<div class="modal-dialog modal-dialog-scrollable">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -54,7 +54,7 @@
         </div>
         <div class="modal-footer">
             <button id="btn_print" type="button" class="btn btn-secondary">Imprimir</button>
-            <button type="button" class="btn btn-success" data-bs-dismiss="modal">Cerrar</button>
+            <button id="btn_cerrar" type="button" class="btn btn-success" data-bs-dismiss="modal">Cerrar</button>
         </div>
     </div>
 </div>
@@ -65,5 +65,8 @@
     $("#btn_print").click(function () {
         console.log('imprimiendo...')
         $(".modal-body").printThis();
+    });
+    $("#btn_cerrar").click(function () {
+        sessionStorage.print = false;
     });
 </script>

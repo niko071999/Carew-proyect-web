@@ -12,32 +12,22 @@ namespace SistemaCajaRegistradora.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Usuario
+    public partial class Imagen
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Usuario()
+        public Imagen()
         {
-            this.MovimientosCajas = new HashSet<MovimientosCaja>();
-            this.Ventas = new HashSet<Venta>();
+            this.Productos = new HashSet<Producto>();
+            this.Usuarios = new HashSet<Usuario>();
         }
     
-        public int id { get; set; }
-        public string nombreUsuario { get; set; }
-        public string clave { get; set; }
+        public long id { get; set; }
+        public string ruta { get; set; }
         public string nombre { get; set; }
-        public string apellido { get; set; }
-        public long imagenid { get; set; }
-        public int rolid { get; set; }
-        public Nullable<bool> solrespass { get; set; }
-        public Nullable<System.DateTime> fecha_creacion { get; set; }
-        public Nullable<System.DateTime> fecha_modificacion { get; set; }
-        public Nullable<bool> conectado { get; set; }
     
-        public virtual Imagen Imagen { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<MovimientosCaja> MovimientosCajas { get; set; }
-        public virtual Role Role { get; set; }
+        public virtual ICollection<Producto> Productos { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Venta> Ventas { get; set; }
+        public virtual ICollection<Usuario> Usuarios { get; set; }
     }
 }

@@ -1,12 +1,10 @@
-﻿$(document).ready(function () {
-    $.get("/Usuario/getSesion", function (data) {
-        if (data != null) {
-            document.getElementById('text_nameuser').innerText = data.nombreuser;
-            document.getElementById('img_user').src = data.imgruta;
-        } else {
-            console.log('error null');
-        }
-    });
+﻿$.get("/Usuario/getSesion", function (data) {
+    if (data != null) {
+        document.getElementById('text_nameuser').innerText = data.nombreuser;
+        document.getElementById('img_user').src = data.imgruta;
+    } else {
+        console.log('error null');
+    }
 });
 
 $("#linksignout").click(function () {

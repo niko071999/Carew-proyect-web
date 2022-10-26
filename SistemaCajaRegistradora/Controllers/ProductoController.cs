@@ -1,12 +1,19 @@
-﻿using SistemaCajaRegistradora.Filters;
+﻿using Firebase.Storage;
+using Firebase.Auth;
+using SistemaCajaRegistradora.Filters;
 using SistemaCajaRegistradora.Models;
 using SistemaCajaRegistradora.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
+using System.Threading;
+using System.Transactions;
 
 namespace SistemaCajaRegistradora.Controllers
 {
@@ -29,25 +36,29 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult getProductos()
         {
             db.Configuration.LazyLoadingEnabled = false;
-            var result = db.Productos.Include(p => p.Categoria).Include(p => p.Prioridade).ToArray();
+            var result = db.Productos.Include(p => p.Categoria)
+                                    .Include(p => p.Prioridade)
+                                    .Include(p => p.Imagen)
+                                    .ToArray();
 
             List<vmProducto> productos = new List<vmProducto>();
 
             foreach (var item in result)
             {
-                vmProducto producto = new vmProducto();
-                producto.id = item.id;
-                producto.codigobarra = item.codigo_barra.Trim();
-                producto.nombre = item.nombre.Trim();
-                producto.categoria = item.Categoria.nombre.Trim();
-                producto.prioridad = item.Prioridade.prioridad.Trim();
-                producto.rutaimg = item.rutaImg.Trim();
-                producto.precio = (int)item.precio;
-                producto.stock = (int)item.stock;
-                producto.stockmin = (int)item.stockmin;
-                producto.stockmax = (int)item.stockmax;
-                producto.fechacreacion = item.fecha_creacion;
-
+                vmProducto producto = new vmProducto
+                {
+                    id = item.id,
+                    codigobarra = item.codigo_barra.Trim(),
+                    nombre = item.nombre.Trim(),
+                    categoria = item.Categoria.nombre.Trim(),
+                    prioridad = item.Prioridade.prioridad.Trim(),
+                    rutaimg = item.Imagen.ruta.Trim(),
+                    precio = (int)item.precio,
+                    stock = (int)item.stock,
+                    stockmin = (int)item.stockmin,
+                    stockmax = (int)item.stockmax,
+                    fechacreacion = item.fecha_creacion
+                };
                 productos.Add(producto);
             }
 
@@ -76,13 +87,115 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult AgregarProducto(Producto producto)
         {
             validarValoresNull(producto);
-            int n = 0;
             //Se define una imagen por defecto
-            producto.rutaImg = "./../Assets/images/productos/default-product-image.png";
-            producto.fecha_creacion = DateTime.UtcNow;
+            producto.imagenid = 1;
+            producto.fecha_creacion = DateTime.Now;
+            producto.fecha_ultima_edicion = producto.fecha_creacion;
             db.Productos.Add(producto);
-            n = db.SaveChanges();
+            int n = db.SaveChanges();
             return Json(n,JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        [ActionName("SubirProductosCSV")]
+        public PartialViewResult SubirProductosCSV() => PartialView("_formsLoadProdsCSV");
+
+        [HttpPost]
+        [ActionName("SubirProductosCSV")]
+        public JsonResult SubirProductosCSV(HttpPostedFileBase csv)
+        {
+            List<string> errorProd = new List<string>();
+            List<string> prodRepetidos = new List<string>();
+
+            var codigosProd = db.Productos.Select(p => p.codigo_barra).ToArray();
+
+            int n = 0;
+            int i = 0;
+            if (csv != null)
+            {
+                string filepath = configDirectory(csv);
+                string csvData = System.IO.File.ReadAllText(filepath);
+                foreach (string row in csvData.Split('\n'))
+                {
+                    if (!string.IsNullOrEmpty(row))
+                    {
+                        int idPrioridad = 0;
+                        int idCategoria = 0;
+                        if (i!=0)
+                        {
+                            var producto = row.Split(';');
+                            bool checkCod = verificarCodigoBarra(codigosProd, producto[0]);
+                            if (!checkCod)//Si no existe el codigo de barra, se sigue como tal el proceso
+                            {
+                                if (isNumber(producto))
+                                {
+                                    idPrioridad = obtenerPrioridadId(producto);
+                                    idCategoria = obtenerCategoriaId(producto);
+
+                                    Producto p = new Producto()
+                                    {
+                                        codigo_barra = producto[0].ToString(),
+                                        nombre = producto[1].ToString(),
+                                        precio = Convert.ToInt32(producto[2]),
+                                        stock = Convert.ToInt32(producto[3]),
+                                        stockmin = Convert.ToInt32(producto[4]),
+                                        stockmax = Convert.ToInt32(producto[5]),
+                                        prioridadid = idPrioridad,
+                                        categoriaid = idCategoria,
+                                        imagenid = 1,
+                                        fecha_creacion = DateTime.Now,
+                                        fecha_ultima_edicion = DateTime.Now
+                                    };
+                                    db.Productos.Add(p);
+                                }
+                                else
+                                {
+                                    errorProd.Add(producto[0]+" - "+ producto[1]+"\n");
+                                }
+                            }
+                            else
+                            {
+                                prodRepetidos.Add(producto[0] + " - "+ producto[1]+"\n");
+                            }                           
+                        }
+                        i++;
+                    }
+                }
+                n = db.SaveChanges();
+                if (n == 0)
+                {
+                    string msgError = "No se guardo ningun cambio en la base de datos";
+                    return Json(new
+                    {
+                        n,
+                        msg = msgError,
+                        status = "Error",
+                        errorProd,
+                        prodRepetidos
+                    }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            string msgSuccess = "Se han agregado con exito los productos";
+            return Json(new
+            {
+                n,
+                msg = msgSuccess,
+                status = "success",
+                errorProd,
+                prodRepetidos
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        private bool verificarCodigoBarra(string[] codigosProd, string producto)
+        {
+            foreach (string codigo in codigosProd)
+            {
+                if (codigo.Equals(producto))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         [HttpGet]
@@ -91,9 +204,11 @@ namespace SistemaCajaRegistradora.Controllers
         public PartialViewResult formsEditar(int? id)
         {   
             var producto = db.Productos.Include(p => p.Categoria)
-                .Include(p => p.Prioridade).Where(p => p.id == id).FirstOrDefault();
+                .Include(p => p.Prioridade).Include(p => p.Imagen).Where(p => p.id == id).FirstOrDefault();
             producto.codigo_barra = producto.codigo_barra.Trim();
             producto.nombre = producto.nombre.Trim();
+            producto.Imagen.ruta = producto.Imagen.ruta.Trim();
+            producto.Imagen.nombre = producto.Imagen.nombre.Trim();
             var categorias = db.Categorias.ToList();
             var prioridades = db.Prioridades.ToList();
             ViewBag.categoriaId = new SelectList(categorias, "id", "nombre",producto.categoriaid);
@@ -108,6 +223,7 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult editarProducto(Producto producto)
         {
             validarValoresNull(producto);
+            producto.fecha_ultima_edicion = DateTime.Now;
             db.Entry(producto).State = EntityState.Modified;
             int n = db.SaveChanges();
             return Json(n, JsonRequestBehavior.AllowGet);
@@ -125,39 +241,77 @@ namespace SistemaCajaRegistradora.Controllers
 
         [HttpPost]
         [ActionName("subirImagen")]
-        [Autorizacion(idoperacion: 6)]
-        public JsonResult subirImagen(HttpPostedFileBase archivo)
+        [Autorizacion(idoperacion: 6)] 
+        public JsonResult subirImagen(string downloadURL, string nameFile)
         {
-            try
+            using (TransactionScope scope = new TransactionScope())
             {
-                if (archivo != null)
+                using (ModelData db1 = new ModelData())
                 {
-                    string path = Server.MapPath("~/Assets/images/productos/");
-                    if (!System.IO.Directory.Exists(path))
+                    string msgSuccess = "Imagen subida correctamente";
+                    string msgError = "Error de subida de archivo";
+                    try
                     {
-                        System.IO.Directory.CreateDirectory(path);
-                    };
-                    archivo.SaveAs(path + System.IO.Path.GetFileName(archivo.FileName));
+                        if (downloadURL.Equals(string.Empty) && nameFile.Equals(string.Empty))
+                            throw new Exception(msgError);
 
-                    int idProducto = (int)Session["idProducto"];
-                    var producto = db.Productos.Find(idProducto);
-                    producto.rutaImg = "./../Assets/images/productos/" + archivo.FileName;
-                    db.Entry(producto).State = EntityState.Modified;
-                    db.SaveChanges();
-                    return Json(
-                    new { mensaje = "Imagen subida correctamente" }, JsonRequestBehavior.AllowGet); ;
+                        Imagen img = new Imagen()
+                        {
+                            nombre = nameFile,
+                            ruta = downloadURL,
+                        };
+
+                        db1.Imagens.Add(img);
+                        int n = db1.SaveChanges();
+
+                        if (n == 0)
+                            throw new Exception(msgError);
+
+                        int idProducto = (int)Session["idProducto"];
+
+                        var producto = db1.Productos.Find(idProducto);
+
+                        string nombreImg = producto.Imagen.nombre;
+                        long idimg = producto.imagenid;
+                        
+                        producto.imagenid = img.id;
+                        producto.fecha_ultima_edicion = DateTime.Now;
+                        db1.Entry(producto).State = EntityState.Modified;
+                        n = db1.SaveChanges();
+                        if (n == 0)
+                            throw new Exception(msgError);
+
+                        //Borrar registro de la otra imagen
+                        if (idimg != 1)
+                        {
+                            var imagen = db1.Imagens.Find(idimg);
+                            db1.Imagens.Remove(imagen);
+                            db1.SaveChanges();
+                        }
+
+                        scope.Complete();
+
+                        return Json(new 
+                        { 
+                            status = "success", 
+                            mensaje = msgSuccess,
+                            idimg,
+                            nombreImg
+                        }, 
+                            JsonRequestBehavior.AllowGet);
+                    }
+                    catch (Exception)
+                    {
+                        return Json(new
+                        {
+                            status = "error",
+                            msg = msgError,
+                            idimg = 0,
+                            nombreImg = ""
+                        }, JsonRequestBehavior.AllowGet);
+                    }
                 }
-                else
-                {
-                    return Json(
-                    new { mensaje = "Error de subida de archivo" }, JsonRequestBehavior.AllowGet);
-                }
-            }
-            catch (Exception)
-            {
-                return Json(
-                    new { mensaje = "Error de subida de archivo" }, JsonRequestBehavior.AllowGet);
-            }
+            }            
         }
 
         [HttpGet]
@@ -177,24 +331,43 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult eliminarProducto(int? id)
         {
             int n = 0;
+            string nameFile = string.Empty;
 
-            var producto = db.Productos.Find(id);
             try
             {
+                var producto = db.Productos.Find(id);
+                nameFile = producto.Imagen.nombre.Trim();
+                long idimg = producto.imagenid;
+                var imagen = db.Imagens.Find(idimg);
                 db.Productos.Remove(producto);
+                if (idimg!=1)
+                {
+                    db.Imagens.Remove(imagen);
+                }
                 n = db.SaveChanges();
+                return Json(new
+                {
+                    n,
+                    nameFile,
+                    idimg
+                }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception)
             {
-                return Json(n, JsonRequestBehavior.AllowGet);
+                return Json(new
+                {
+                    n,
+                    nameFile,
+                    idimg = 0
+                }, JsonRequestBehavior.AllowGet);
             }
-            return Json(n, JsonRequestBehavior.AllowGet);
+            
         }
 
         [HttpPost]
         [ActionName("addExistencias")]
         [Autorizacion(idoperacion: 7)]
-        public JsonResult addExistencias(Producto producto)
+        public JsonResult addExistencias(vmAddExistenciaProduct producto)
         {
             if (producto != null)
             {
@@ -205,7 +378,7 @@ namespace SistemaCajaRegistradora.Controllers
                     
                     return Json(new
                     {
-                        id = prod.id,
+                        prod.id,
                         codigobarra = prod.codigo_barra.Trim(),
                         nombre = prod.nombre.Trim(),
                         newstock = producto.stock,
@@ -226,14 +399,15 @@ namespace SistemaCajaRegistradora.Controllers
         [HttpPost]
         [ActionName("aplicarExistencias")]
         [Autorizacion(idoperacion: 7)]
-        public JsonResult aplicarExistencias(Producto producto)
+        public JsonResult aplicarExistencias(vmAddExistenciaProduct producto)
         {
             int n = 0;
-            var resulProducto = db.Productos.Include(p => p.Categoria).Include(p => p.Prioridade)
+            var resulProducto = db.Productos.Include(p => p.Categoria).Include(p => p.Prioridade).Include(p=>p.Imagen)
                 .Where(p => p.codigo_barra == producto.codigo_barra).FirstOrDefault();
             if (resulProducto!=null)
             {
                 resulProducto.stock += producto.stock;
+                resulProducto.fecha_ultima_edicion = DateTime.Now;
                 db.Entry(resulProducto).State = EntityState.Modified;
                 n = db.SaveChanges();
                 return Json(n,JsonRequestBehavior.AllowGet);
@@ -264,6 +438,75 @@ namespace SistemaCajaRegistradora.Controllers
             }
         }
 
+        private string configDirectory(HttpPostedFileBase csv)
+        {
+            string path = Server.MapPath("~/Content/DocumentsCSV/");
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            string filepath = path + Path.GetFileName(csv.FileName);
+            csv.SaveAs(filepath);
+            return filepath;
+        }
+
+        private bool isNumber(string[] producto)
+        {
+            return !double.IsNaN(Convert.ToDouble(producto[2])) &&
+                   !double.IsNaN(Convert.ToDouble(producto[3])) &&
+                   !double.IsNaN(Convert.ToDouble(producto[4])) &&
+                   !double.IsNaN(Convert.ToDouble(producto[5]));
+        }
+
+        private int obtenerPrioridadId(string[] produto)
+        {
+            switch (produto[6].ToString())
+            {
+                case ("Alta"):
+                    return 3;
+                case ("Medio"):
+                    return 2;
+                case ("Baja"):
+                    return 1;
+                default:
+                    return 0;
+            }
+        }
+
+        private int obtenerCategoriaId(string[] producto)
+        {
+            string cat = producto[7].ToString();
+            var categorias = db.Categorias.ToArray();
+            foreach (var c in categorias)
+            {
+                string newValue = cat.Replace("\r", string.Empty).ToUpper();
+                string oldValue = c.nombre.Trim().ToUpper();
+                if (oldValue.Equals(newValue))
+                {
+                    return c.id;
+                }
+            }
+            Categoria categoria = new Categoria()
+            {
+                nombre = cat,
+            };
+            db.Categorias.Add(categoria);
+            db.SaveChanges();
+            return categoria.id;
+        }
+
 
     }
 }
+
+//Subir imagen de forma local
+//string path = Server.MapPath("~/Assets/images/productos/");
+//if (!System.IO.Directory.Exists(path))
+//{
+//    System.IO.Directory.CreateDirectory(path);
+//};
+//archivo.SaveAs(path + System.IO.Path.GetFileName(archivo.FileName));
+
+//Stream stream = archivo.InputStream;
+//string nombre = DateTime.UtcNow.ToString() + "_producto";
+//string urlimagen = subirImagenStorage(stream,nombre).Result;
