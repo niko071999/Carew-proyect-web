@@ -34,6 +34,16 @@ if (!!document.getElementById('stockProd')) {
 
     stockProd.addEventListener("change", verificarStock);
     borrarCod.addEventListener("click", borrarCodigo);
+    $("#btn_reset").click(function () {
+        let preciomin = parseInt($("#text_preciomin").val().replace(/[$.]/g, ''));
+        let preciomax = parseInt($("#text_preciomax").val().replace(/[$.]/g, ''));
+        if (preciomin != min || preciomax != max) {
+            $("#text_preciomin").val(min);
+            $("#text_preciomax").val(max);
+            formatearIputs();
+            resetTable1();
+        }
+    });
 
     $("#btnAplicar").attr('disabled', true);
     $("#text_preciomin").change(function () {
@@ -41,12 +51,16 @@ if (!!document.getElementById('stockProd')) {
         if (txt_min < min || txt_min > max) {
             $("#text_preciomin").val(min);
             formatearIputs();
+        } else {
+            formatearIputs();
         }
     });
     $("#text_preciomax").change(function () {
         let txt_max = parseInt($("#text_preciomax").val().replace(/[$.]/g, ''));
         if (txt_max < min || txt_max > max) {
             $("#text_preciomax").val(max);
+            formatearIputs();
+        } else {
             formatearIputs();
         }
     });
@@ -65,13 +79,6 @@ if (!!document.getElementById('stockProd')) {
         var key = e.keyCode || e.which;
         cargarExistencias(key);
     });
-}
-
-function formatearIputs() {
-    $("#text_preciomin").val(parseFloat($("#text_preciomin").val().replace(/[$.]/g, ''))
-        .toLocaleString('es-CL'));
-    $("#text_preciomax").val(parseFloat($("#text_preciomax").val().replace(/[$.]/g, ''))
-        .toLocaleString('es-CL'));
 }
 function cargarExistencias(key) {
     var codigo = $('#codigoAdd').val();
@@ -194,7 +201,7 @@ function quitarItem(codigoItem) {
 function AgregarForms(urlForms) {
     $.get(urlForms + '/', function (data) {
         abrirModal(data);
-    })
+    });
 }
 function AgregarProducto(urlAgregar) {
     var idproducto = $('#id').val();
@@ -382,7 +389,6 @@ function formsImagenP(urlFormsImagen, id) {
         abrirModal(data);
     });
 }
-
 function subirImagenP(url) {
     var inputArchivoId = document.getElementById('idArchivo');
     var archivo = inputArchivoId.files[0];
@@ -401,6 +407,7 @@ function subirImagenP(url) {
             // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
             var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             console.log('Upload is ' + progress + '% done');
+            console.log(snapshot.state);
             switch (snapshot.state) {
                 case firebase.storage.TaskState.PAUSED: // or 'paused'
                     console.log('Upload is paused');
@@ -413,17 +420,18 @@ function subirImagenP(url) {
         (error) => {
             switch (error.code) {
                 case 'storage/canceled':
-                    console.error('La carga a sido cancelada')
+                    alert('Se ha cancelado la subida de imagen');
+                    console.error('La carga a sido cancelada');
                     break;
                 case 'storage/unknown':
-                    console.error('A ocurrido un error desconocido')
+                    alert('Ha ocurrido un error desconocido');
+                    console.error('A ocurrido un error desconocido');
                     break;
             }
         },
         () => {
             // Upload completed successfully, now we can get the download URL
             uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-                console.log('File available at', downloadURL);
                 var dataForm = new FormData();
                 dataForm.append('downloadURL', downloadURL);
                 dataForm.append('nameFile', nameFile);
@@ -451,29 +459,20 @@ function subirImagenP(url) {
                             case 'error':
                                 //Mostra un mensaje cuando llegue un error y eliminar la imagen de Firebase
                                 showMenssage('error', data.mensaje, true);
-                                if (eliminarImagenStorageP(nameFile)) {
-                                    console.log('IMAGEN ELIMINADA');
-                                } else {
-                                    console.error('La imagen no eliminada');
-                                }
+                                eliminarImagenStorageP(nameFile);
                             default:
                         }
                     },
                     error: function (data) {
                         data.mensaje = "Error: La imagen no se a cambiado o no se a subido al servidor";
                         showMenssage('error', mensaje, true);
-                        if (eliminarImagenStorageP(nameFile)) {
-                            console.log('IMAGEN ELIMINADA');
-                        } else {
-                            console.error('La imagen no eliminada');
-                        }
+                        eliminarImagenStorageP(nameFile);
                     },
                 });
             });
         }
     );
 }
-
 function eliminarImagenStorageP(namefile) {
     if (storageRef == undefined) {
         storageRef = firebase.storage().ref();
@@ -515,6 +514,71 @@ function eliminarProducto(urlEliminar, id) {
             showMenssage('error', mensaje, true);
         }
     }, 'json');
+}
+function cargarProdsForms(url) {
+    $.get(url, function (data) {
+        abrirModal(data);
+    });
+}
+function cargarProdsFile(urlLoadProds) {
+    var inputArchivoId = document.getElementById('idArchivo');
+    var archivo = inputArchivoId.files[0];
+    var dataForm = new FormData();
+    dataForm.append("csv", archivo);
+    let msgErrorProd = "Productos con errores en sus datos:\n";
+    let msgProdRep = "Productos con su codigo de barra ya registrados en la base de datos:\n"; 
+    $.ajax({
+        url: urlLoadProds,
+        type: 'POST',
+        data: dataForm,
+        contentType: false,
+        processData: false,
+        success: function (data) {
+            console.log(data);
+            if (data.errorProd.length > 0 || data.prodRepetidos.length > 0) {
+                for (var i = 0; i < data.errorProd.length; i++) {
+                    msgErrorProd = msgErrorProd + data.errorProd[i] + '\n';
+                }
+                for (var i = 0; i < data.prodRepetidos.length; i++) {
+                    msgProdRep = msgProdRep + data.prodRepetidos[i] + '\n';
+                }
+                Swal.fire({
+                    title: 'Hubieron errores con los siguientes productos',
+                    text: msgErrorProd+msgProdRep,
+                    icon: 'info',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Esta bien',
+                    width: 900
+                }).then(() => {
+                    switch (data.status) {
+                        case 'success':
+                            sessionStorage.clear();
+                            sessionStorage.mensaje = data.msg;
+                            location = location.href;
+                            break;
+                        case 'error':
+                            showMenssage('error', data.msg, true);
+                        default:
+                    }
+                });
+            } else {
+                switch (data.status) {
+                    case 'success':
+                        sessionStorage.clear();
+                        sessionStorage.mensaje = data.msg;
+                        location = location.href;
+                        break;
+                    case 'error':
+                        showMenssage('error', data.msg, true);
+                    default:
+                }
+            }
+        },
+        error: function (data) {
+            data.mensaje = "Error: La imagen no se a cambiado o no se a subido al servidor";
+            showMenssage('error', mensaje, true);
+        },
+    });
 }
 
 const validarCamposPro = (codigo_barra, nombre, prioridadid, categoriaid) => {
@@ -603,6 +667,12 @@ function desabilitar() {
     } else {//Si hay imagenes
         btn.disabled = false;
     }
+}
+function formatearIputs() {
+    $("#text_preciomin").val(parseFloat($("#text_preciomin").val().replace(/[$.]/g, ''))
+        .toLocaleString('es-CL'));
+    $("#text_preciomax").val(parseFloat($("#text_preciomax").val().replace(/[$.]/g, ''))
+        .toLocaleString('es-CL'));
 }
 
 const quitarPuntoNumber = (number) => {

@@ -5,7 +5,6 @@ function formatearmonto() {
 }
 
 let form_opencaja = document.getElementById('form_opencaja');
-
 form_opencaja.addEventListener('submit', function (e) {
     e.preventDefault();
     Swal.fire({

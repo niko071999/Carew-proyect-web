@@ -4,36 +4,36 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="1a02322b8fe74b09ad529ce713638291" Name="Diagram1">
-        <EntityTypeShape EntityType="ModelData.Caja" Width="1.5" PointX="9" PointY="1.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="ModelData.Categoria" Width="1.5" PointX="0.75" PointY="1.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="ModelData.DetalleVenta" Width="1.5" PointX="8.25" PointY="4.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="ModelData.Imagen" Width="1.5" PointX="0.75" PointY="4.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ModelData.MetodoPago" Width="1.5" PointX="11.25" PointY="1.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="ModelData.Modulo" Width="1.5" PointX="1.5" PointY="11.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="ModelData.MovimientosCaja" Width="1.5" PointX="11.25" PointY="4.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="ModelData.Operacione" Width="1.5" PointX="3.75" PointY="11.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="ModelData.Prioridade" Width="1.5" PointX="0.75" PointY="8.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="ModelData.Producto" Width="1.5" PointX="3" PointY="3.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ModelData.rol_operacion" Width="1.5" PointX="6" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ModelData.Role" Width="1.5" PointX="3.75" PointY="0.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="ModelData.Usuario" Width="1.5" PointX="6" PointY="3.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="ModelData.Venta" Width="1.5" PointX="13.5" PointY="4" IsExpanded="true" />
-        <AssociationConnector Association="ModelData.FK_MovimientosCajas_Cajas" ManuallyRouted="false" />
-        <AssociationConnector Association="ModelData.FK_Productos_Categorias" ManuallyRouted="false" />
-        <AssociationConnector Association="ModelData.FK_DetalleVenta_Productos" ManuallyRouted="false" />
-        <AssociationConnector Association="ModelData.FK_DetalleVenta_Ventas" ManuallyRouted="false" />
-        <AssociationConnector Association="ModelData.FK_Productos_Imagen" ManuallyRouted="false" />
-        <AssociationConnector Association="ModelData.FK_Usuarios_Imagen" ManuallyRouted="false" />
-        <AssociationConnector Association="ModelData.FK_Ventas_MetodoPagos" ManuallyRouted="false" />
-        <AssociationConnector Association="ModelData.FK_Operaciones_Modulos" ManuallyRouted="false" />
-        <AssociationConnector Association="ModelData.FK_MovimientosCajas_Usuarios" ManuallyRouted="false" />
-        <AssociationConnector Association="ModelData.FK_Ventas_MovimientosCajas" ManuallyRouted="false" />
-        <AssociationConnector Association="ModelData.FK_rol_operacion_Operaciones" ManuallyRouted="false" />
-        <AssociationConnector Association="ModelData.FK_Productos_Prioridades" ManuallyRouted="false" />
-        <AssociationConnector Association="ModelData.FK_rol_operacion_Roles" ManuallyRouted="false" />
-        <AssociationConnector Association="ModelData.FK_Usuarios_Roles" ManuallyRouted="false" />
-        <AssociationConnector Association="ModelData.FK_Ventas_Usuarios" ManuallyRouted="false" />
+      <Diagram DiagramId="d9dc7199db1347f9b24cbdb2936ed592" Name="Diagram1">
+        <EntityTypeShape EntityType="CarewEntities.Caja" Width="1.5" PointX="9" PointY="1.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewEntities.Categoria" Width="1.5" PointX="0.75" PointY="1.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewEntities.DetalleVenta" Width="1.5" PointX="8.25" PointY="4.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewEntities.Imagen" Width="1.5" PointX="0.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewEntities.MetodoPago" Width="1.5" PointX="11.25" PointY="1.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewEntities.Modulo" Width="1.5" PointX="1.5" PointY="11.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewEntities.MovimientosCaja" Width="1.5" PointX="11.25" PointY="4" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewEntities.Operacione" Width="1.5" PointX="3.75" PointY="11.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewEntities.Prioridade" Width="1.5" PointX="0.75" PointY="8.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewEntities.Producto" Width="1.5" PointX="3" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewEntities.rol_operacion" Width="1.5" PointX="6" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewEntities.Role" Width="1.5" PointX="3.75" PointY="0.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewEntities.Usuario" Width="1.5" PointX="6" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="CarewEntities.Venta" Width="1.5" PointX="13.5" PointY="4" IsExpanded="true" />
+        <AssociationConnector Association="CarewEntities.FK_MovimientosCajas_Cajas" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewEntities.FK_Productos_Categorias" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewEntities.FK_DetalleVenta_Productos" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewEntities.FK_DetalleVenta_Ventas" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewEntities.FK_Productos_Imagen" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewEntities.FK_Usuarios_Imagen" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewEntities.FK_Ventas_MetodoPagos" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewEntities.FK_Operaciones_Modulos" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewEntities.FK_MovimientosCajas_Usuarios" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewEntities.FK_Ventas_MovimientosCajas" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewEntities.FK_rol_operacion_Operaciones" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewEntities.FK_Productos_Prioridades" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewEntities.FK_rol_operacion_Roles" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewEntities.FK_Usuarios_Roles" ManuallyRouted="false" />
+        <AssociationConnector Association="CarewEntities.FK_Ventas_Usuarios" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

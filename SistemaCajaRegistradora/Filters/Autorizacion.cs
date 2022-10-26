@@ -11,7 +11,7 @@ namespace SistemaCajaRegistradora.Filters
     public class Autorizacion : AuthorizeAttribute
     {
         private Usuario usuario;
-        private CarewEntities db = new CarewEntities();
+        private ModelData db = new ModelData();
         private int idoperacion;
 
         public Autorizacion(int idoperacion = 0)

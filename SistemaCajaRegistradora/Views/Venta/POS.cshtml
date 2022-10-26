@@ -38,6 +38,22 @@
         <div class="col-4">
             <h1 class="h3 mb-4 text-gray-800">@ViewBag.Title</h1>
         </div>
+        <div class="col-4">
+            <div class="d-grid gap-2 mb-2">
+                <button id="btn_printLastSales" type="button" class="btn btn-secondary">
+                    <i class="fas fa-print"></i>
+                    Imprimir la ultima venta
+                </button>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="d-grid gap-2 mb-2">
+                <a class="btn btn-outline-danger" href="@Url.Action("CerrarCaja","Venta")">
+                    <i class="far fa-times-circle"></i>
+                    Cerrar caja
+                </a>
+            </div>
+        </div>
     </div>
     <div class="input-group mb-3">
         <span class="input-group-text">Codigo Barra</span>
@@ -81,6 +97,15 @@
                 <tbody id="bodyTable">
                 </tbody>
             </table>
+            @{
+                if (TempData["msgError"] != null)
+                {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @TempData["msgError"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                }
+            }
         </div>
         <div class="col col-4">
             <div class="card">

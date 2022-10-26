@@ -12,23 +12,52 @@ using System.Security.Claims;
 using System.Threading;
 using System.Web.WebPages;
 using System.Transactions;
+using System.Web.Helpers;
+using SistemaCajaRegistradora.Models.ViewModels;
+using System.Collections;
 
 namespace SistemaCajaRegistradora.Controllers
 {
     [HandleError]
     public class UsuarioController : Controller
     {
-        private readonly CarewEntities db = new CarewEntities();
+        private readonly ModelData db = new ModelData();
 
         [HttpGet]
         [ActionName("Listar")]
         [Autorizacion(idoperacion:12)]
         public ActionResult Listar()
         {
-            Usuario usuario = (Usuario)Session["User"];
-            ViewBag.nombreUser = usuario.nombreUsuario;
-            var usuarios = db.Usuarios.Include(x => x.Role);
-            return View(usuarios.ToList());
+            return View();
+        }
+
+        [HttpGet]
+        [ActionName("getUsuarios")]
+        public JsonResult getUsuarios()
+        {
+            db.Configuration.LazyLoadingEnabled = false;
+            List<vmUsuario> usuariosList = new List<vmUsuario>();
+            vmUsuario vmUsuario;
+            var usuarios = db.Usuarios.Include(u => u.Imagen).Include(u => u.Role).ToArray();
+            foreach (var usuario in usuarios)
+            {
+                vmUsuario = new vmUsuario()
+                {
+                    id = usuario.id,
+                    nombreCajero = usuario.nombre.Trim() + " " + usuario.apellido.Trim(),
+                    nombreUsuario = usuario.nombreUsuario.Trim(),
+                    rutaImg = usuario.Imagen.ruta,
+                    rol = usuario.Role.rol.Trim(),
+                    stateConexion = usuario.conectado,
+                    solrespass = usuario.solrespass
+                };
+                usuariosList.Add(vmUsuario);
+            }
+
+            return Json(new
+            {
+                data = usuariosList
+            }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
@@ -51,6 +80,7 @@ namespace SistemaCajaRegistradora.Controllers
                 usuario.imagenid = 2; //Se define una imagen por defecto
                 usuario.fecha_creacion = DateTime.UtcNow;
                 usuario.fecha_modificacion = usuario.fecha_creacion;
+                usuario.conectado = false;
                 db.Usuarios.Add(usuario);
                 int n = db.SaveChanges();
                 return Json(n, JsonRequestBehavior.AllowGet);
@@ -108,7 +138,12 @@ namespace SistemaCajaRegistradora.Controllers
                 .Where(u => u.id == id).FirstOrDefault();
                 nameFile = usuario.Imagen.nombre.Trim();
                 long idimg = usuario.imagenid;
+                db.Imagens.Find(idimg);
                 db.Usuarios.Remove(usuario);
+                if (idimg != 2)
+                {
+                    db.Usuarios.Remove(usuario);
+                }
                 n = db.SaveChanges();
                 return Json(new
                 {
@@ -152,6 +187,7 @@ namespace SistemaCajaRegistradora.Controllers
             usuario.clave = Encrypt.GetSHA256(usuario.clave);
             var user = (Usuario)Session["User"];
             usuario.id = user.id;
+            usuario.fecha_modificacion = DateTime.Now;
             db.Usuarios.Attach(usuario);
             db.Entry(usuario).Property(u => u.clave).IsModified = true;
             n = db.SaveChanges();
@@ -175,7 +211,7 @@ namespace SistemaCajaRegistradora.Controllers
         {
             using (TransactionScope scope = new TransactionScope())
             {
-                using (CarewEntities db1 = new CarewEntities())
+                using (ModelData db1 = new ModelData())
                 {
                     string msgSuccess = "Imagen subida correctamente";
                     string msgError = "Error de subida de archivo";
@@ -210,6 +246,7 @@ namespace SistemaCajaRegistradora.Controllers
                         long idimg = usuario.imagenid;
 
                         usuario.imagenid = img.id;
+                        usuario.fecha_modificacion = DateTime.Now;
                         db1.Entry(usuario).State = EntityState.Modified;
                         n = db1.SaveChanges();
                         if (n == 0)
@@ -257,9 +294,10 @@ namespace SistemaCajaRegistradora.Controllers
             usuario.solrespass = false;
             usuario.clave = clave;
             usuario.clave = Encrypt.GetSHA256(usuario.clave);
+            usuario.fecha_modificacion = DateTime.Now;
             db.Entry(usuario).State = EntityState.Modified;
             n = db.SaveChanges();
-            return RedirectToAction("Listar", "Usuario");
+            return RedirectToAction("Listar");
         }
 
         [HttpGet]

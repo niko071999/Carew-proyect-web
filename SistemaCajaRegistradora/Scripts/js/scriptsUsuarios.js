@@ -8,6 +8,25 @@ coreModal.addEventListener('shown.bs.modal', function () {
 
 initialFirebase();
 
+function accionU(cod, param) {
+    switch (cod) {
+        case (1):
+            formsImagenU('/Usuario/formsImagen', param);
+            break;
+        case (2):
+            formsEditar('/Usuario/formsEditar', param);
+            break;
+        case (3):
+            restablecerClave(param);
+            break;
+        case (4):
+            formsEliminar('/Usuario/formsEliminar', param)
+            break;
+        default:
+            mensaje = 'Se ha producido un error inesperado, intentelo nuevamente o recargue la pagina';
+            showMenssage('error', mensaje, true);
+    }
+}
 function AgregarForms(urlForms) {
     $.get(urlForms + '/', function (data) {
         abrirModal(data);
@@ -166,15 +185,12 @@ function subirImagenU(urlSubirIMG) {
     var inputArchivoId = document.getElementById('idArchivo');
     var archivo = inputArchivoId.files[0];
     let nameFile = Date.now().toString() + '_usuario';
-
     // Create a root reference
     storageRef = firebase.storage().ref();
-
     // Create a reference
     var uploadTask = storageRef.child('usuarios')
         .child(nameFile)
         .put(archivo);
-
     uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
         (snapshot) => {
             // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded

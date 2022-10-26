@@ -19,7 +19,7 @@ namespace SistemaCajaRegistradora.Controllers
 {
     public class ProductoController : Controller
     {
-        private readonly CarewEntities db = new CarewEntities();
+        private readonly ModelData db = new ModelData();
 
         // GET: Producto
         [HttpGet]
@@ -89,11 +89,113 @@ namespace SistemaCajaRegistradora.Controllers
             validarValoresNull(producto);
             //Se define una imagen por defecto
             producto.imagenid = 1;
-            producto.fecha_creacion = DateTime.UtcNow;
+            producto.fecha_creacion = DateTime.Now;
             producto.fecha_ultima_edicion = producto.fecha_creacion;
             db.Productos.Add(producto);
             int n = db.SaveChanges();
             return Json(n,JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        [ActionName("SubirProductosCSV")]
+        public PartialViewResult SubirProductosCSV() => PartialView("_formsLoadProdsCSV");
+
+        [HttpPost]
+        [ActionName("SubirProductosCSV")]
+        public JsonResult SubirProductosCSV(HttpPostedFileBase csv)
+        {
+            List<string> errorProd = new List<string>();
+            List<string> prodRepetidos = new List<string>();
+
+            var codigosProd = db.Productos.Select(p => p.codigo_barra).ToArray();
+
+            int n = 0;
+            int i = 0;
+            if (csv != null)
+            {
+                string filepath = configDirectory(csv);
+                string csvData = System.IO.File.ReadAllText(filepath);
+                foreach (string row in csvData.Split('\n'))
+                {
+                    if (!string.IsNullOrEmpty(row))
+                    {
+                        int idPrioridad = 0;
+                        int idCategoria = 0;
+                        if (i!=0)
+                        {
+                            var producto = row.Split(';');
+                            bool checkCod = verificarCodigoBarra(codigosProd, producto[0]);
+                            if (!checkCod)//Si no existe el codigo de barra, se sigue como tal el proceso
+                            {
+                                if (isNumber(producto))
+                                {
+                                    idPrioridad = obtenerPrioridadId(producto);
+                                    idCategoria = obtenerCategoriaId(producto);
+
+                                    Producto p = new Producto()
+                                    {
+                                        codigo_barra = producto[0].ToString(),
+                                        nombre = producto[1].ToString(),
+                                        precio = Convert.ToInt32(producto[2]),
+                                        stock = Convert.ToInt32(producto[3]),
+                                        stockmin = Convert.ToInt32(producto[4]),
+                                        stockmax = Convert.ToInt32(producto[5]),
+                                        prioridadid = idPrioridad,
+                                        categoriaid = idCategoria,
+                                        imagenid = 1,
+                                        fecha_creacion = DateTime.Now,
+                                        fecha_ultima_edicion = DateTime.Now
+                                    };
+                                    db.Productos.Add(p);
+                                }
+                                else
+                                {
+                                    errorProd.Add(producto[0]+" - "+ producto[1]+"\n");
+                                }
+                            }
+                            else
+                            {
+                                prodRepetidos.Add(producto[0] + " - "+ producto[1]+"\n");
+                            }                           
+                        }
+                        i++;
+                    }
+                }
+                n = db.SaveChanges();
+                if (n == 0)
+                {
+                    string msgError = "No se guardo ningun cambio en la base de datos";
+                    return Json(new
+                    {
+                        n,
+                        msg = msgError,
+                        status = "Error",
+                        errorProd,
+                        prodRepetidos
+                    }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            string msgSuccess = "Se han agregado con exito los productos";
+            return Json(new
+            {
+                n,
+                msg = msgSuccess,
+                status = "success",
+                errorProd,
+                prodRepetidos
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        private bool verificarCodigoBarra(string[] codigosProd, string producto)
+        {
+            foreach (string codigo in codigosProd)
+            {
+                if (codigo.Equals(producto))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         [HttpGet]
@@ -121,7 +223,7 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult editarProducto(Producto producto)
         {
             validarValoresNull(producto);
-            producto.fecha_ultima_edicion = DateTime.UtcNow;
+            producto.fecha_ultima_edicion = DateTime.Now;
             db.Entry(producto).State = EntityState.Modified;
             int n = db.SaveChanges();
             return Json(n, JsonRequestBehavior.AllowGet);
@@ -139,12 +241,12 @@ namespace SistemaCajaRegistradora.Controllers
 
         [HttpPost]
         [ActionName("subirImagen")]
-        [Autorizacion(idoperacion: 6)]
+        [Autorizacion(idoperacion: 6)] 
         public JsonResult subirImagen(string downloadURL, string nameFile)
         {
             using (TransactionScope scope = new TransactionScope())
             {
-                using (CarewEntities db1 = new CarewEntities())
+                using (ModelData db1 = new ModelData())
                 {
                     string msgSuccess = "Imagen subida correctamente";
                     string msgError = "Error de subida de archivo";
@@ -173,6 +275,7 @@ namespace SistemaCajaRegistradora.Controllers
                         long idimg = producto.imagenid;
                         
                         producto.imagenid = img.id;
+                        producto.fecha_ultima_edicion = DateTime.Now;
                         db1.Entry(producto).State = EntityState.Modified;
                         n = db1.SaveChanges();
                         if (n == 0)
@@ -237,7 +340,10 @@ namespace SistemaCajaRegistradora.Controllers
                 long idimg = producto.imagenid;
                 var imagen = db.Imagens.Find(idimg);
                 db.Productos.Remove(producto);
-                db.Imagens.Remove(imagen);
+                if (idimg!=1)
+                {
+                    db.Imagens.Remove(imagen);
+                }
                 n = db.SaveChanges();
                 return Json(new
                 {
@@ -301,6 +407,7 @@ namespace SistemaCajaRegistradora.Controllers
             if (resulProducto!=null)
             {
                 resulProducto.stock += producto.stock;
+                resulProducto.fecha_ultima_edicion = DateTime.Now;
                 db.Entry(resulProducto).State = EntityState.Modified;
                 n = db.SaveChanges();
                 return Json(n,JsonRequestBehavior.AllowGet);
@@ -329,6 +436,63 @@ namespace SistemaCajaRegistradora.Controllers
             {
                 producto.stockmax = 0;
             }
+        }
+
+        private string configDirectory(HttpPostedFileBase csv)
+        {
+            string path = Server.MapPath("~/Content/DocumentsCSV/");
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            string filepath = path + Path.GetFileName(csv.FileName);
+            csv.SaveAs(filepath);
+            return filepath;
+        }
+
+        private bool isNumber(string[] producto)
+        {
+            return !double.IsNaN(Convert.ToDouble(producto[2])) &&
+                   !double.IsNaN(Convert.ToDouble(producto[3])) &&
+                   !double.IsNaN(Convert.ToDouble(producto[4])) &&
+                   !double.IsNaN(Convert.ToDouble(producto[5]));
+        }
+
+        private int obtenerPrioridadId(string[] produto)
+        {
+            switch (produto[6].ToString())
+            {
+                case ("Alta"):
+                    return 3;
+                case ("Medio"):
+                    return 2;
+                case ("Baja"):
+                    return 1;
+                default:
+                    return 0;
+            }
+        }
+
+        private int obtenerCategoriaId(string[] producto)
+        {
+            string cat = producto[7].ToString();
+            var categorias = db.Categorias.ToArray();
+            foreach (var c in categorias)
+            {
+                string newValue = cat.Replace("\r", string.Empty).ToUpper();
+                string oldValue = c.nombre.Trim().ToUpper();
+                if (oldValue.Equals(newValue))
+                {
+                    return c.id;
+                }
+            }
+            Categoria categoria = new Categoria()
+            {
+                nombre = cat,
+            };
+            db.Categorias.Add(categoria);
+            db.SaveChanges();
+            return categoria.id;
         }
 
 

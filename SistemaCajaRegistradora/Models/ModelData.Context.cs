@@ -13,10 +13,10 @@ namespace SistemaCajaRegistradora.Models
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class CarewEntities : DbContext
+    public partial class ModelData : DbContext
     {
-        public CarewEntities()
-            : base("name=CarewEntities")
+        public ModelData()
+            : base("name=ModelData")
         {
         }
     

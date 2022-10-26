@@ -337,7 +337,9 @@
       <DependentUpon>ModelData.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ViewModels\vmAddExistenciaProduct.cs" />
+    <Compile Include="Models\ViewModels\vmCerrarCaja.cs" />
     <Compile Include="Models\ViewModels\vmProducto.cs" />
+    <Compile Include="Models\ViewModels\vmUsuario.cs" />
     <Compile Include="Models\ViewModels\vmVenta.cs" />
     <Compile Include="Models\ViewModels\vmVentaDetalle.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -385,6 +387,7 @@
     <Content Include="Scripts\Datatable\datatables.min.js" />
     <Content Include="Scripts\Datatable\dtCategoria.js" />
     <Content Include="Scripts\Datatable\dtProducto.js" />
+    <Content Include="Scripts\Datatable\dtUsuario.js" />
     <Content Include="Scripts\Datatable\dtVenta.js" />
     <Content Include="Scripts\Datatable\jquery.dataTables.min.js" />
     <Content Include="Scripts\Datatable\moment.min.js" />
@@ -396,6 +399,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\js\alertmenssages.js" />
     <Content Include="Scripts\js\aperturacajascript.js" />
+    <Content Include="Scripts\js\cerrarcajascript.js" />
     <Content Include="Scripts\js\printThis.js" />
     <Content Include="Scripts\js\scriptsCategoria.js" />
     <Content Include="Scripts\js\scriptsFirstOpen.js" />
@@ -2240,10 +2244,13 @@
     <Content Include="Views\Sesion\AgregarUsuarioAdmin.cshtml" />
     <Content Include="Views\Usuario\_formObtenerBarcode.cshtml" />
     <Content Include="Views\Venta\AbrirCaja.cshtml" />
+    <Content Include="Views\Venta\CerrarCaja.cshtml" />
+    <Content Include="Views\Producto\_formsLoadProdsCSV.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Assets\images\usuarios\" />
+    <Folder Include="Content\DocumentsCSV\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

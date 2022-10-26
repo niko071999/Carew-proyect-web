@@ -77,6 +77,10 @@ function generarTabla1() {
     let table = $("#tablaProducto").DataTable({
         responsive: true,
         dom: '<"toolbar">frtp',
+        lengthMenu: [
+            [5, -1],
+            [5, 'All'],
+        ],
         ajax: {
             'url': '/Producto/getProductos',
             'type': 'GET',
@@ -99,13 +103,16 @@ function generarTabla1() {
                 orderable: false,
                 visible: false
             },
-            { data: 'codigobarra' },
             {
                 data: 'codigobarra',
                 render: function (data) {
-                    return `<img class="barcode mx-auto d-block"
-                                jsbarcode-format="ean13" jsbarcode-value="${data}"
-                                style="width: 100%; min-width: 100px; min-height: 50px; height: 80px;" />`;
+                    return `<a href="javascript:void(0);" onclick="descargarBarcode(${data})" data-bs-toggle="tooltip" title="Descargar codigo de barra">
+                                <canvas id="${data}_barcode" class="barcode mx-auto d-block"
+                                        jsbarcode-format="ean13" jsbarcode-value="${data}"
+                                        style="width: 100%; min-width: 100px; min-height: 50px; height: 80px;">
+                                </canvas>
+                            </a>
+                            <span class="invisible">${data}</span>`;
                 },
                 orderable: false
             },
@@ -172,7 +179,7 @@ function generarTabla1() {
             {
                 data: 'id',
                 'render': function (id) {
-                    return `<div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    return `<div class="d-grid gap-2 d-md-flex justify-content-md-center align-items-center h-100">
                                 <button class="btn btn-warning" type="button" onclick="accion(1,${id})" data-bs-toggle="tooltip" title="Editar producto">
                                    <i class="fas fa-pen float-left"></i>
                                 </button>
@@ -316,6 +323,20 @@ function generarTabla1() {
             url: 'https://cdn.datatables.net/plug-ins/1.12.0/i18n/es-ES.json',
         }
     });
+    //table.on('page.dt', function () {
+    //    //let page = table.page();
+    //<div class="d-grid gap-2 d-md-flex justify-content-md-center align-items-center h-100">
+    //<button class="btn btn-dark" type="button" onclick="accion(3,${id})" data-bs-toggle="tooltip" title="Editar producto">
+    //    <i class="fas fa-pen float-left"></i>
+    //</button>
+    //</div >
+        
+    //});
+    table.on('draw', function () {
+        $("span.invisible").hide();
+        JsBarcode(".barcode").init();
+        initTooltip();
+    });
     // Event listener to the two range filtering inputs to redraw on input
     $('#text_preciomin, #text_preciomax').keyup(function () {
         table.draw();
@@ -323,24 +344,7 @@ function generarTabla1() {
     $("#text_viewstockmin").change(function () {
         table.draw();
     });
-    table.on("init", function () {
-        var data = table.rows().data().toArray();
-        //barcode_codigobarra img-barcode
-        for (var i = 0; i < data.length; i++) {
-            let check = !!document.getElementById('barcode_'+data[i].codigobarra)
-            console.log(check)
-            try {
-                JsBarcode(".barcode").init();
-            } catch (e) {
-                console.error('El codigo de barra no es valido: ' + e);
-            }
-            console.log(data[i]);
-        }
-        initTooltip();
-        table.page.len(5).draw();
-    });
 }
-
 function generarTabla2() {
     $("#findTable").DataTable({
         responsive: 'true',
@@ -425,4 +429,19 @@ function initTooltip() {
     var tooltipList2 = tooltipList1.map(function (tooltipTriggerfun) {
         return new bootstrap.Tooltip(tooltipTriggerfun)
     });
+}
+function descargarBarcode(barcode) {
+    let canvas = document.getElementById(barcode+"_barcode");
+    let enlace = document.createElement('a');
+    //Indicamos el titulo
+    enlace.download = barcode + "_barcodeimg.jpg";
+    // Convertir la imagen a Base64 y ponerlo en el enlace
+    enlace.href = canvas.toDataURL("image/jpg", 1);
+    //Descargamos
+    enlace.click();
+    enlace.remove();
+}
+function resetTable1() {
+    $("#tablaProducto").DataTable().destroy();
+    generarTabla1();
 }

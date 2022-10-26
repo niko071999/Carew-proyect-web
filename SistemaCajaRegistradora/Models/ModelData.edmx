@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="ModelData.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="CarewEntities.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Cajas">
           <Key>
             <PropertyRef Name="id" />
@@ -56,13 +56,14 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="fecha_apertura" Type="datetime" Nullable="false" />
           <Property Name="monto_apertura" Type="int" Nullable="false" />
           <Property Name="cajeroid" Type="int" Nullable="false" />
           <Property Name="cajaid" Type="int" Nullable="false" />
           <Property Name="total_venta_diaria" Type="int" />
-          <Property Name="total_caja_real" Type="int" />
+          <Property Name="total_caja_real_efectivo" Type="int" />
+          <Property Name="total_caja_real_transferencia" Type="int" />
           <Property Name="diferencia_caja" Type="int" />
           <Property Name="fecha_cierre" Type="datetime" />
         </EntityType>
@@ -127,6 +128,7 @@
           <Property Name="solrespass" Type="bit" />
           <Property Name="fecha_creacion" Type="datetime" />
           <Property Name="fecha_modificacion" Type="datetime" />
+          <Property Name="conectado" Type="bit" />
         </EntityType>
         <EntityType Name="Ventas">
           <Key>
@@ -326,7 +328,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="ModelDataStoreContainer">
+        <EntityContainer Name="CarewEntitiesStoreContainer">
           <EntitySet Name="Cajas" EntityType="Self.Cajas" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Categorias" EntityType="Self.Categorias" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DetalleVenta" EntityType="Self.DetalleVenta" Schema="dbo" store:Type="Tables" />
@@ -402,16 +404,17 @@
             <End Role="Ventas" EntitySet="Ventas" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="ModelData" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+      <Schema Namespace="CarewEntities" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityType Name="Caja">
           <Key>
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="num_caja" Nullable="false" Type="Int32" />
+          <Property Name="num_caja" Type="Int32" Nullable="false" />
           <NavigationProperty Name="MovimientosCajas" Relationship="Self.FK_MovimientosCajas_Cajas" FromRole="Cajas" ToRole="MovimientosCajas" />
         </EntityType>
         <EntityType Name="Categoria">
@@ -465,13 +468,14 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="fecha_apertura" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="monto_apertura" Type="Int32" Nullable="false" />
           <Property Name="cajeroid" Type="Int32" Nullable="false" />
           <Property Name="cajaid" Type="Int32" Nullable="false" />
           <Property Name="total_venta_diaria" Type="Int32" />
-          <Property Name="total_caja_real" Type="Int32" />
+          <Property Name="total_caja_real_efectivo" Type="Int32" />
+          <Property Name="total_caja_real_transferencia" Type="Int32" />
           <Property Name="diferencia_caja" Type="Int32" />
           <Property Name="fecha_cierre" Type="DateTime" Precision="3" />
           <NavigationProperty Name="Caja" Relationship="Self.FK_MovimientosCajas_Cajas" FromRole="MovimientosCajas" ToRole="Cajas" />
@@ -550,6 +554,7 @@
           <Property Name="solrespass" Type="Boolean" />
           <Property Name="fecha_creacion" Type="DateTime" Precision="3" />
           <Property Name="fecha_modificacion" Type="DateTime" Precision="3" />
+          <Property Name="conectado" Type="Boolean" />
           <NavigationProperty Name="Imagen" Relationship="Self.FK_Usuarios_Imagen" FromRole="Usuarios" ToRole="Imagen" />
           <NavigationProperty Name="MovimientosCajas" Relationship="Self.FK_MovimientosCajas_Usuarios" FromRole="Usuarios" ToRole="MovimientosCajas" />
           <NavigationProperty Name="Role" Relationship="Self.FK_Usuarios_Roles" FromRole="Usuarios" ToRole="Roles" />
@@ -757,7 +762,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="CarewEntities" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="ModelData" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Cajas" EntityType="Self.Caja" />
           <EntitySet Name="Categorias" EntityType="Self.Categoria" />
           <EntitySet Name="DetalleVentas" EntityType="Self.DetalleVenta" />
@@ -838,9 +843,9 @@
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="ModelDataStoreContainer" CdmEntityContainer="CarewEntities">
+        <EntityContainerMapping StorageEntityContainer="CarewEntitiesStoreContainer" CdmEntityContainer="ModelData">
           <EntitySetMapping Name="Cajas">
-            <EntityTypeMapping TypeName="ModelData.Caja">
+            <EntityTypeMapping TypeName="CarewEntities.Caja">
               <MappingFragment StoreEntitySet="Cajas">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="num_caja" ColumnName="num_caja" />
@@ -848,7 +853,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Categorias">
-            <EntityTypeMapping TypeName="ModelData.Categoria">
+            <EntityTypeMapping TypeName="CarewEntities.Categoria">
               <MappingFragment StoreEntitySet="Categorias">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="nombre" ColumnName="nombre" />
@@ -857,7 +862,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="DetalleVentas">
-            <EntityTypeMapping TypeName="ModelData.DetalleVenta">
+            <EntityTypeMapping TypeName="CarewEntities.DetalleVenta">
               <MappingFragment StoreEntitySet="DetalleVenta">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="productoid" ColumnName="productoid" />
@@ -868,7 +873,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Imagens">
-            <EntityTypeMapping TypeName="ModelData.Imagen">
+            <EntityTypeMapping TypeName="CarewEntities.Imagen">
               <MappingFragment StoreEntitySet="Imagen">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="ruta" ColumnName="ruta" />
@@ -877,7 +882,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="MetodoPagos">
-            <EntityTypeMapping TypeName="ModelData.MetodoPago">
+            <EntityTypeMapping TypeName="CarewEntities.MetodoPago">
               <MappingFragment StoreEntitySet="MetodoPagos">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="metodo_pago" ColumnName="metodo_pago" />
@@ -885,7 +890,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Modulos">
-            <EntityTypeMapping TypeName="ModelData.Modulo">
+            <EntityTypeMapping TypeName="CarewEntities.Modulo">
               <MappingFragment StoreEntitySet="Modulos">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="nombre" ColumnName="nombre" />
@@ -893,7 +898,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="MovimientosCajas">
-            <EntityTypeMapping TypeName="ModelData.MovimientosCaja">
+            <EntityTypeMapping TypeName="CarewEntities.MovimientosCaja">
               <MappingFragment StoreEntitySet="MovimientosCajas">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="fecha_apertura" ColumnName="fecha_apertura" />
@@ -901,14 +906,15 @@
                 <ScalarProperty Name="cajeroid" ColumnName="cajeroid" />
                 <ScalarProperty Name="cajaid" ColumnName="cajaid" />
                 <ScalarProperty Name="total_venta_diaria" ColumnName="total_venta_diaria" />
-                <ScalarProperty Name="total_caja_real" ColumnName="total_caja_real" />
+                <ScalarProperty Name="total_caja_real_efectivo" ColumnName="total_caja_real_efectivo" />
+                <ScalarProperty Name="total_caja_real_transferencia" ColumnName="total_caja_real_transferencia" />
                 <ScalarProperty Name="diferencia_caja" ColumnName="diferencia_caja" />
                 <ScalarProperty Name="fecha_cierre" ColumnName="fecha_cierre" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Operaciones">
-            <EntityTypeMapping TypeName="ModelData.Operacione">
+            <EntityTypeMapping TypeName="CarewEntities.Operacione">
               <MappingFragment StoreEntitySet="Operaciones">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="nombre" ColumnName="nombre" />
@@ -917,7 +923,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Prioridades">
-            <EntityTypeMapping TypeName="ModelData.Prioridade">
+            <EntityTypeMapping TypeName="CarewEntities.Prioridade">
               <MappingFragment StoreEntitySet="Prioridades">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="prioridad" ColumnName="prioridad" />
@@ -925,7 +931,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Productos">
-            <EntityTypeMapping TypeName="ModelData.Producto">
+            <EntityTypeMapping TypeName="CarewEntities.Producto">
               <MappingFragment StoreEntitySet="Productos">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="codigo_barra" ColumnName="codigo_barra" />
@@ -943,7 +949,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="rol_operacion">
-            <EntityTypeMapping TypeName="ModelData.rol_operacion">
+            <EntityTypeMapping TypeName="CarewEntities.rol_operacion">
               <MappingFragment StoreEntitySet="rol_operacion">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="idrol" ColumnName="idrol" />
@@ -952,7 +958,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Roles">
-            <EntityTypeMapping TypeName="ModelData.Role">
+            <EntityTypeMapping TypeName="CarewEntities.Role">
               <MappingFragment StoreEntitySet="Roles">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="rol" ColumnName="rol" />
@@ -960,7 +966,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Usuarios">
-            <EntityTypeMapping TypeName="ModelData.Usuario">
+            <EntityTypeMapping TypeName="CarewEntities.Usuario">
               <MappingFragment StoreEntitySet="Usuarios">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="nombreUsuario" ColumnName="nombreUsuario" />
@@ -972,11 +978,12 @@
                 <ScalarProperty Name="solrespass" ColumnName="solrespass" />
                 <ScalarProperty Name="fecha_creacion" ColumnName="fecha_creacion" />
                 <ScalarProperty Name="fecha_modificacion" ColumnName="fecha_modificacion" />
+                <ScalarProperty Name="conectado" ColumnName="conectado" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Ventas">
-            <EntityTypeMapping TypeName="ModelData.Venta">
+            <EntityTypeMapping TypeName="CarewEntities.Venta">
               <MappingFragment StoreEntitySet="Ventas">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="total_venta" ColumnName="total_venta" />

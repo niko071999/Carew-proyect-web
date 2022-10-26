@@ -41,7 +41,7 @@
         <div class="mb-3 row">
             <label for="staticDate" class="col-sm-2 col-form-label">Fecha apertura:</label>
             <div class="col-sm-10">
-                <input type="text" name="fecha" readonly class="form-control-plaintext" id="staticDate" value="@DateTime.UtcNow">
+                <input type="text" name="fecha" readonly class="form-control-plaintext" id="staticDate" value="@DateTime.Now">
             </div>
         </div>
         <div class="mb-3 row">
@@ -61,7 +61,7 @@
             <label for="inputMonto" class="col-sm-2 col-form-label">Monto apertura:</label>
             <div class="col-sm-10 input-group mb-3">
                 <span class="input-group-text">$</span>
-                <input type="text" class="form-control precio" name="monto" id="inputMonto" value="0">
+                <input type="text" class="form-control" name="monto" id="inputMonto" value="0">
             </div>
         </div>
         <button type="submit" class="btn btn-primary mb-3">Abrir Caja</button>

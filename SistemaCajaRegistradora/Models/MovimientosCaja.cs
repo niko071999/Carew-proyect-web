@@ -26,7 +26,8 @@ namespace SistemaCajaRegistradora.Models
         public int cajeroid { get; set; }
         public int cajaid { get; set; }
         public Nullable<int> total_venta_diaria { get; set; }
-        public Nullable<int> total_caja_real { get; set; }
+        public Nullable<int> total_caja_real_efectivo { get; set; }
+        public Nullable<int> total_caja_real_transferencia { get; set; }
         public Nullable<int> diferencia_caja { get; set; }
         public Nullable<System.DateTime> fecha_cierre { get; set; }
     
