@@ -12,49 +12,60 @@ namespace SistemaCajaRegistradora.Controllers
     public class SesionController : Controller
     {
         private readonly ModelData db = new ModelData();
+
+        [HttpGet]
+        [ActionName("Login")]
         public ActionResult Login()
         {
-            var contextUsuarios = db.Usuarios.Include(u => u.Role);
-            var usuarios = contextUsuarios.ToArray();
-            //Verificar si existen usuarios en el sistema
-            if (usuarios.Length == 0)
+            try
             {
-                //Si no existen enviar a la vista de bienvenida y creacion de usuarios administrador
-                return RedirectToAction("AgregarUsuarioAdmin");
-            }
-            if (Session["User"] != null)
-            {
-                Usuario user = (Usuario)Session["User"];
-                //CAMBIAR ATRIBUTO CONECTADO A TRUE
-                var usuario = contextUsuarios.Where(u => u.id == user.id).FirstOrDefault();
-                if (!(bool)usuario.conectado)
+                var contextUsuarios = db.Usuarios.Include(u => u.Role);
+                var usuarios = contextUsuarios.ToArray();
+                //Verificar si existen usuarios en el sistema
+                if (usuarios.Length == 0)
                 {
-                    usuario.conectado = true;
-                    db.Entry(usuario).State = EntityState.Modified;
-                    db.SaveChanges();
+                    //Si no existen enviar a la vista de bienvenida y creacion de usuarios administrador
+                    return RedirectToAction("AgregarUsuarioAdmin");
                 }
+                if (Session["User"] != null)
+                {
+                    Usuario user = (Usuario)Session["User"];
+                    //CAMBIAR ATRIBUTO CONECTADO A TRUE
+                    var usuario = contextUsuarios.Where(u => u.id == user.id).FirstOrDefault();
+                    if (!(bool)usuario.conectado)
+                    {
+                        usuario.conectado = true;
+                        db.Entry(usuario).State = EntityState.Modified;
+                        db.SaveChanges();
+                    }
 
-                if (user.rolid == 1)
-                {
-                    if (usuario != null)
+                    if (user.rolid == 1)
                     {
-                        return RedirectToAction("Index", "Home");
+                        if (usuario != null)
+                        {
+                            return RedirectToAction("Index", "Home");
+                        }
+                    }
+                    else if (user.rolid == 2)
+                    {
+                        if (usuario != null)
+                        {
+                            return RedirectToAction("POS", "Venta");
+                        }
+                    }
+                    else
+                    {
+                        return Content("Error, Rol de id no existe o el usuario no existe");
                     }
                 }
-                else if (user.rolid == 2)
-                {
-                    if (usuario != null)
-                    {
-                        return RedirectToAction("POS", "Venta");
-                    }
-                }
-                else
-                {
-                    return Content("Error, Rol de id no existe o el usuario no existe");
-                }
+                return View();
+            }
+            catch (Exception)
+            {
             }
             return View();
         }
+
         [HttpPost]
         [ActionName("Login")]
         public ActionResult Login(string user, string clave)
@@ -119,20 +130,29 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("SignOut")]
         public ActionResult SignOut()
         {
-            var user = (Usuario)Session["User"];
-            var contextUsuarios = db.Usuarios.Include(u => u.Role);
-            var usuario = contextUsuarios.Where(u => u.id == user.id).FirstOrDefault();
-            if (usuario != null && (bool)usuario.conectado)
+            try
             {
-                //Cambiamos la variable conectado a false
-                usuario.conectado = false;
-                db.Entry(usuario).State = EntityState.Modified;
-                db.SaveChanges();
-            }
+                var user = (Usuario)Session["User"];
+                var contextUsuarios = db.Usuarios.Include(u => u.Role);
+                var usuario = contextUsuarios.Where(u => u.id == user.id).FirstOrDefault();
+                if (usuario != null && (bool)usuario.conectado)
+                {
+                    //Cambiamos la variable conectado a false
+                    usuario.conectado = false;
+                    db.Entry(usuario).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
 
-            Session["User"] = null;
-            TempData["logout"] = "Sesion finalizada";
-            return Redirect("~/Sesion/Login");
+                Session["User"] = null;
+                TempData["logout"] = "Sesion finalizada";
+                return Redirect("~/Sesion/Login");
+            }
+            catch (Exception)
+            {
+                Session["User"] = null;
+                TempData["logout"] = "Sesion finalizada";
+                return Redirect("~/Sesion/Login");
+            }
         }
 
         [HttpGet]
@@ -214,6 +234,37 @@ namespace SistemaCajaRegistradora.Controllers
                 ViewBag.Error = "Ocurrio un error al guardar el usuario, intentelo de nuevo o mas tarde";
                 return View();
             }
+        }
+
+        [HttpPost]
+        [ActionName("verificarSession")]
+        public JsonResult verificarSession(string user)
+        {
+            var usuario = db.Usuarios.Where(u => u.nombreUsuario.Equals(user)).FirstOrDefault();
+            if (usuario != null)
+            {
+                if (usuario.conectado == true)
+                {
+                    usuario.conectado = false;
+                    db.Entry(usuario).State = EntityState.Modified;
+                    db.SaveChanges();
+
+                    return Json(new
+                    {
+                        data = "success"
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+                return Json(new
+                {
+                    data = "not change"
+                },JsonRequestBehavior.AllowGet);
+            }
+            
+            return Json(new
+            {
+                data = "error"
+            }, JsonRequestBehavior.AllowGet); 
         }
     }
 }

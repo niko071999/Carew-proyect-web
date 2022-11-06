@@ -48,7 +48,7 @@ namespace SistemaCajaRegistradora.Controllers
                 vmProducto producto = new vmProducto
                 {
                     id = item.id,
-                    codigobarra = item.codigo_barra.Trim(),
+                    codigobarra = item.codigo_barra.Trim().ToString(),
                     nombre = item.nombre.Trim(),
                     categoria = item.Categoria.nombre.Trim(),
                     prioridad = item.Prioridade.prioridad.Trim(),
@@ -90,7 +90,7 @@ namespace SistemaCajaRegistradora.Controllers
             //Se define una imagen por defecto
             producto.imagenid = 1;
             producto.fecha_creacion = DateTime.Now;
-            producto.fecha_ultima_edicion = producto.fecha_creacion;
+            producto.fecha_modificacion = producto.fecha_creacion;
             db.Productos.Add(producto);
             int n = db.SaveChanges();
             return Json(n,JsonRequestBehavior.AllowGet);
@@ -144,7 +144,7 @@ namespace SistemaCajaRegistradora.Controllers
                                         categoriaid = idCategoria,
                                         imagenid = 1,
                                         fecha_creacion = DateTime.Now,
-                                        fecha_ultima_edicion = DateTime.Now
+                                        fecha_modificacion = DateTime.Now
                                     };
                                     db.Productos.Add(p);
                                 }
@@ -223,7 +223,7 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult editarProducto(Producto producto)
         {
             validarValoresNull(producto);
-            producto.fecha_ultima_edicion = DateTime.Now;
+            producto.fecha_modificacion = DateTime.Now;
             db.Entry(producto).State = EntityState.Modified;
             int n = db.SaveChanges();
             return Json(n, JsonRequestBehavior.AllowGet);
@@ -275,7 +275,7 @@ namespace SistemaCajaRegistradora.Controllers
                         long idimg = producto.imagenid;
                         
                         producto.imagenid = img.id;
-                        producto.fecha_ultima_edicion = DateTime.Now;
+                        producto.fecha_modificacion = DateTime.Now;
                         db1.Entry(producto).State = EntityState.Modified;
                         n = db1.SaveChanges();
                         if (n == 0)
@@ -407,7 +407,7 @@ namespace SistemaCajaRegistradora.Controllers
             if (resulProducto!=null)
             {
                 resulProducto.stock += producto.stock;
-                resulProducto.fecha_ultima_edicion = DateTime.Now;
+                resulProducto.fecha_modificacion = DateTime.Now;
                 db.Entry(resulProducto).State = EntityState.Modified;
                 n = db.SaveChanges();
                 return Json(n,JsonRequestBehavior.AllowGet);

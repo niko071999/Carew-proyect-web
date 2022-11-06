@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="CarewEntities.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="CarewModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Cajas">
           <Key>
             <PropertyRef Name="id" />
@@ -94,7 +94,7 @@
           <Property Name="stockmin" Type="int" />
           <Property Name="stockmax" Type="int" />
           <Property Name="fecha_creacion" Type="datetime" Nullable="false" />
-          <Property Name="fecha_ultima_edicion" Type="datetime" />
+          <Property Name="fecha_modificacion" Type="datetime" />
           <Property Name="imagenid" Type="bigint" Nullable="false" />
           <Property Name="prioridadid" Type="int" Nullable="false" />
           <Property Name="categoriaid" Type="int" Nullable="false" />
@@ -138,7 +138,6 @@
           <Property Name="total_venta" Type="int" Nullable="false" />
           <Property Name="fecha_creacion" Type="datetime" Nullable="false" />
           <Property Name="vuelto" Type="int" Nullable="false" />
-          <Property Name="cajeroid" Type="int" Nullable="false" />
           <Property Name="movimientocajaid" Type="int" Nullable="false" />
           <Property Name="metodo_pagoid" Type="int" Nullable="false" />
           <Property Name="monto_ingresado" Type="int" Nullable="false" />
@@ -316,19 +315,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Ventas_Usuarios">
-          <End Role="Usuarios" Type="Self.Usuarios" Multiplicity="1" />
-          <End Role="Ventas" Type="Self.Ventas" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Usuarios">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Ventas">
-              <PropertyRef Name="cajeroid" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <EntityContainer Name="CarewEntitiesStoreContainer">
+        <EntityContainer Name="CarewModelStoreContainer">
           <EntitySet Name="Cajas" EntityType="Self.Cajas" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Categorias" EntityType="Self.Categorias" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DetalleVenta" EntityType="Self.DetalleVenta" Schema="dbo" store:Type="Tables" />
@@ -399,16 +386,11 @@
             <End Role="MovimientosCajas" EntitySet="MovimientosCajas" />
             <End Role="Ventas" EntitySet="Ventas" />
           </AssociationSet>
-          <AssociationSet Name="FK_Ventas_Usuarios" Association="Self.FK_Ventas_Usuarios">
-            <End Role="Usuarios" EntitySet="Usuarios" />
-            <End Role="Ventas" EntitySet="Ventas" />
-          </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="CarewEntities" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+      <Schema Namespace="CarewModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityType Name="Caja">
           <Key>
             <PropertyRef Name="id" />
@@ -512,7 +494,6 @@
           <Property Name="stockmin" Type="Int32" />
           <Property Name="stockmax" Type="Int32" />
           <Property Name="fecha_creacion" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="fecha_ultima_edicion" Type="DateTime" Precision="3" />
           <Property Name="imagenid" Type="Int64" Nullable="false" />
           <Property Name="prioridadid" Type="Int32" Nullable="false" />
           <Property Name="categoriaid" Type="Int32" Nullable="false" />
@@ -520,6 +501,7 @@
           <NavigationProperty Name="DetalleVentas" Relationship="Self.FK_DetalleVenta_Productos" FromRole="Productos" ToRole="DetalleVenta" />
           <NavigationProperty Name="Imagen" Relationship="Self.FK_Productos_Imagen" FromRole="Productos" ToRole="Imagen" />
           <NavigationProperty Name="Prioridade" Relationship="Self.FK_Productos_Prioridades" FromRole="Productos" ToRole="Prioridades" />
+          <Property Name="fecha_modificacion" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="rol_operacion">
           <Key>
@@ -558,7 +540,6 @@
           <NavigationProperty Name="Imagen" Relationship="Self.FK_Usuarios_Imagen" FromRole="Usuarios" ToRole="Imagen" />
           <NavigationProperty Name="MovimientosCajas" Relationship="Self.FK_MovimientosCajas_Usuarios" FromRole="Usuarios" ToRole="MovimientosCajas" />
           <NavigationProperty Name="Role" Relationship="Self.FK_Usuarios_Roles" FromRole="Usuarios" ToRole="Roles" />
-          <NavigationProperty Name="Ventas" Relationship="Self.FK_Ventas_Usuarios" FromRole="Usuarios" ToRole="Ventas" />
         </EntityType>
         <EntityType Name="Venta">
           <Key>
@@ -568,7 +549,6 @@
           <Property Name="total_venta" Type="Int32" Nullable="false" />
           <Property Name="fecha_creacion" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="vuelto" Type="Int32" Nullable="false" />
-          <Property Name="cajeroid" Type="Int32" Nullable="false" />
           <Property Name="movimientocajaid" Type="Int32" Nullable="false" />
           <Property Name="metodo_pagoid" Type="Int32" Nullable="false" />
           <Property Name="monto_ingresado" Type="Int32" Nullable="false" />
@@ -576,7 +556,6 @@
           <NavigationProperty Name="DetalleVentas" Relationship="Self.FK_DetalleVenta_Ventas" FromRole="Ventas" ToRole="DetalleVenta" />
           <NavigationProperty Name="MetodoPago" Relationship="Self.FK_Ventas_MetodoPagos" FromRole="Ventas" ToRole="MetodoPagos" />
           <NavigationProperty Name="MovimientosCaja" Relationship="Self.FK_Ventas_MovimientosCajas" FromRole="Ventas" ToRole="MovimientosCajas" />
-          <NavigationProperty Name="Usuario" Relationship="Self.FK_Ventas_Usuarios" FromRole="Ventas" ToRole="Usuarios" />
         </EntityType>
         <Association Name="FK_MovimientosCajas_Cajas">
           <End Role="Cajas" Type="Self.Caja" Multiplicity="1" />
@@ -750,18 +729,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Ventas_Usuarios">
-          <End Role="Usuarios" Type="Self.Usuario" Multiplicity="1" />
-          <End Role="Ventas" Type="Self.Venta" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Usuarios">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Ventas">
-              <PropertyRef Name="cajeroid" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityContainer Name="ModelData" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Cajas" EntityType="Self.Caja" />
           <EntitySet Name="Categorias" EntityType="Self.Categoria" />
@@ -833,19 +800,15 @@
             <End Role="Roles" EntitySet="Roles" />
             <End Role="Usuarios" EntitySet="Usuarios" />
           </AssociationSet>
-          <AssociationSet Name="FK_Ventas_Usuarios" Association="Self.FK_Ventas_Usuarios">
-            <End Role="Usuarios" EntitySet="Usuarios" />
-            <End Role="Ventas" EntitySet="Ventas" />
-          </AssociationSet>
         </EntityContainer>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="CarewEntitiesStoreContainer" CdmEntityContainer="ModelData">
+        <EntityContainerMapping StorageEntityContainer="CarewModelStoreContainer" CdmEntityContainer="ModelData">
           <EntitySetMapping Name="Cajas">
-            <EntityTypeMapping TypeName="CarewEntities.Caja">
+            <EntityTypeMapping TypeName="CarewModel.Caja">
               <MappingFragment StoreEntitySet="Cajas">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="num_caja" ColumnName="num_caja" />
@@ -853,7 +816,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Categorias">
-            <EntityTypeMapping TypeName="CarewEntities.Categoria">
+            <EntityTypeMapping TypeName="CarewModel.Categoria">
               <MappingFragment StoreEntitySet="Categorias">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="nombre" ColumnName="nombre" />
@@ -862,7 +825,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="DetalleVentas">
-            <EntityTypeMapping TypeName="CarewEntities.DetalleVenta">
+            <EntityTypeMapping TypeName="CarewModel.DetalleVenta">
               <MappingFragment StoreEntitySet="DetalleVenta">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="productoid" ColumnName="productoid" />
@@ -873,7 +836,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Imagens">
-            <EntityTypeMapping TypeName="CarewEntities.Imagen">
+            <EntityTypeMapping TypeName="CarewModel.Imagen">
               <MappingFragment StoreEntitySet="Imagen">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="ruta" ColumnName="ruta" />
@@ -882,7 +845,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="MetodoPagos">
-            <EntityTypeMapping TypeName="CarewEntities.MetodoPago">
+            <EntityTypeMapping TypeName="CarewModel.MetodoPago">
               <MappingFragment StoreEntitySet="MetodoPagos">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="metodo_pago" ColumnName="metodo_pago" />
@@ -890,7 +853,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Modulos">
-            <EntityTypeMapping TypeName="CarewEntities.Modulo">
+            <EntityTypeMapping TypeName="CarewModel.Modulo">
               <MappingFragment StoreEntitySet="Modulos">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="nombre" ColumnName="nombre" />
@@ -898,7 +861,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="MovimientosCajas">
-            <EntityTypeMapping TypeName="CarewEntities.MovimientosCaja">
+            <EntityTypeMapping TypeName="CarewModel.MovimientosCaja">
               <MappingFragment StoreEntitySet="MovimientosCajas">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="fecha_apertura" ColumnName="fecha_apertura" />
@@ -914,7 +877,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Operaciones">
-            <EntityTypeMapping TypeName="CarewEntities.Operacione">
+            <EntityTypeMapping TypeName="CarewModel.Operacione">
               <MappingFragment StoreEntitySet="Operaciones">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="nombre" ColumnName="nombre" />
@@ -923,7 +886,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Prioridades">
-            <EntityTypeMapping TypeName="CarewEntities.Prioridade">
+            <EntityTypeMapping TypeName="CarewModel.Prioridade">
               <MappingFragment StoreEntitySet="Prioridades">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="prioridad" ColumnName="prioridad" />
@@ -931,8 +894,9 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Productos">
-            <EntityTypeMapping TypeName="CarewEntities.Producto">
+            <EntityTypeMapping TypeName="CarewModel.Producto">
               <MappingFragment StoreEntitySet="Productos">
+                <ScalarProperty Name="fecha_modificacion" ColumnName="fecha_modificacion" />
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="codigo_barra" ColumnName="codigo_barra" />
                 <ScalarProperty Name="nombre" ColumnName="nombre" />
@@ -941,7 +905,6 @@
                 <ScalarProperty Name="stockmin" ColumnName="stockmin" />
                 <ScalarProperty Name="stockmax" ColumnName="stockmax" />
                 <ScalarProperty Name="fecha_creacion" ColumnName="fecha_creacion" />
-                <ScalarProperty Name="fecha_ultima_edicion" ColumnName="fecha_ultima_edicion" />
                 <ScalarProperty Name="imagenid" ColumnName="imagenid" />
                 <ScalarProperty Name="prioridadid" ColumnName="prioridadid" />
                 <ScalarProperty Name="categoriaid" ColumnName="categoriaid" />
@@ -949,7 +912,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="rol_operacion">
-            <EntityTypeMapping TypeName="CarewEntities.rol_operacion">
+            <EntityTypeMapping TypeName="CarewModel.rol_operacion">
               <MappingFragment StoreEntitySet="rol_operacion">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="idrol" ColumnName="idrol" />
@@ -958,7 +921,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Roles">
-            <EntityTypeMapping TypeName="CarewEntities.Role">
+            <EntityTypeMapping TypeName="CarewModel.Role">
               <MappingFragment StoreEntitySet="Roles">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="rol" ColumnName="rol" />
@@ -966,7 +929,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Usuarios">
-            <EntityTypeMapping TypeName="CarewEntities.Usuario">
+            <EntityTypeMapping TypeName="CarewModel.Usuario">
               <MappingFragment StoreEntitySet="Usuarios">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="nombreUsuario" ColumnName="nombreUsuario" />
@@ -983,13 +946,12 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Ventas">
-            <EntityTypeMapping TypeName="CarewEntities.Venta">
+            <EntityTypeMapping TypeName="CarewModel.Venta">
               <MappingFragment StoreEntitySet="Ventas">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="total_venta" ColumnName="total_venta" />
                 <ScalarProperty Name="fecha_creacion" ColumnName="fecha_creacion" />
                 <ScalarProperty Name="vuelto" ColumnName="vuelto" />
-                <ScalarProperty Name="cajeroid" ColumnName="cajeroid" />
                 <ScalarProperty Name="movimientocajaid" ColumnName="movimientocajaid" />
                 <ScalarProperty Name="metodo_pagoid" ColumnName="metodo_pagoid" />
                 <ScalarProperty Name="monto_ingresado" ColumnName="monto_ingresado" />

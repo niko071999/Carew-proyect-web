@@ -24,7 +24,6 @@ namespace SistemaCajaRegistradora.Models
         public int total_venta { get; set; }
         public System.DateTime fecha_creacion { get; set; }
         public int vuelto { get; set; }
-        public int cajeroid { get; set; }
         public int movimientocajaid { get; set; }
         public int metodo_pagoid { get; set; }
         public int monto_ingresado { get; set; }
@@ -34,6 +33,5 @@ namespace SistemaCajaRegistradora.Models
         public virtual ICollection<DetalleVenta> DetalleVentas { get; set; }
         public virtual MetodoPago MetodoPago { get; set; }
         public virtual MovimientosCaja MovimientosCaja { get; set; }
-        public virtual Usuario Usuario { get; set; }
     }
 }

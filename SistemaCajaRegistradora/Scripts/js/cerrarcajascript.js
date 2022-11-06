@@ -29,7 +29,6 @@ form_closecaja.addEventListener('submit', function (e) {
             form_closecaja.submit();
             formatearmontos();
         } else {
-            formatearmontos();
             e.stopImmediatePropagation();
         }
     });

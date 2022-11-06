@@ -1,9 +1,8 @@
 ﻿@{
-    ViewBag.Title = "Listado de ventas";
+    ViewBag.Title = "Reporte de los productos mas vendidos";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Topbar  -->
 <nav class="navbar navbar-expand navbar-light bg-white mb-4 topbar shadow">
 
     <!-- Sidebar Toggle (Topbar) -->
@@ -30,46 +29,41 @@
         </li>
     </ul>
 </nav>
-<!-- End of Topbar -->
-<!-- Begin Page Content -->
 <div class="container-fluid">
     <!-- Page Heading -->
     <div class="row justify-content-between">
         <div class="col-4">
-            <h1 class="h3 mb-4 text-gray-800">@ViewBag.Title</h1>
+            <h3 class="mb-4 text-gray-800">@ViewBag.Title</h3>
         </div>
-        <div class="col-4">
-            <div class="d-grid gap-2 mb-2">
-                <a class="btn color-carew text-white" href="@Url.Action("POS","Venta")">
-                    <i class="fas fa-cash-register"></i>
-                    Ir a POS
-                </a>
+    </div>
+    <!-- Filter -->
+    @*<div class="row">
+            <div class="col-4">
+                <h5 class="mb-2 text-gray-600">Rango de fecha</h5>
+                <div class="input-group mb-2">
+                    <span class="input-group-text" id="datemin">Fecha inicio</span>
+                    <input id="text_datemin" type="text" class="form-control" aria-describedby="datemin" placeholder="Ingrese fecha inicio">
+                    <span class="input-group-text" id="datemax">Fecha final</span>
+                    <input id="text_datemax" type="text" class="form-control" aria-describedby="datemax" placeholder="Ingrese fecha final">
+                </div>
             </div>
-        </div>
-        <!-- table -->
-        <div class="row">
-            <div class="col-12">
-                <table id="tablaVenta" class="display table table-bordered table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">Cajero</th>
-                            <th scope="col">Metodo de pago</th>
-                            <th scope="col">Numero Boleta</th>
-                            <th scope="col">Total venta</th>
-                            <th scope="col">Fecha de creacion</th>
-                            <th scope="col">Detalle</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
+        </div>*@
+    <!-- table -->
+    <div class="row">
+        <div class="col-12">
+            <table id="tablaRPV" class="display table table-bordered table-hover w-100">
+                <thead>
+                    <tr>
+                        <th scope="col" style="max-width: 160px">Codigo Barra</th>
+                        <th scope="col" style="max-width: 150px">Imagen Producto</th>
+                        <th scope="col">Nombre Producto</th>
+                        <th scope="col">Precio Producto</th>
+                        <th scope="col">Cantidad vendido</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
     </div>
 </div>
-<!-- Modal core base-->
-<div class="modal fade" id="coreModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true" data-bs-backdrop="static">
+<script src="~/Scripts/Datatable/dtRPV.js"></script>
 
-</div>
-<script src="~/Scripts/js/printThis.js"></script>
-<script src="~/Scripts/js/scriptVenta.js"></script>
-<script src="~/Scripts/Datatable/dtVenta.js"></script>

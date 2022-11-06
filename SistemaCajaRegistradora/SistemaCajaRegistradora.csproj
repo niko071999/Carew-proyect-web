@@ -339,6 +339,8 @@
     <Compile Include="Models\ViewModels\vmAddExistenciaProduct.cs" />
     <Compile Include="Models\ViewModels\vmCerrarCaja.cs" />
     <Compile Include="Models\ViewModels\vmProducto.cs" />
+    <Compile Include="Models\ViewModels\vmReporteProductosVendidos.cs" />
+    <Compile Include="Models\ViewModels\vmReporteVentaDiaria.cs" />
     <Compile Include="Models\ViewModels\vmUsuario.cs" />
     <Compile Include="Models\ViewModels\vmVenta.cs" />
     <Compile Include="Models\ViewModels\vmVentaDetalle.cs" />
@@ -359,6 +361,7 @@
     <Content Include="Content\css\bootstrap.min.css" />
     <Content Include="Content\css\sb-admin-2.css" />
     <Content Include="Content\css\sb-admin-2.min.css" />
+    <Content Include="Content\Datatable\buttons.bootstrap5.min.css" />
     <Content Include="Content\Datatable\dataTables.bootstrap5.min.css" />
     <Content Include="Content\Datatable\datatables.min.css" />
     <Content Include="Content\Datatable\responsive.bootstrap5.min.css" />
@@ -387,6 +390,8 @@
     <Content Include="Scripts\Datatable\datatables.min.js" />
     <Content Include="Scripts\Datatable\dtCategoria.js" />
     <Content Include="Scripts\Datatable\dtProducto.js" />
+    <Content Include="Scripts\Datatable\dtRPV.js" />
+    <Content Include="Scripts\Datatable\dtRVD.js" />
     <Content Include="Scripts\Datatable\dtUsuario.js" />
     <Content Include="Scripts\Datatable\dtVenta.js" />
     <Content Include="Scripts\Datatable\jquery.dataTables.min.js" />
@@ -400,6 +405,7 @@
     <Content Include="Scripts\js\alertmenssages.js" />
     <Content Include="Scripts\js\aperturacajascript.js" />
     <Content Include="Scripts\js\cerrarcajascript.js" />
+    <Content Include="Scripts\js\loginscripts.js" />
     <Content Include="Scripts\js\printThis.js" />
     <Content Include="Scripts\js\scriptsCategoria.js" />
     <Content Include="Scripts\js\scriptsFirstOpen.js" />
@@ -2246,6 +2252,8 @@
     <Content Include="Views\Venta\AbrirCaja.cshtml" />
     <Content Include="Views\Venta\CerrarCaja.cshtml" />
     <Content Include="Views\Producto\_formsLoadProdsCSV.cshtml" />
+    <Content Include="Views\Venta\ReporteVentaDiaria.cshtml" />
+    <Content Include="Views\Venta\ReporteProductosVendidos.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -14,7 +14,6 @@ $("#btn_printLastSales").click(function () { imprimirLastSales() });
 //    $.get('/Venta/CerrarCaja/');
 //})
 
-
 let btn_finalizarventa = document.getElementById('btn_finalizarventa');
 let btn_cancelarventa = document.getElementById('btn_cancelarventa');
 let btn_efectivo = document.getElementById('btn_efectivo');
@@ -54,7 +53,7 @@ function imprimirLastSales() {
         } else {
             let idventa = data.data;
             msg = data.msg;
-            showMenssage('success', msg, false);
+            showMenssage('success', msg, true);
             console.log(data);
             $.get('/Venta/viewBoletaVenta/' + idventa, function (data) {
                 abrirModal(data);
@@ -85,7 +84,6 @@ function finalizarVenta() {
         "total_venta": $("#precioTotalPagar").html().replace(/[$.]/g, ''),
         "fecha_creacion": "",
         "vuelto": $("#totalVuelto").html().replace(/[$.]/g, ''),
-        "cajeroid": "",
         "movimientocajaid": "",
         "metodo_pagoid": metodoPago,
         "monto_ingresado": $("#input_montoRecibido").val().replace(/[$.]/g, ''),
@@ -118,12 +116,15 @@ function finalizarVenta() {
             console.log(data);
             let msg = '';
             if (data.data == '') {
+                if (data.idventa == -1) {
+                    location = location.href;
+                }
                 msg = data.msg;
                 showMenssage('error', msg, true);
             } else {
                 let idventa = data.idventa;
                 msg = data.msg;
-                showMenssage('success', msg, false);
+                showMenssage('success', msg, true);
                 console.log(data);
                 $.get('/Venta/viewBoletaVenta/' + idventa, function (data) {
                     sessionStorage.print = true;
@@ -164,7 +165,10 @@ function init() {
 
 
 document.getElementById('coreModal').addEventListener('hide.bs.modal', function (event) {
-    location = location.href;
+    if (sessionStorage.print) {
+        sessionStorage.print = false;
+        location = location.href;
+    }
 });
 document.getElementById('coreModal').addEventListener('shown.bs.modal', function (event) {
     if (sessionStorage.print) {
@@ -206,7 +210,7 @@ function cargarProducto(key) {
     }
     if (key === 13 && codigo.trim() != '') {
         $.post('/Venta/cargarProducto', producto, function (data) {
-            console.log(data);
+            
             let exist = false;
             if (data.codigobarra != "") {
                 if (listaVenta.length > 0) {
@@ -223,6 +227,7 @@ function cargarProducto(key) {
                 } else {
                     listaVenta.push(data);
                 }
+                
                 drawTable();
                 
                 disabledSwitch(false);
@@ -237,6 +242,7 @@ function cargarProducto(key) {
 }
 
 function drawTable() {
+    console.log(listaVenta);
     $('#bodyTable').empty();
     $("#txt_metodopago").html("Efectivo");
     precioPagar = 0; 
@@ -274,7 +280,7 @@ function drawTable() {
                            <input id="txt_${listaVenta[i].codigobarra}" class="form-control form-control-sm w-50" 
                                    type="number" max="${listaVenta[i].cantidadmax}" 
                                    value="${listaVenta[i].cantidad}" 
-                                   onchange="verificarStockMax(${listaVenta[i].codigobarra})" />
+                                   onchange="verificarStockMax('${listaVenta[i].codigobarra}')" />
                         </div>
                     </div>
                     <div class="row col">
@@ -287,7 +293,7 @@ function drawTable() {
                 <td>
                     <button type="button"
                             class="btn btn-sm btn-circle btn-danger"
-                            onclick="quitarProducto(${listaVenta[i].codigobarra})">
+                            onclick="quitarProducto('${listaVenta[i].codigobarra}')">
                         <i class="fas fa-times"></i>
                     </button>
                 </td>
@@ -314,11 +320,6 @@ function disabledSwitch(bool) {
     $("#btn_efectivo").attr("disabled", bool);
     $("#btn_debcred").attr("disabled", bool);
 }
-//function formsPagarVenta() {
-//    $.get("/Venta/formsPagarVenta/", function (data) {
-//        abrirModal(data);
-//    });
-//}
 function cancelarVenta() {
     Swal.fire({
         title: 'Cancelar la venta',

@@ -1,34 +1,29 @@
 ﻿@{
     ViewBag.Title = "Inicio";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <!-- Topbar  -->
-<nav class="navbar navbar-expand navbar-light bg-white mb-4 topbar shadow">
+<nav class="navbar navbar-expand-lg navbar-light bg-white mb-4 topbar shadow">
 
-    <!-- Sidebar Toggle (Topbar) -->
-    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-        <i class="fa fa-bars"></i>
-    </button>
-
-    <!-- Topbar Navbar -->
     <!-- Topbar Navbar -->
     <ul class="navbar-nav ml-auto">
-
         <!-- Nav Item - User Information -->
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <span id="text_nameuser" class="mr-2 d-none d-md-inline text-gray-600 fw-bold">Cargando...</span>
                 <img id="img_user" class="img-profile rounded-circle img-fluid"
                      src="~/Assets/images/blank-profile.png">
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                 <li><a id="linksChangePass" class="dropdown-item" href="javascript:;">Cambiar contraseña</a></li>
-                <li><hr class="dropdown-divider"></li>
+                <li><div class="dropdown-divider"></div></li>
                 <li><a id="linksignout" class="dropdown-item text-danger" href="javascript:;">Cerrar sesion</a></li>
             </ul>
         </li>
     </ul>
 </nav>
 <!-- End of Topbar -->
+
 <!-- Modal core base-->
 <div class="modal fade" id="coreModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">

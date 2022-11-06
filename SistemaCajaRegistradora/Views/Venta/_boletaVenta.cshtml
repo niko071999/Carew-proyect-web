@@ -12,12 +12,9 @@
                 <li>DIRECCIÓN: PJE. HERMOSO, TALCA, REGION DEL MAULE</li>
                 <li>GIRO: MINIMARKET BOTILLERÍA</li>
                 <li>TELEFONO: 9 87654321</li>
-                <li>&nbsp</li>
-                <li>&nbsp</li>
-                <li>&nbsp</li>
                 <li class="h3 fw-bold text-center">BOLETA N°: @Model.First().Venta.num_boleta</li>
                 <li class="text-center">FECHA EMISION: @Model.First().Venta.fecha_creacion.ToShortDateString()</li>
-                <li class="text-center">CAJERO: @Model.First().Venta.Usuario.nombre @Model.First().Venta.Usuario.apellido</li>
+                <li class="text-center">CAJERO: @Model.First().Venta.MovimientosCaja.Usuario.nombre @Model.First().Venta.MovimientosCaja.Usuario.apellido</li>
             </ul>
             <br />
             <br />
@@ -65,8 +62,5 @@
     $("#btn_print").click(function () {
         console.log('imprimiendo...')
         $(".modal-body").printThis();
-    });
-    $("#btn_cerrar").click(function () {
-        sessionStorage.print = false;
     });
 </script>

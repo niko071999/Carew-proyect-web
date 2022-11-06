@@ -71,21 +71,25 @@ function generarTabla1() {
         } else {
             return false;
         }
-
-        
     });
     let table = $("#tablaProducto").DataTable({
         responsive: true,
-        dom: '<"toolbar">frtp',
-        lengthMenu: [
-            [5, -1],
-            [5, 'All'],
-        ],
+        dom: 'Bfrtp',
+        order:[[3,"asc"]],
+        lengthMenu: [5],
         ajax: {
             'url': '/Producto/getProductos',
             'type': 'GET',
             'datatype': 'json'
         },
+        buttons: [
+            {
+                extend: 'excelHtml5',
+                text: '<i class="fas fa-file-excel"></i> Exportar tabla a excel',
+                className: 'btn btn-success',
+                exportOptions: { orthogonal: 'export', columns: ':visible' }
+            }
+        ],
         columnDefs: [
             {
                 target: 10,
@@ -122,7 +126,8 @@ function generarTabla1() {
                     return `<a href="javascript:void(0);" onclick="accion(3,${idProd})" data-bs-toggle="tooltip" title="Subir/Cambiar imagen">
                                <img class="rounded mx-auto d-block shadow" src="${data}" alt="Imagen del producto"
                                style="width: 100px; min-width: 100px; min-height: 50px; height: 80px;" />
-                            </a>`;
+                            </a>
+                            <span class="invisible" style="max-width: 80px;">${data}</span>`;
                 },
                 searchable: false,
                 orderable: false,
@@ -131,21 +136,25 @@ function generarTabla1() {
             { data: 'categoria' },
             {
                 data: 'precio',
-                render: function (data) {
+                render: function (data, type) {
                     let number = $.fn.dataTable.render
                         .number('.', ',', 0, '$')
                         .display(data);
-                    return number;
+                    return type === 'export' ?
+                        data.toString().replace(/[$.]/g, '') :
+                        number
                 }
             },
             {
                 data: 'stock',
-                render: function (data) {
+                render: function (data, type) {
                     sprod = data;
                     let number = $.fn.dataTable.render
                         .number('.', ',', 0)
                         .display(data);
-                    return number;
+                    return type === 'export' ?
+                        data.toString().replace(/[$.]/g, '') :
+                        number;
                 }
             },
             {
@@ -323,15 +332,6 @@ function generarTabla1() {
             url: 'https://cdn.datatables.net/plug-ins/1.12.0/i18n/es-ES.json',
         }
     });
-    //table.on('page.dt', function () {
-    //    //let page = table.page();
-    //<div class="d-grid gap-2 d-md-flex justify-content-md-center align-items-center h-100">
-    //<button class="btn btn-dark" type="button" onclick="accion(3,${id})" data-bs-toggle="tooltip" title="Editar producto">
-    //    <i class="fas fa-pen float-left"></i>
-    //</button>
-    //</div >
-        
-    //});
     table.on('draw', function () {
         $("span.invisible").hide();
         JsBarcode(".barcode").init();
@@ -344,42 +344,31 @@ function generarTabla1() {
     $("#text_viewstockmin").change(function () {
         table.draw();
     });
+    //Evento escucha cuando la se activa el metodo de exportacion
+    table.on('buttons-processing', function (e, indicator) {
+        if (indicator) {
+            table.columns([11, 12]).visible(false);
+            table.columns([0, 7, 8]).visible(true);
+        }
+        else {
+            table.columns([11, 12]).visible(true);
+            table.columns([0, 7, 8]).visible(false);
+        }
+    });
 }
+
+
 function generarTabla2() {
     $("#findTable").DataTable({
         responsive: 'true',
-        dom: '<"toolbar">frt',
+        dom: 'frt',
+        paging: false,
+        order: [[1,'asc']],
         ajax: {
             'url': '/Producto/getProductos',
             'type': 'GET',
             'datatype': 'json'
         },
-        columnDefs: [
-            {//Imagen
-                target: 0,
-                searchable: false,
-            },
-            {//Nombre
-                target: 1,
-                searchable: true,
-                orderable: true,
-            },
-            {//Precio
-                target: 2,
-                visible: true,
-                searchable: false,
-            },
-            {//stock
-                target: 3,
-                visible: true,
-                searchable: false,
-            },
-            {//Accion add
-                target: 4,
-                searchable: false,
-                orderable: false,
-            },
-        ],
         columns: [
             {
                 data: 'rutaimg',
@@ -387,9 +376,24 @@ function generarTabla2() {
                     return `<img class="rounded mx-auto d-block" src="${data}" alt="Imagen del producto"
                                     style="width: 60px; min-width: 50px; min-height: 50px; height: 50px;" />
                                 `;
-                }
+                },
+                searchable: false,
+                orderable: false,
             },
-            { data: 'nombre' },
+            {
+                data: 'nombre',
+                render: function (data) {
+                    console.log(data);
+                    return data;
+                },
+                searchable: true,
+                orderable: true,
+            },
+            {
+                data: 'categoria',
+                searchable: true,
+                orderable: true,
+            },
             {
                 data: 'precio',
                 render: function (data) {
@@ -397,7 +401,9 @@ function generarTabla2() {
                         .number('.', ',', 0, '$')
                         .display(data);
                     return number;
-                }
+                },
+                visible: true,
+                searchable: false,
             },
             {
                 data: 'stock',
@@ -407,16 +413,20 @@ function generarTabla2() {
                         .number('.', ',', 0)
                         .display(data);
                     return number;
-                }
+                },
+                visible: true,
+                searchable: false,
             },
             {
                 data: 'codigobarra',
                 render: function (data) {
-                    let codigo = data;
-                    return `<button class="btn btn-success" type="button" onclick="ingresarCodigo(${codigo})">
+                    console.log(typeof data);
+                    return `<button class="btn btn-success" type="button" onclick="ingresarCodigo('${data}')">
                                     <i class="fas fa-check"></i>
                             </button>`;
-                }
+                },
+                searchable: false,
+                orderable: false,
             }
         ],
         language: {
@@ -426,7 +436,7 @@ function generarTabla2() {
 }
 function initTooltip() {
     var tooltipList1 = [].slice.call(document.querySelectorAll('[data-bs-toggle = "tooltip"]'))
-    var tooltipList2 = tooltipList1.map(function (tooltipTriggerfun) {
+    tooltipList1.map(function (tooltipTriggerfun) {
         return new bootstrap.Tooltip(tooltipTriggerfun)
     });
 }

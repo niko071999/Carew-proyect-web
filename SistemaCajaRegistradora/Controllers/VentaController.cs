@@ -9,18 +9,18 @@ using System.Data.Entity;
 using SistemaCajaRegistradora.Filters;
 using System.Transactions;
 using Microsoft.Ajax.Utilities;
-using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using System.Web.WebPages;
 using System.Runtime.Remoting.Contexts;
-using Firebase.Auth;
+using WebGrease.Activities;
 
 namespace SistemaCajaRegistradora.Controllers
 {
     public class VentaController : Controller
     {
         private readonly ModelData db = new ModelData();
-
+        private readonly int numeroBoleta = 0;
+        
         // GET: Venta
         [HttpGet]
         [Autorizacion(idoperacion: 21)]
@@ -32,9 +32,8 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("getVentas")]
         public JsonResult getVentas()
         {
-            //db.Configuration.LazyLoadingEnabled = false;
-            var result = db.Ventas.Include(v => v.MetodoPago).Include(v => v.Usuario).ToArray();
-
+            db.Configuration.LazyLoadingEnabled = false;
+            var result = db.Ventas.Include(v => v.MetodoPago).Include(v => v.MovimientosCaja.Usuario).ToArray();
             List<vmVenta> ventas = new List<vmVenta>();
 
             foreach (var item in result)
@@ -42,12 +41,12 @@ namespace SistemaCajaRegistradora.Controllers
                 vmVenta venta = new vmVenta
                 {
                     id = item.id,
-                    cajero = item.Usuario.nombre.Trim() + " " + item.Usuario.apellido.Trim(),
+                    cajero = item.MovimientosCaja.Usuario.nombre.Trim() + " " + item.MovimientosCaja.Usuario.apellido.Trim(),
                     metodoPago = item.MetodoPago.metodo_pago.Trim(),
+                    numboleta = item.num_boleta,
                     totalVenta = item.total_venta,
                     fecha = item.fecha_creacion.ToShortDateString()
                 };
-
                 ventas.Add(venta);
             }
 
@@ -58,6 +57,7 @@ namespace SistemaCajaRegistradora.Controllers
         }
 
         [HttpGet]
+        [Autorizacion(idoperacion: 23)]
         [ActionName("getMoreDetail")]
         public PartialViewResult getMoreDetail(long? id)
         {
@@ -65,7 +65,7 @@ namespace SistemaCajaRegistradora.Controllers
             {
                 var detailVentas = db.DetalleVentas
                                     .Include(vp => vp.Producto)
-                                    .Include(vp => vp.Venta)
+                                    .Include(vp => vp.Venta.MovimientosCaja.Usuario)
                                     .Where(vp => vp.ventaid == id);
                 return PartialView("_detailVenta", detailVentas.ToList());
             }
@@ -79,9 +79,7 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("POS")]
         public ActionResult POS()
         {
-            bool check = verificarAperturaCaja();
-
-            if (check)
+            if (verificarAperturaCaja())
             {
                 return RedirectToAction("AbrirCaja");
             }
@@ -105,31 +103,41 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("AbrirCaja")]
         public ActionResult AbrirCaja(DateTime fecha, string monto, int cajas)
         {
-            if (verificarAperturaCaja())
+            //Verificar valores
+            if (fecha == null && monto.IsEmpty())
             {
-                if (fecha == null && monto.IsEmpty())
+                return RedirectToAction("AbrirCaja");
+            }
+            if (!verificarCajaUso(cajas))
+            {
+                if (verificarAperturaCaja())
                 {
-                    return RedirectToAction("AbrirCajas");
-                }
-                Usuario user = (Usuario)Session["User"];
-                monto = monto.Replace(".", "");
-                int montoapertura = Convert.ToInt32(monto);
+                    Usuario user = (Usuario)Session["User"];
+                    monto = monto.Replace(".", "");
+                    int montoapertura = Convert.ToInt32(monto);
 
-                MovimientosCaja mc = new MovimientosCaja()
-                {
-                    fecha_apertura = fecha,
-                    monto_apertura = montoapertura,
-                    cajaid = cajas,
-                    cajeroid = user.id
-                };
+                    MovimientosCaja mc = new MovimientosCaja()
+                    {
+                        fecha_apertura = fecha,
+                        monto_apertura = montoapertura,
+                        cajaid = cajas,
+                        cajeroid = user.id
+                    };
 
-                db.MovimientosCajas.Add(mc);
-                int n = db.SaveChanges();
-                if (n == 0)
-                {
-                    return RedirectToAction("AbrirCajas");
+                    db.MovimientosCajas.Add(mc);
+                    int n = db.SaveChanges();
+                    if (n == 0)
+                    {
+                        return RedirectToAction("AbrirCaja");
+                    }
                 }
             }
+            else
+            {
+                TempData["msgError"] = "La caja seleccionada esta siendo utilizada por otro cajero";
+                return RedirectToAction("AbrirCaja");
+            }
+            
             return RedirectToAction("POS");
         }
 
@@ -148,8 +156,7 @@ namespace SistemaCajaRegistradora.Controllers
             var lastMC = db.MovimientosCajas.Include(mc => mc.Usuario)
                                     .Where(mc => mc.cajeroid == user.id)
                                     .OrderByDescending(mc => mc.fecha_apertura).FirstOrDefault();
-            var ventaDia = db.Ventas.Where(v => v.cajeroid == user.id).ToArray();
-            //item.fecha_creacion.Ticks >= lastMC.fecha_apertura.Ticks && item.fecha_creacion.Ticks <= lastDate.Ticks
+            var ventaDia = db.Ventas.Where(v => v.MovimientosCaja.cajeroid == user.id).ToArray();
 
             foreach (var item in ventaDia.ToArray())
             {
@@ -182,25 +189,32 @@ namespace SistemaCajaRegistradora.Controllers
         public ActionResult CerrarCaja(DateTime fecha_cc, int total, int montoRealEfectivo, 
                                     int montoRealTransferencia, int diferencia)
         {
+
             Usuario user = (Usuario)Session["User"];
             var lastMC = db.MovimientosCajas.Include(mc => mc.Usuario)
                                     .Where(mc => mc.cajeroid == user.id)
                                     .OrderByDescending(mc => mc.fecha_apertura).FirstOrDefault();
-
-            lastMC.total_caja_real_efectivo = montoRealEfectivo;
-            lastMC.total_caja_real_transferencia = montoRealTransferencia;
-            lastMC.total_venta_diaria = total;
-            lastMC.diferencia_caja = diferencia;
-            lastMC.fecha_cierre = fecha_cc;
-
-            db.Entry(lastMC).State = EntityState.Modified;
-            int n = db.SaveChanges();
-
-            if (n != 0)
+            
+            if (lastMC.fecha_cierre == null)
             {
-                return RedirectToAction("POS");
+                lastMC.total_caja_real_efectivo = montoRealEfectivo;
+                lastMC.total_caja_real_transferencia = montoRealTransferencia;
+                lastMC.total_venta_diaria = total;
+                lastMC.diferencia_caja = diferencia;
+                lastMC.fecha_cierre = fecha_cc;
+
+                db.Entry(lastMC).State = EntityState.Modified;
+                int n = db.SaveChanges();
+
+                if (n != 0)
+                {
+                    return RedirectToAction("POS");
+                }
+                return View();
             }
-            return View();
+
+            return RedirectToAction("POS");
+
         }
 
         [HttpGet]
@@ -209,8 +223,8 @@ namespace SistemaCajaRegistradora.Controllers
         {
             Usuario user = (Usuario)Session["User"];
             var result = db.Ventas.Include(v => v.MetodoPago)
-                                .Include(v => v.Usuario)
-                                .Where(v => v.cajeroid == user.id)
+                                .Include(v => v.MovimientosCaja)
+                                .Where(v => v.MovimientosCaja.cajeroid == user.id)
                                 .OrderByDescending(v => v.fecha_creacion)
                                 .FirstOrDefault();
             if (result == null)
@@ -236,7 +250,7 @@ namespace SistemaCajaRegistradora.Controllers
         {
             Usuario user = (Usuario)Session["User"];
 
-            var result = db.Ventas.Include(v => v.MetodoPago).Include(v => v.Usuario).Where(v => v.cajeroid == user.id).ToArray();
+            var result = db.Ventas.Include(v => v.MetodoPago).Include(v => v.MovimientosCaja).Where(v => v.MovimientosCaja.cajeroid == user.id).ToArray();
 
             List<vmVenta> ventas = new List<vmVenta>();
 
@@ -245,7 +259,7 @@ namespace SistemaCajaRegistradora.Controllers
                 vmVenta venta = new vmVenta
                 {
                     id = item.id,
-                    cajero = item.Usuario.nombre.Trim() + " " + item.Usuario.apellido.Trim(),
+                    cajero = item.MovimientosCaja.Usuario.nombre.Trim() + " " + item.MovimientosCaja.Usuario.apellido.Trim(),
                     metodoPago = item.MetodoPago.metodo_pago.Trim(),
                     totalVenta = item.total_venta,
                     fecha = item.fecha_creacion.ToShortDateString()
@@ -259,6 +273,7 @@ namespace SistemaCajaRegistradora.Controllers
                 data = ventas
             }, JsonRequestBehavior.AllowGet);
         }
+
         [HttpPost]
         [ActionName("cargarProducto")]
         public JsonResult cargarProducto(Producto producto)
@@ -315,6 +330,14 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("finalizarVenta")]
         public JsonResult finalizarVenta(vmVentaDetalle ventaDetalle)
         {
+            if (verificarAperturaCaja())
+            {
+                return Json(new
+                {
+                    data = "",
+                    idventa = -1
+                }, JsonRequestBehavior.AllowGet);
+            }
             using (TransactionScope scope = new TransactionScope())
             {
                 using (ModelData db1 = new ModelData())
@@ -341,9 +364,8 @@ namespace SistemaCajaRegistradora.Controllers
 
                             //Insercion de los datos de la venta a la base de datos
                             ventaDetalle.venta.fecha_creacion = DateTime.Now;
-                            ventaDetalle.venta.cajeroid = user.id;
                             ventaDetalle.venta.movimientocajaid = lastMC.id;
-                            ventaDetalle.venta.num_boleta = length; //Generar el num de la boleta
+                            ventaDetalle.venta.num_boleta = numeroBoleta + length; //Generar el num de la boleta
                             db.Ventas.Add(ventaDetalle.venta);
                             int n = db.SaveChanges();
                             //Si ocurre un error realizar un rollback
@@ -394,7 +416,8 @@ namespace SistemaCajaRegistradora.Controllers
                         return Json(new
                         {
                             data = "",
-                            msg = msgError
+                            msg = msgError,
+                            idventa = 0
                         }, JsonRequestBehavior.AllowGet);
                     }
                 }
@@ -433,6 +456,152 @@ namespace SistemaCajaRegistradora.Controllers
 
         }
 
+        
+        [HttpGet]
+        [Autorizacion(idoperacion: 24)]
+        [ActionName("ReporteVentaDiaria")]
+        public ActionResult ReporteVentaDiaria() => View();
+
+        [HttpGet]
+        [Autorizacion(idoperacion: 25)]
+        [ActionName("getVentaDiaria")]
+        public JsonResult getVentaDiaria()
+        {
+            double totalventadiaria = 0;
+            int totalventadiariaAnterior = 0;
+            int count = 0;
+            DateTime fechaOld = new DateTime();
+
+            List<vmReporteVentaDiaria> rvdList = new List<vmReporteVentaDiaria>();
+            var ventas = db.Ventas.ToArray();
+            string fechaAux = ventas.First().fecha_creacion.ToShortDateString();
+            foreach (var venta in ventas)
+            {
+                vmReporteVentaDiaria rvd; //Reporte Venta Diaria
+                double crecimiento;
+                double porcentaje;
+                if (fechaAux.Equals(venta.fecha_creacion.ToShortDateString()))
+                {
+                    totalventadiaria += venta.total_venta;
+                    fechaOld = venta.fecha_creacion;
+                    if (ventas.Last().fecha_creacion.Equals(venta.fecha_creacion))
+                    {
+                        crecimiento = totalventadiaria - totalventadiariaAnterior;
+                        porcentaje = (crecimiento / totalventadiaria) * 100;
+                        if (count > 0)
+                        {
+                            rvd = new vmReporteVentaDiaria()
+                            {
+                                fecha = fechaOld,
+                                totalventa = Convert.ToInt32(totalventadiaria),
+                                crecimiento = Convert.ToInt32(crecimiento),
+                                porcentajeCrecimiento = porcentaje
+                            };
+                            rvdList.Add(rvd);
+                            totalventadiariaAnterior = Convert.ToInt32(totalventadiaria);
+                            totalventadiaria = 0;
+                        }
+                    }
+                }
+                else
+                {
+                    crecimiento = totalventadiaria - totalventadiariaAnterior;
+                    porcentaje = (crecimiento / totalventadiaria) * 100;
+                    if (count > 0)
+                    {
+                        rvd = new vmReporteVentaDiaria()
+                        {
+                            fecha = fechaOld,
+                            totalventa = Convert.ToInt32(totalventadiaria),
+                            crecimiento = Convert.ToInt32(crecimiento),
+                            porcentajeCrecimiento = porcentaje
+                        };
+                        rvdList.Add(rvd);
+                        totalventadiariaAnterior = Convert.ToInt32(totalventadiaria);
+                        totalventadiaria = 0;
+                    }
+                    fechaAux = venta.fecha_creacion.ToShortDateString();
+                    totalventadiaria += venta.total_venta;
+                }
+                count++;
+            }
+            return Json(new
+            {
+                data = rvdList.ToArray(),
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        [Autorizacion(idoperacion: 26)]
+        [ActionName("ReporteProductosVendidos")]
+        public ActionResult ReporteProductosVendidos() => View();
+
+        [HttpGet]
+        [Autorizacion(idoperacion: 30)]
+        [ActionName("getProductosVendidos")]
+        public JsonResult getProductosVendidos()
+        {
+            int count_pv = 0;
+            Nullable<int> precioOld = 0;
+            string codebarOld = string.Empty;
+            string nombreProdOld = string.Empty;
+            string rutaImgOld = string.Empty;
+            List<vmReporteProductosVendidos> rpvList = new List<vmReporteProductosVendidos>();
+            vmReporteProductosVendidos rpv;
+            var detallesventas = db.DetalleVentas.Include(dv => dv.Producto.Imagen).OrderBy(dv => dv.productoid).ToArray();
+            string codebar = detallesventas.First().Producto.codigo_barra.Trim();
+            foreach (var dv in detallesventas)
+            {
+                if (codebar.Equals(dv.Producto.codigo_barra.Trim()))
+                {
+                    count_pv += dv.total_cantidad_producto;
+                    codebarOld = dv.Producto.codigo_barra.Trim();
+                    nombreProdOld = dv.Producto.nombre.Trim();
+                    rutaImgOld = dv.Producto.Imagen.ruta.Trim();
+                    precioOld = dv.Producto.precio;
+                }
+                else
+                {
+                    rpv = new vmReporteProductosVendidos()
+                    {
+                        codigobarra = codebarOld,
+                        nombre_producto = nombreProdOld,
+                        ruta_imagen = rutaImgOld,
+                        precio = precioOld,
+                        cantidad_vendido = count_pv
+                    };
+                    rpvList.Add(rpv);
+                    count_pv = 0;
+                    count_pv += dv.total_cantidad_producto; 
+                }
+                codebar = dv.Producto.codigo_barra.Trim();                
+            }
+            return Json(new
+            {
+                data = rpvList.ToArray()
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        private bool verificarCajaUso(int cajas)
+        {
+            var movimientosCajas = db.MovimientosCajas.Where(mc => mc.fecha_cierre == null).ToArray();
+
+            if (movimientosCajas.Length == 0)
+            {
+                return false;
+            }
+
+            foreach (var mc in movimientosCajas)
+            {
+                if (mc.cajaid == cajas)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public bool verificarAperturaCaja()
         {
             DateTime datetime = DateTime.Now;
@@ -441,7 +610,7 @@ namespace SistemaCajaRegistradora.Controllers
                                     .Where(mc => mc.cajeroid == usuario.id)
                                     .OrderByDescending(mc => mc.fecha_apertura);
             
-            //Verificar si existe movimientos de caja de tal cajero
+            //Verificar si no existen movimientos de caja del cajero
             if (contextMCUser.FirstOrDefault() == null)
             {
                 return true;

@@ -10,6 +10,7 @@ namespace SistemaCajaRegistradora.Models.ViewModels
         public long id { get; set; }
         public string cajero { get; set; }
         public string metodoPago { get; set; }
+        public long numboleta { get; set; }
         public int totalVenta { get; set; }
         public string fecha { get; set; }
     }
