@@ -19,7 +19,7 @@ namespace SistemaCajaRegistradora.Controllers
     public class VentaController : Controller
     {
         private readonly ModelData db = new ModelData();
-        private readonly int numeroBoleta = 0;
+        private readonly int numeroBoleta = 0; //Numero de boletas
         
         // GET: Venta
         [HttpGet]
@@ -45,7 +45,7 @@ namespace SistemaCajaRegistradora.Controllers
                     metodoPago = item.MetodoPago.metodo_pago.Trim(),
                     numboleta = item.num_boleta,
                     totalVenta = item.total_venta,
-                    fecha = item.fecha_creacion.ToShortDateString()
+                    fecha = item.fecha_creacion
                 };
                 ventas.Add(venta);
             }
@@ -81,140 +81,9 @@ namespace SistemaCajaRegistradora.Controllers
         {
             if (verificarAperturaCaja())
             {
-                return RedirectToAction("AbrirCaja");
+                return RedirectToAction("AbrirCaja","MovimientoCaja");
             }
             return View();
-        }
-
-        [HttpGet]
-        [ActionName("AbrirCaja")]
-        public ActionResult AbrirCaja()
-        {
-            Usuario user = (Usuario)Session["User"];
-            var cajero = db.Usuarios.Where(u => u.id == user.id).FirstOrDefault();
-            string nombreCajero = cajero.nombre.Trim() + " " + cajero.apellido.Trim();
-            var cajas = db.Cajas.ToList();
-            ViewBag.cajero = nombreCajero;
-            ViewBag.cajas = new SelectList(cajas, "id", "num_caja");
-            return View();
-        }
-
-        [HttpPost]
-        [ActionName("AbrirCaja")]
-        public ActionResult AbrirCaja(DateTime fecha, string monto, int cajas)
-        {
-            //Verificar valores
-            if (fecha == null && monto.IsEmpty())
-            {
-                return RedirectToAction("AbrirCaja");
-            }
-            if (!verificarCajaUso(cajas))
-            {
-                if (verificarAperturaCaja())
-                {
-                    Usuario user = (Usuario)Session["User"];
-                    monto = monto.Replace(".", "");
-                    int montoapertura = Convert.ToInt32(monto);
-
-                    MovimientosCaja mc = new MovimientosCaja()
-                    {
-                        fecha_apertura = fecha,
-                        monto_apertura = montoapertura,
-                        cajaid = cajas,
-                        cajeroid = user.id
-                    };
-
-                    db.MovimientosCajas.Add(mc);
-                    int n = db.SaveChanges();
-                    if (n == 0)
-                    {
-                        return RedirectToAction("AbrirCaja");
-                    }
-                }
-            }
-            else
-            {
-                TempData["msgError"] = "La caja seleccionada esta siendo utilizada por otro cajero";
-                return RedirectToAction("AbrirCaja");
-            }
-            
-            return RedirectToAction("POS");
-        }
-
-        [HttpGet]
-        [ActionName("CerrarCaja")]
-        public ActionResult CerrarCaja()
-        {
-            int totalVentasDia = 0;
-            DateTime lastDate = DateTime.Now;
-            Usuario user = (Usuario)Session["User"];
-            
-            var cajero = db.Usuarios.Where(u => u.id == user.id).FirstOrDefault();
-            string nombreCajero = cajero.nombre.Trim() + " " + cajero.apellido.Trim();
-            ViewBag.cajero = nombreCajero;
-
-            var lastMC = db.MovimientosCajas.Include(mc => mc.Usuario)
-                                    .Where(mc => mc.cajeroid == user.id)
-                                    .OrderByDescending(mc => mc.fecha_apertura).FirstOrDefault();
-            var ventaDia = db.Ventas.Where(v => v.MovimientosCaja.cajeroid == user.id).ToArray();
-
-            foreach (var item in ventaDia.ToArray())
-            {
-                if (item.fecha_creacion.Ticks >= lastMC.fecha_apertura.Ticks && item.fecha_creacion.Ticks <= lastDate.Ticks)
-                {
-                    totalVentasDia += item.total_venta;
-                }
-            }
-
-            if (totalVentasDia == 0)
-            {
-                TempData["msgError"] = "No existe ninguna venta, al menos debe haber una venta realizada para el cierre de caja";
-                return RedirectToAction("POS");
-            }
-
-            vmCerrarCaja cc = new vmCerrarCaja()
-            {
-                totalVentaDia = totalVentasDia,
-                montoAperturaCaja = lastMC.monto_apertura,
-                total = totalVentasDia + lastMC.monto_apertura,
-                fecha_cc = lastDate,
-                fecha_ac = lastMC.fecha_apertura
-            };
-
-            return View(cc);
-        }
-
-        [HttpPost]
-        [ActionName("CerrarCaja")]
-        public ActionResult CerrarCaja(DateTime fecha_cc, int total, int montoRealEfectivo, 
-                                    int montoRealTransferencia, int diferencia)
-        {
-
-            Usuario user = (Usuario)Session["User"];
-            var lastMC = db.MovimientosCajas.Include(mc => mc.Usuario)
-                                    .Where(mc => mc.cajeroid == user.id)
-                                    .OrderByDescending(mc => mc.fecha_apertura).FirstOrDefault();
-            
-            if (lastMC.fecha_cierre == null)
-            {
-                lastMC.total_caja_real_efectivo = montoRealEfectivo;
-                lastMC.total_caja_real_transferencia = montoRealTransferencia;
-                lastMC.total_venta_diaria = total;
-                lastMC.diferencia_caja = diferencia;
-                lastMC.fecha_cierre = fecha_cc;
-
-                db.Entry(lastMC).State = EntityState.Modified;
-                int n = db.SaveChanges();
-
-                if (n != 0)
-                {
-                    return RedirectToAction("POS");
-                }
-                return View();
-            }
-
-            return RedirectToAction("POS");
-
         }
 
         [HttpGet]
@@ -262,7 +131,7 @@ namespace SistemaCajaRegistradora.Controllers
                     cajero = item.MovimientosCaja.Usuario.nombre.Trim() + " " + item.MovimientosCaja.Usuario.apellido.Trim(),
                     metodoPago = item.MetodoPago.metodo_pago.Trim(),
                     totalVenta = item.total_venta,
-                    fecha = item.fecha_creacion.ToShortDateString()
+                    fecha = item.fecha_creacion
                 };
 
                 ventas.Add(venta);
@@ -456,7 +325,6 @@ namespace SistemaCajaRegistradora.Controllers
 
         }
 
-        
         [HttpGet]
         [Autorizacion(idoperacion: 24)]
         [ActionName("ReporteVentaDiaria")]
@@ -582,27 +450,7 @@ namespace SistemaCajaRegistradora.Controllers
             }, JsonRequestBehavior.AllowGet);
         }
 
-        private bool verificarCajaUso(int cajas)
-        {
-            var movimientosCajas = db.MovimientosCajas.Where(mc => mc.fecha_cierre == null).ToArray();
-
-            if (movimientosCajas.Length == 0)
-            {
-                return false;
-            }
-
-            foreach (var mc in movimientosCajas)
-            {
-                if (mc.cajaid == cajas)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public bool verificarAperturaCaja()
+        private bool verificarAperturaCaja()
         {
             DateTime datetime = DateTime.Now;
             var usuario = (Usuario)Session["User"];

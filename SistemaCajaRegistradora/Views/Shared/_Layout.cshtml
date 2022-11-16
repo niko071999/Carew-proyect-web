@@ -67,7 +67,7 @@
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
                 <a class="nav-link" href="@Url.Action("Listar","Venta")">
-                    <i class="fas fa-money-bill-wave-alt"></i>
+                    <i class="fas fa-dollar-sign"></i>
                     <span>Gestor de ventas</span>
                 </a>
                 <a class="nav-link" href="@Url.Action("POS","Venta")">
@@ -89,8 +89,20 @@
                     <span>Reporte venta diaria</span>
                 </a>
                 <a class="nav-link" href="@Url.Action("ReporteProductosVendidos","Venta")">
-                    <i class="far fa-file"></i>
+                    <i class="far fa-file-alt"></i>
                     <span>Reporte productos mas vendidos</span>
+                </a>
+            </li>
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Modulo de caja
+            </div>
+
+            <li class="nav-item">
+                <a class="nav-link" href="@Url.Action("Listar","MovimientoCaja")">
+                    <i class="fas fa-coins"></i>
+                    <span>Movimientos de caja</span>
                 </a>
             </li>
 
@@ -148,7 +160,7 @@
             </div>
             <!-- End of Main Content -->
             <!-- Footer -->
-            <footer class="sticky-footer fixed-bottom color-carew">
+            <footer class="color-carew p-3">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto text-white">
                         <span>Copyright &copy; CAREW 2022</span>
