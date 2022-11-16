@@ -14,5 +14,6 @@ namespace SistemaCajaRegistradora.Models.ViewModels
         public string rol { get; set; }
         public bool? stateConexion { get; set; }
         public bool? solrespass { get; set; }
+
     }
 }
