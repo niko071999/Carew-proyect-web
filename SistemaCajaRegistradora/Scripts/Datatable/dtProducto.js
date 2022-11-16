@@ -96,6 +96,9 @@ function generarTabla1() {
                 render: DataTable.render.date()
             }
         ],
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.12.0/i18n/es-ES.json',
+        },
         columns: [
             {
                 data: 'id',
@@ -327,10 +330,7 @@ function generarTabla1() {
                 searchable: false,
                 orderable: false,
             }
-        ],
-        language: {
-            url: 'https://cdn.datatables.net/plug-ins/1.12.0/i18n/es-ES.json',
-        }
+        ]
     });
     table.on('draw', function () {
         $("span.invisible").hide();
@@ -357,12 +357,12 @@ function generarTabla1() {
     });
 }
 
-
 function generarTabla2() {
+    let codigo;
     $("#findTable").DataTable({
         responsive: 'true',
-        dom: 'frt',
         paging: false,
+        dom: 'frt',
         order: [[1,'asc']],
         ajax: {
             'url': '/Producto/getProductos',
@@ -370,6 +370,14 @@ function generarTabla2() {
             'datatype': 'json'
         },
         columns: [
+            {
+                data: 'codigobarra',
+                render: function (data) {
+                    codigo = data;
+                    return data;
+                },
+                visible: false
+            },
             {
                 data: 'rutaimg',
                 render: function (data) {
@@ -402,7 +410,6 @@ function generarTabla2() {
                         .display(data);
                     return number;
                 },
-                visible: true,
                 searchable: false,
             },
             {
@@ -414,14 +421,12 @@ function generarTabla2() {
                         .display(data);
                     return number;
                 },
-                visible: true,
                 searchable: false,
             },
             {
-                data: 'codigobarra',
+                data: 'id',
                 render: function (data) {
-                    console.log(typeof data);
-                    return `<button class="btn btn-success" type="button" onclick="ingresarCodigo('${data}')">
+                    return `<button class="btn btn-success" type="button" onclick="ingresarCodigo('${codigo}')">
                                     <i class="fas fa-check"></i>
                             </button>`;
                 },
