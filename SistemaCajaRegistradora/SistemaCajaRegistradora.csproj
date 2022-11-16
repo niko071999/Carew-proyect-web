@@ -269,6 +269,7 @@
     <Compile Include="Controllers\CategoriaController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MovimientoCajaController.cs" />
     <Compile Include="Controllers\ProductoController.cs" />
     <Compile Include="Controllers\SesionController.cs" />
     <Compile Include="Controllers\UsuarioController.cs" />
@@ -338,6 +339,7 @@
     </Compile>
     <Compile Include="Models\ViewModels\vmAddExistenciaProduct.cs" />
     <Compile Include="Models\ViewModels\vmCerrarCaja.cs" />
+    <Compile Include="Models\ViewModels\vmMovimientosCaja.cs" />
     <Compile Include="Models\ViewModels\vmProducto.cs" />
     <Compile Include="Models\ViewModels\vmReporteProductosVendidos.cs" />
     <Compile Include="Models\ViewModels\vmReporteVentaDiaria.cs" />
@@ -389,6 +391,7 @@
     <Content Include="Scripts\Datatable\dataTables.bootstrap5.min.js" />
     <Content Include="Scripts\Datatable\datatables.min.js" />
     <Content Include="Scripts\Datatable\dtCategoria.js" />
+    <Content Include="Scripts\Datatable\dtMC.js" />
     <Content Include="Scripts\Datatable\dtProducto.js" />
     <Content Include="Scripts\Datatable\dtRPV.js" />
     <Content Include="Scripts\Datatable\dtRVD.js" />
@@ -2249,11 +2252,12 @@
     <Content Include="Views\Venta\_boletaVenta.cshtml" />
     <Content Include="Views\Sesion\AgregarUsuarioAdmin.cshtml" />
     <Content Include="Views\Usuario\_formObtenerBarcode.cshtml" />
-    <Content Include="Views\Venta\AbrirCaja.cshtml" />
-    <Content Include="Views\Venta\CerrarCaja.cshtml" />
+    <Content Include="Views\MovimientoCaja\AbrirCaja.cshtml" />
+    <Content Include="Views\MovimientoCaja\CerrarCaja.cshtml" />
     <Content Include="Views\Producto\_formsLoadProdsCSV.cshtml" />
     <Content Include="Views\Venta\ReporteVentaDiaria.cshtml" />
     <Content Include="Views\Venta\ReporteProductosVendidos.cshtml" />
+    <Content Include="Views\MovimientoCaja\Listar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
