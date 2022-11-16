@@ -1,0 +1,106 @@
+﻿
+@{
+    ViewBag.Title = "Movimientos de caja";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Topbar  -->
+<nav class="navbar navbar-expand navbar-light bg-white mb-4 topbar shadow">
+
+    <!-- Sidebar Toggle (Topbar) -->
+    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+        <i class="fa fa-bars"></i>
+    </button>
+
+    <!-- Topbar Navbar -->
+    <!-- Topbar Navbar -->
+    <ul class="navbar-nav ml-auto">
+
+        <!-- Nav Item - User Information -->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span id="text_nameuser" class="mr-2 d-none d-md-inline text-gray-600 fw-bold">Cargando...</span>
+                <img id="img_user" class="img-profile rounded-circle img-fluid"
+                     src="~/Assets/images/blank-profile.png">
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                <li><a id="linksChangePass" class="dropdown-item" href="javascript:;">Cambiar contraseña</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a id="linksignout" class="dropdown-item text-danger" href="javascript:;">Cerrar sesion</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>
+<!-- End of Topbar -->
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="row justify-content-between">
+        <div class="col-4">
+            <h1 class="h3 mb-4 text-gray-800">@ViewBag.Title</h1>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-lg-4">
+            <label for="categoriaId" class="form-label fw-bold">Cajero</label>
+            @Html.DropDownList("cajerosid", null, "Seleccionar cajero",
+                        htmlAttributes: new { @class = "form-select" })
+        </div>
+        <div class="col-lg-4">
+            <div class="row">
+                <label for="input_desde" class="form-label text-center fw-bold">Filtro de Fecha</label>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="label_desde">Desde</span>
+                    <input id="input_desde" type="text" class="form-control" aria-describedby="label_desde">
+                    <span class="input-group-text" id="label_hasta">Hasta</span>
+                    <input id="input_hasta" type="text" class="form-control" aria-describedby="label_hasta">
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 align-self-center">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="radio_fecha" id="radio_apertura" checked value="1">
+                <label class="form-check-label" for="radio_apertura">
+                    Filtrar fecha apertura
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="radio_fecha" id="radio_cierre" value="2">
+                <label class="form-check-label" for="radio_cierre">
+                    Filtrar fecha cierre
+                </label>
+            </div>
+        </div>
+    </div>
+    <!-- table -->
+    <div class="row">
+        <div class="col-12">
+            <table id="tablaMC" class="display table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th scope="col">N° de Caja</th>
+                        <th scope="col">Monto de apertura</th>
+                        <th scope="col">Fecha de apertura</th>
+                        <th scope="col">Fecha de cierre</th>
+                        <th scope="col">Total venta diaria</th>
+                        <th scope="col">Total real efectivo</th>
+                        <th scope="col">Total real transferencias</th>
+                        <th scope="col">Diferencia</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th colspan="8" style="text-align:right">Total Diferencia:</th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- Modal core base-->
+<div class="modal fade" id="coreModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true" data-bs-backdrop="static">
+</div>
+<script src="~/Scripts/Datatable/dtMC.js"></script>
