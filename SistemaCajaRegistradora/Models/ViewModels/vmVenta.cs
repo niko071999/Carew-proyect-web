@@ -12,6 +12,6 @@ namespace SistemaCajaRegistradora.Models.ViewModels
         public string metodoPago { get; set; }
         public long numboleta { get; set; }
         public int totalVenta { get; set; }
-        public string fecha { get; set; }
+        public DateTime fecha { get; set; }
     }
 }
