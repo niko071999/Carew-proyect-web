@@ -13,8 +13,7 @@
             previous: '&lt;',
             weekdays: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
             months: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-        },
-        secondsAvailable: [00, 15, 30, 45]
+        }
     });
     
     let maxDate = new DateTime($('#text_datemax'), {
