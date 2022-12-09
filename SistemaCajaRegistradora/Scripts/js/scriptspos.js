@@ -211,7 +211,6 @@ function cargarProducto(key) {
     }
     if (key === 13 && codigo.trim() != '') {
         $.post('/Venta/cargarProducto', producto, function (data) {
-            
             let exist = false;
             if (data.codigobarra != "") {
                 if (listaVenta.length > 0) {
@@ -391,6 +390,16 @@ function formateodatos() {
         .toLocaleString('es-CL'));
 }
 function countdownInit() {
-
+    $.get('/MovimientoCaja/getFechaApertura', function (data) {
+        let fecha = new Date(data);
+        $('#div_countdown').countdown({
+            until: fecha, compact: true,
+            layout: 'Falta <b>{hnn}{sep}{mnn}{sep}{snn}</b> {desc}',
+            description: 'para cerrar la caja', onExpiry: expireTime });
+    });
+}
+function expireTime() {
+    alert("Se ha acabado el tiempo!");
+    location = location.href;
 }
 

@@ -1,4 +1,5 @@
-﻿using SistemaCajaRegistradora.Models;
+﻿using Firebase.Auth;
+using SistemaCajaRegistradora.Models;
 using SistemaCajaRegistradora.Models.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -72,6 +73,18 @@ namespace SistemaCajaRegistradora.Controllers
             {
                 movimientos = mcList.ToArray()
             }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        [ActionName("getFechaApertura")]
+        public JsonResult getFechaApertura()
+        {
+            Usuario user = (Usuario)Session["User"];
+            var lastMC = db.MovimientosCajas.Include(mc => mc.Usuario)
+                                    .Where(mc => mc.cajeroid == user.id)
+                                    .OrderByDescending(mc => mc.fecha_apertura).FirstOrDefault();
+            if (lastMC == null) return Json(null, JsonRequestBehavior.AllowGet);
+            return Json(lastMC.fecha_apertura.AddDays(1).ToString("MM-dd-yyyy HH:mm:ss"), JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
