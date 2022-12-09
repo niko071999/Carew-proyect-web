@@ -190,6 +190,7 @@
     </div>
 </div>
 
+@section jsmodal{
 <script type="text/javascript" title="scannerValidation">
     $('#codigo_barra').bind('keyup', function (e) {
         let key = e.keyCode || e.which;
@@ -302,10 +303,9 @@
         let audio = document.getElementById("audio_beep");
         audio.play();
     }
-</script>
-<script type="text/javascript" title="cleave">
-    var cleave = new Cleave( '.input-number', {
+    var cleave = new Cleave('.input-number', {
         numeral: true,
         numeralThousandsGroupStyle: 'thousand'
     });
 </script>
+}

@@ -60,33 +60,6 @@
                                 <th scope="col">Acciones</th>
                             </tr>
                         </thead>
-                        @*<tbody>
-                                @foreach (var c in Model)
-                                {
-                                    <tr>
-                                        <td class="align-middle">@c.nombre</td>
-                                        <td class="align-middle">
-                                            <div class="row">
-                                                <div class="col-12 text-truncate">
-                                                    @c.descripcion
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="align-middle">
-                                            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                                                <button class="btn btn-warning btn-icon-split" type="button" onclick="formsEditar('@Url.Action("formsEditar", "Categoria")',@c.id)">
-                                                    <span class="icon text-white-50"><i class="fas fa-pen float-left"></i></span>
-                                                    <span class="text">Editar</span>
-                                                </button>
-                                                <button class="btn btn-danger btn-icon-split" type="button" onclick="formsEliminar('@Url.Action("formsEliminar", "Categoria")', @c.id)">
-                                                    <span class="icon text-white-50"><i class="fas fa-trash float-left"></i></span>
-                                                    <span class="text">Eliminar</span>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>*@
                     </table>
                 </div>
             </div>
@@ -111,11 +84,12 @@
         }
     </div>
 </div>
-<!-- /.container-fluid -->
 <!-- Modal core base-->
 <div class="modal fade" id="coreModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
 
 </div>
+@section js{
 <script src="~/Scripts/js/scriptsCategoria.js"></script>
 <script src="~/Scripts/Datatable/dtCategoria.js"></script>
+}

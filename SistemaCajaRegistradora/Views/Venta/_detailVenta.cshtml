@@ -62,7 +62,9 @@
         </div>
     </div>
 </div>
+@section jsmodal{
 <script type="text/javascript">
     $("td.precio").each(function () { $(this).html(parseFloat($(this).text()).toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })); });
     $("td.numero").each(function () { $(this).html(parseFloat($(this).text()).toLocaleString('es-CL')); });
 </script>
+}

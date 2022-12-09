@@ -363,15 +363,14 @@
     <Content Include="Content\css\boleta.css" />
     <Content Include="Content\css\bootstrap.min.css" />
     <Content Include="Content\css\jquery.countdown.css" />
-    <Content Include="Content\css\sb-admin-2.css" />
     <Content Include="Content\css\sb-admin-2.min.css" />
     <Content Include="Content\Datatable\buttons.bootstrap5.min.css" />
     <Content Include="Content\Datatable\dataTables.bootstrap5.min.css" />
+    <Content Include="Content\Datatable\dataTables.dateTime.min.css" />
     <Content Include="Content\Datatable\datatables.min.css" />
     <Content Include="Content\Datatable\responsive.bootstrap5.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
-    <Content Include="Content\Site.css" />
     <EntityDeploy Include="Models\ModelData.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>ModelData.Designer.cs</LastGenOutput>
@@ -390,7 +389,9 @@
       <DependentUpon>ModelData.edmx</DependentUpon>
       <LastGenOutput>ModelData.cs</LastGenOutput>
     </Content>
+    <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\Datatable\dataTables.bootstrap5.min.js" />
+    <Content Include="Scripts\Datatable\dataTables.dateTime.min.js" />
     <Content Include="Scripts\Datatable\datatables.min.js" />
     <Content Include="Scripts\Datatable\dtCategoria.js" />
     <Content Include="Scripts\Datatable\dtMC.js" />
@@ -399,32 +400,44 @@
     <Content Include="Scripts\Datatable\dtRVD.js" />
     <Content Include="Scripts\Datatable\dtUsuario.js" />
     <Content Include="Scripts\Datatable\dtVenta.js" />
+    <Content Include="Scripts\Datatable\Exports\buttons.bootstrap5.min.js" />
+    <Content Include="Scripts\Datatable\Exports\buttons.colVis.min.js" />
+    <Content Include="Scripts\Datatable\Exports\buttons.html5.min.js" />
+    <Content Include="Scripts\Datatable\Exports\buttons.print.min.js" />
+    <Content Include="Scripts\Datatable\Exports\dataTables.buttons.min.js" />
+    <Content Include="Scripts\Datatable\Exports\jszip.min.js" />
+    <Content Include="Scripts\Datatable\Exports\pdfmake.min.js" />
+    <Content Include="Scripts\Datatable\Exports\vfs_fonts.js" />
     <Content Include="Scripts\Datatable\jquery.dataTables.min.js" />
     <Content Include="Scripts\Datatable\moment.min.js" />
     <Content Include="Scripts\Datatable\responsive.bootstrap5.min.js" />
+    <Content Include="Scripts\Firebase\firebase-app.js" />
+    <Content Include="Scripts\Firebase\firebase-storage.js" />
     <Content Include="Scripts\jquery-3.5.1.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\JsBarcode.all.min.js" />
     <Content Include="Scripts\js\alertmenssages.js" />
     <Content Include="Scripts\js\aperturacajascript.js" />
     <Content Include="Scripts\js\cerrarcajascript.js" />
-    <Content Include="Scripts\js\jquery.countdown-es.js" />
-    <Content Include="Scripts\js\jquery.countdown.min.js" />
-    <Content Include="Scripts\js\jquery.plugin.min.js" />
+    <Content Include="Scripts\cleave.min.js" />
+    <Content Include="Scripts\jquery.countdown-es.js" />
+    <Content Include="Scripts\jquery.countdown.min.js" />
+    <Content Include="Scripts\jquery.plugin.min.js" />
     <Content Include="Scripts\js\loginscripts.js" />
     <Content Include="Scripts\js\printThis.js" />
     <Content Include="Scripts\js\scriptsCategoria.js" />
     <Content Include="Scripts\js\scriptsFirstOpen.js" />
     <Content Include="Scripts\js\scriptspos.js" />
     <Content Include="Scripts\js\scriptsProductos.js" />
-    <Content Include="Scripts\js\sb-admin-2.js" />
     <Content Include="Scripts\js\sb-admin-2.min.js" />
     <Content Include="Scripts\js\scriptsUsuarios.js" />
     <Content Include="Scripts\js\scriptVenta.js" />
     <Content Include="Scripts\js\usersesion.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Scripts\sweetalert2.11.js" />
     <Content Include="Scripts\vendor\fontawesome-free\attribution.js" />
     <Content Include="Scripts\vendor\fontawesome-free\css\all.css" />
     <Content Include="Scripts\vendor\fontawesome-free\css\all.min.css" />
