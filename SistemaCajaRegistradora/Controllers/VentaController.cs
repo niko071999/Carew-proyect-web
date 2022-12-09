@@ -86,7 +86,7 @@ namespace SistemaCajaRegistradora.Controllers
             if (verificarCierreCaja())
             {
                 TempData["mensaje"] = "Han pasado 24 horas desde la apertura de caja, se debe cerrar obligatoriamente";
-                return RedirectToAction("CierreCaja", "MovimientoCaja");
+                return RedirectToAction("CerrarCaja", "MovimientoCaja");
             }
             return View();
         }
@@ -499,15 +499,14 @@ namespace SistemaCajaRegistradora.Controllers
         {
             DateTime hoy = DateTime.Now;
             var usuario = (Usuario)Session["User"];
-            var contextMCUser = db.MovimientosCajas.Include(mc => mc.Usuario)
-                                    .Where(mc => mc.cajeroid == usuario.id)
+            var contextMCUser = db.MovimientosCajas.Where(mc => mc.cajeroid == usuario.id)
                                     .OrderByDescending(mc => mc.fecha_apertura);
 
             var mov = contextMCUser.FirstOrDefault();
+            if (mov == null) 
+                return false;
 
-            if (mov == null) return false;
-
-            return hoy >= mov.fecha_apertura;
+            return hoy >= mov.fecha_apertura.AddDays(1);
         }
     }
 }
