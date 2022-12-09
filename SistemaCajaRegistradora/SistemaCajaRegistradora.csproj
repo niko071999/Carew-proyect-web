@@ -338,6 +338,7 @@
       <DependentUpon>ModelData.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ViewModels\vmAddExistenciaProduct.cs" />
+    <Compile Include="Models\ViewModels\vmAmountItems.cs" />
     <Compile Include="Models\ViewModels\vmCerrarCaja.cs" />
     <Compile Include="Models\ViewModels\vmMovimientosCaja.cs" />
     <Compile Include="Models\ViewModels\vmProducto.cs" />
@@ -388,6 +389,7 @@
       <DependentUpon>ModelData.edmx</DependentUpon>
       <LastGenOutput>ModelData.cs</LastGenOutput>
     </Content>
+    <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\Datatable\dataTables.bootstrap5.min.js" />
     <Content Include="Scripts\Datatable\datatables.min.js" />
     <Content Include="Scripts\Datatable\dtCategoria.js" />
@@ -400,6 +402,8 @@
     <Content Include="Scripts\Datatable\jquery.dataTables.min.js" />
     <Content Include="Scripts\Datatable\moment.min.js" />
     <Content Include="Scripts\Datatable\responsive.bootstrap5.min.js" />
+    <Content Include="Scripts\Firebase\firebaseapp.js" />
+    <Content Include="Scripts\Firebase\firebasestorage.js" />
     <Content Include="Scripts\jquery-3.5.1.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
