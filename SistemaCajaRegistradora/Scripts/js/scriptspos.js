@@ -160,6 +160,7 @@ function init() {
     $("#input_montoRecibido").val(0);
     disabledSwitch(true);
 
+    countdownInit()
     formateodatos();
 }
 
@@ -348,7 +349,6 @@ function quitarProducto(codigoProd) {
     } else {
         listaVenta = listaVenta.filter((item) => item.codigobarra != codigoProd);
         $('#bodyTable').empty();
-
         drawTable();
     }
 }
@@ -389,5 +389,8 @@ function formateodatos() {
     $("td.numero").each(function () { $(this).html(parseFloat($(this).text()).toLocaleString('es-CL')); });
     $("#input_montoRecibido").val(parseFloat($("#input_montoRecibido").val().replace(/[$.]/g, ''))
         .toLocaleString('es-CL'));
+}
+function countdownInit() {
+
 }
 
