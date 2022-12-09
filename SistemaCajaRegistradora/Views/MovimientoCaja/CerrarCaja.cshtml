@@ -38,27 +38,37 @@
             <h1 class="h3 mb-4 text-gray-800">@ViewBag.Title</h1>
         </div>
     </div>
+    @if (TempData["mensaje"] != null)
+    {
+        <div class="alert alert-danger d-flex align-items-center alert-dismissible fade show" role="alert">
+            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill" /></svg>
+            <div>
+                @TempData["mensaje"]
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
     <form id="form_closecaja" action="@Url.Action("CerrarCaja","MovimientoCaja")" method="post">
         <div class="row">
             <div class="col-lg-6">
                 <div class="mb-3 row">
                     <label for="staticDateA" class="col-sm-3 col-form-label fw-bold">Fecha de apertura:</label>
                     <div class="col-sm-9">
-                        <input type="text" name="fecha_ac" readonly class="form-control" 
+                        <input type="text" name="fecha_ac" readonly class="form-control"
                                aria-label="readonly input example" id="staticDateA" value="@Model.fecha_ac">
                     </div>
                 </div>
                 <div class="mb-3 row">
                     <label for="staticDateC" class="col-sm-3 col-form-label fw-bold">Fecha de cierre:</label>
                     <div class="col-sm-9">
-                        <input type="text" name="fecha_cc" readonly class="form-control" 
+                        <input type="text" name="fecha_cc" readonly class="form-control"
                                aria-label="readonly input example" id="staticDateC" value="@Model.fecha_cc">
                     </div>
                 </div>
                 <div class="mb-3 row">
                     <label for="staticCajero" class="col-sm-3 col-form-label fw-bold">Nombre cajero:</label>
                     <div class="col-sm-9">
-                        <input type="text" readonly class="form-control" 
+                        <input type="text" readonly class="form-control"
                                aria-label="readonly input example" id="staticCajero" value="@ViewBag.cajero">
                     </div>
                 </div>
