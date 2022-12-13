@@ -10,6 +10,7 @@ namespace SistemaCajaRegistradora.Models.ViewModels
         public string amountProd { get; set; }
         public string amountCategoria { get; set; }
         public string totalVentas { get; set; }
+        public string amountVentas { get; set; }
         public string amountUsuarios { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿@{
+﻿@model SistemaCajaRegistradora.Models.ViewModels.vmAmountItems
+@{
     ViewBag.Title = "Inicio";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -23,18 +24,172 @@
     </ul>
 </nav>
 <!-- End of Topbar -->
+<!-- Begin Page Content -->
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <h1 class="h3 mb-4 text-gray-800">@ViewBag.Title</h1>
+    <div class="row">
+        <div class="col-lg-8 col-sm-12">
+            <div class="row">
+                <!-- Productos -->
+                <div class="col-lg-4 col-sm-12 mb-4">
+                    <a class="text-decoration-none" href="@Url.Action("Listar","Producto")">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Productos
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.amountProd</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-cube fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <!-- Categorias -->
+                <div class="col-lg-4 col-sm-12 mb-4">
+                    <a class="text-decoration-none" href="@Url.Action("Listar","Categoria")">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Categorias
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.amountCategoria</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-tags fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <!-- Usuarios -->
+                <div class="col-lg-4 col-sm-12 mb-4">
+                    <a class="text-decoration-none" href="@Url.Action("Listar","Usuario")">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Usuarios
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.amountUsuarios</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <!-- Punto de venta -->
+                <div class="col-lg-4 col-sm-12 mb-4">
+                    <a class="text-decoration-none" href="@Url.Action("POS","Venta")">
+                        <div class="card border-left-secondary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">Punto de venta</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-cash-register fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <!-- Reportes -->
+                <div class="col-lg-4 col-sm-12 mb-4 dropdown">
+                    <a id="dropdown_reportes" class="text-decoration-none" href="#"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="card border-left-secondary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">Reportes</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class=""></i>
+                                        <i class="fas fa-file-invoice fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdown_reportes">
+                        <li>
+                            <a class="dropdown-item" href="@Url.Action("ReporteVentaDiaria","Venta")">
+                                Reporte de venta diaria
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="@Url.Action("ReporteProductosVendidos","Venta")">
+                                Reporte de productos mas vendidos
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Movimientos Caja -->
+                <div class="col-lg-4 col-sm-12 mb-4">
+                    <a class="text-decoration-none" href="@Url.Action("Listar","MovimientoCaja")">
+                        <div class="card border-left-secondary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">Movimientos de Caja</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-12 mb-4">
+            <a class="text-decoration-none" href="@Url.Action("Listar","Venta")">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Ventas
+                                </div>
+                                <div class="h5 font-weight-bold text-gray-800 mb-4">Total: @Model.totalVentas</div>
+                                <hr class="sidebar-divider my-0">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mt-4">
+                                    Numero de ventas
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.amountVentas</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-dollar-sign fa-4x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
 
 <!-- Modal core base-->
 <div class="modal fade" id="coreModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
      aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
 
 </div>
-
-<!-- Begin Page Content -->
-<div class="container-fluid">
-    <!-- Page Heading -->
-    <h1 class="h3 mb-4 text-gray-800">@ViewBag.Title</h1>
-</div>
 @section js{
-<script src="~/Scripts/js/usersesion.js"></script>
+    <script src="~/Scripts/js/usersesion.js"></script>
 }
