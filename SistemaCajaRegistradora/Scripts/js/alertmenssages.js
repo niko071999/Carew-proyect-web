@@ -30,3 +30,13 @@
         sessionStorage.clear();
     }
 });
+
+function loadingModal(mensaje, loading) {
+    if (loading) {
+        $("#loadingModal").show();
+        $("#text_mensaje").text(mensaje);
+    } else {
+        $("#loadingModal").hide();
+    }
+    
+}
