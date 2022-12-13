@@ -8,11 +8,6 @@ using System.Web.Mvc;
 using System.Data.Entity;
 using SistemaCajaRegistradora.Filters;
 using System.Transactions;
-using Microsoft.Ajax.Utilities;
-using System.Text.RegularExpressions;
-using System.Web.WebPages;
-using System.Runtime.Remoting.Contexts;
-using WebGrease.Activities;
 
 namespace SistemaCajaRegistradora.Controllers
 {
@@ -393,6 +388,7 @@ namespace SistemaCajaRegistradora.Controllers
                         totalventadiariaAnterior = Convert.ToInt32(totalventadiaria);
                         totalventadiaria = 0;
                     }
+                    fechaOld = venta.fecha_creacion;
                     fechaAux = venta.fecha_creacion.ToShortDateString();
                     totalventadiaria += venta.total_venta;
                 }
