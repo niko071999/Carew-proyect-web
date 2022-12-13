@@ -18,144 +18,152 @@
           rel="stylesheet">
 </head>
 <body id="page-top">
+    <div class="preloader-wrapper">
+        <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <h4 class="text-light ms-4"><span class="align-middle">Cargando el sistema CAREW</span></h4>
+    </div>
     <audio id="audio_beep" controls>
         <source src="~/Assets/audio/beep.wav" />
     </audio>
     <!-- Page Wrapper -->
-    <div id="wrapper">
-        <!-- Sidebar -->
-        <ul class="navbar-nav color-carew sidebar sidebar-dark accordion" id="accordionSidebar">
+    <div id="app" style="display:none">
+        <div id="wrapper">
+            <!-- Sidebar -->
+            <ul class="navbar-nav color-carew sidebar sidebar-dark accordion" id="accordionSidebar">
 
-            <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="@Url.Action("Index","Home")">
-                <div class="sidebar-brand-icon">
-                    <img class="img-fluid" src="~/Assets/logo/logo-web-carew.jpg" />
-                </div>
-            </a>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
-
-            <!-- Nav Item - Dashboard -->
-            <li class="nav-item">
-                <a class="nav-link" href="@Url.Action("Index","Home")">
-                    <i class="fa fa-home"></i>
-                    <span>Inicio</span>
-                </a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Modulo de venta
-            </div>
-
-            <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link" href="@Url.Action("Listar","Venta")">
-                    <i class="fas fa-dollar-sign"></i>
-                    <span>Gestor de ventas</span>
-                </a>
-                <a class="nav-link" href="@Url.Action("POS","Venta")">
-                    <i class="fas fa-cash-register"></i>
-                    <span>Punto de venta</span>
-                </a>
-            </li>
-
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Reportes de venta
-            </div>
-
-            <li class="nav-item">
-                <a class="nav-link" href="@Url.Action("ReporteVentaDiaria","Venta")">
-                    <i class="far fa-file"></i>
-                    <span>Reporte venta diaria</span>
-                </a>
-                <a class="nav-link" href="@Url.Action("ReporteProductosVendidos","Venta")">
-                    <i class="far fa-file-alt"></i>
-                    <span>Reporte productos mas vendidos</span>
-                </a>
-            </li>
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Modulo de caja
-            </div>
-
-            <li class="nav-item">
-                <a class="nav-link" href="@Url.Action("Listar","MovimientoCaja")">
-                    <i class="fas fa-coins"></i>
-                    <span>Movimientos de caja</span>
-                </a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Modulo de producto
-            </div>
-
-            <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link" href="@Url.Action("Listar","Producto")">
-                    <i class="fas fa-cube"></i>
-                    <span>Gestor productos</span>
-                </a>
-                <a class="nav-link" href="@Url.Action("Listar","Categoria")">
-                    <i class="fa fa-tags"></i>
-                    <span>Gestor categorias</span>
-                </a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Modulo de usuario
-            </div>
-
-            <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link" href="@Url.Action("Listar","Usuario")">
-                    <i class="fas fa-user"></i>
-                    <span>Gestor usuarios</span>
-                </a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
-
-            <!-- Sidebar Toggler (Sidebar) -->
-            <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
-            </div>
-
-        </ul>
-        <!-- End of Sidebar -->
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
-            <!-- Main Content -->
-            <div id="content">
-                @RenderBody()
-            </div>
-            <!-- End of Main Content -->
-            <!-- Footer -->
-            <footer class="color-carew p-3">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto text-white">
-                        <span>Copyright &copy; CAREW 2022</span>
+                <!-- Sidebar - Brand -->
+                <a class="sidebar-brand d-flex align-items-center justify-content-center" href="@Url.Action("Index","Home")">
+                    <div class="sidebar-brand-icon">
+                        <img class="img-fluid" src="~/Assets/logo/logo-web-carew.jpg" />
                     </div>
+                </a>
+
+                <!-- Divider -->
+                <hr class="sidebar-divider my-0">
+
+                <!-- Nav Item - Dashboard -->
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Index","Home")">
+                        <i class="fa fa-home"></i>
+                        <span>Inicio</span>
+                    </a>
+                </li>
+
+                <!-- Divider -->
+                <hr class="sidebar-divider">
+
+                <!-- Heading -->
+                <div class="sidebar-heading">
+                    Modulo de venta
                 </div>
-            </footer>
-            <!-- End of Footer -->
+
+                <!-- Nav Item - Pages Collapse Menu -->
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Listar","Venta")">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>Gestor de ventas</span>
+                    </a>
+                    <a class="nav-link" href="@Url.Action("POS","Venta")">
+                        <i class="fas fa-cash-register"></i>
+                        <span>Punto de venta</span>
+                    </a>
+                </li>
+
+                <hr class="sidebar-divider">
+
+                <!-- Heading -->
+                <div class="sidebar-heading">
+                    Reportes de venta
+                </div>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("ReporteVentaDiaria","Venta")">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        <span>Reporte venta diaria</span>
+                    </a>
+                    <a class="nav-link" href="@Url.Action("ReporteProductosVendidos","Venta")">
+                        <i class="far fa-file-alt"></i>
+                        <span>Reporte productos mas vendidos</span>
+                    </a>
+                </li>
+
+                <!-- Heading -->
+                <div class="sidebar-heading">
+                    Modulo de caja
+                </div>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Listar","MovimientoCaja")">
+                        <i class="fas fa-coins"></i>
+                        <span>Movimientos de caja</span>
+                    </a>
+                </li>
+
+                <!-- Divider -->
+                <hr class="sidebar-divider">
+
+                <!-- Heading -->
+                <div class="sidebar-heading">
+                    Modulo de producto
+                </div>
+
+                <!-- Nav Item - Pages Collapse Menu -->
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Listar","Producto")">
+                        <i class="fas fa-cube"></i>
+                        <span>Gestor productos</span>
+                    </a>
+                    <a class="nav-link" href="@Url.Action("Listar","Categoria")">
+                        <i class="fa fa-tags"></i>
+                        <span>Gestor categorias</span>
+                    </a>
+                </li>
+
+                <!-- Divider -->
+                <hr class="sidebar-divider">
+
+                <!-- Heading -->
+                <div class="sidebar-heading">
+                    Modulo de usuario
+                </div>
+
+                <!-- Nav Item - Pages Collapse Menu -->
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Listar","Usuario")">
+                        <i class="fas fa-users"></i>
+                        <span>Gestor usuarios</span>
+                    </a>
+                </li>
+
+                <!-- Divider -->
+                <hr class="sidebar-divider d-none d-md-block">
+
+                <!-- Sidebar Toggler (Sidebar) -->
+                <div class="text-center d-none d-md-inline">
+                    <button class="rounded-circle border-0" id="sidebarToggle"></button>
+                </div>
+
+            </ul>
+            <!-- End of Sidebar -->
+            <!-- Content Wrapper -->
+            <div id="content-wrapper" class="d-flex flex-column">
+                <!-- Main Content -->
+                <div id="content">
+                    @RenderBody()
+                </div>
+                <!-- End of Main Content -->
+                <!-- Footer -->
+                <footer class="color-carew p-3">
+                    <div class="container my-auto">
+                        <div class="copyright text-center my-auto text-white">
+                            <span>Copyright &copy; CAREW 2022</span>
+                        </div>
+                    </div>
+                </footer>
+                <!-- End of Footer -->
+            </div>
         </div>
     </div>
     <!-- End of Content Wrapper -->

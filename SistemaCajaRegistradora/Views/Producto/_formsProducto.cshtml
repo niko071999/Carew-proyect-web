@@ -189,123 +189,120 @@
         </div>
     </div>
 </div>
-
-@section jsmodal{
 <script type="text/javascript" title="scannerValidation">
-    $('#codigo_barra').bind('keyup', function (e) {
-        let key = e.keyCode || e.which;
-        let codigo = document.getElementById("codigo_barra").value;
-        console.log(codigo);
-        if (key === 13) {
-            playBeep();
-            if (codigo != '') {
-                generarBarcode(codigo);
-                verificar(codigo);
-            }
-        }
-    });
-
-    $('#btnVerificar').click(function () {
-        let codigo = document.getElementById("codigo_barra").value;
-        if (codigo != '') {
-            generarBarcode(codigo);
-            let existCodigo = true;
-            existCodigo = verificar(codigo);
-            if (!existCodigo) {
-                let mensaje = 'El codigo de barra es el mismo'
-                showMenssage('success', mensaje, true);
-            }
-        }
-    });
-
-    function generarBarcode(codigo) {
-        try {
-            $("#barcode").show();
-            JsBarcode("#barcode", codigo, {
-                format: "EAN13",
-                width: 3,
-            });
-            $("#texto_infocodigobarra").hide();
-        } catch (e) {
-            let mensaje = 'El codigo de barra ingresado no es valido'
-            console.error('El codigo de barra no es valido: ' + e);
-            $("#barcode").hide();
-            $("#texto_infocodigobarra").show();
-            showMenssage('error', mensaje, true);
-        }
-    }
-
-    function verificar(codigo) {
-        var codigo = document.getElementById("codigo_barra").value;
-        return getDataProduct(codigo);
-    }
-
-    function getDataProduct(codigo) {
-        var producto = {
-            "id": 0,
-            "codigo_barra": codigo,
-            "nombre": 'test',
-            "precio": 0,
-            "stock": 1,
-            "stockmin": 0,
-            "stockmax": 0,
-            "fecha_creacion": null,
-            "prioridadid": 0,
-            "categoriaid": 0,
-            "rutaImg": 'test'
-        };
-        $.post('@Url.Action("addExistencias", "Producto")', producto, function (data) {
-            if (data.codigobarra != '') {
-                console.log('data.codigobarra !=', data.codigobarra);
-                if (data.codigobarra !== sessionStorage.codigobarrainit) {
-                    console.log('data.codigobarra == sessionStorage.codigobarrainit ELSE', data.codigobarra.length, sessionStorage.codigobarrainit.length);
-                    let mensaje = 'El codigo de barra esta siendo usado por otro producto, ¿Quieres abrir el agregador de existencias?'
-                    showMenssage('warning', mensaje, false);
-                    sessionStorage.codigo = data.codigobarra;
-                    return true;
-                } else {
-                    return false;
+        $('#codigo_barra').bind('keyup', function (e) {
+            let key = e.keyCode || e.which;
+            let codigo = document.getElementById("codigo_barra").value;
+            console.log(codigo);
+            if (key === 13) {
+                playBeep();
+                if (codigo != '') {
+                    generarBarcode(codigo);
+                    verificar(codigo);
                 }
-            } else {
-                console.log('data.codigobarra != ELSE');
-                let mensaje = 'El codigo no esta siendo utilizado por otro producto';
-                showMenssage('success', mensaje, true);
-                let inputs = [{ nombre: 'codigo_barra' },{ nombre: 'nombre' }, { nombre: 'categoriaId' }, { nombre: 'precio' },
-                    { nombre: 'stock' }, { nombre: 'stockmin' }, { nombre: 'stockmax' }, { nombre: 'prioridadId' }]
-                for (let i = 0; i < inputs.length; i++) {
-                    let input = document.getElementById(inputs[i].nombre);
-                    if (i != 0) {
-                        input.disabled = false;
-                    } else {
-                        let btn_verificar = document.getElementById('btnVerificar');
-                        btn_verificar.disabled = true;
-                        input.disabled = true;
-                    }                    
-                }
-                return false;
             }
         });
-    }
 
-    function verificarOpcion(opcion) {
-        if (opcion) {
-            $('#coreModal').modal('hide');
-            var myCollapse = document.getElementById('addExistenciasPanel');
-            var bsCollapse = new bootstrap.Collapse(myCollapse, {
-                hide: true,
-            });
-            $('#codigoAdd').val(sessionStorage.codigo);
-            sessionStorage.clear();
+        $('#btnVerificar').click(function () {
+            let codigo = document.getElementById("codigo_barra").value;
+            if (codigo != '') {
+                generarBarcode(codigo);
+                let existCodigo = true;
+                existCodigo = verificar(codigo);
+                if (!existCodigo) {
+                    let mensaje = 'El codigo de barra es el mismo'
+                    showMenssage('success', mensaje, true);
+                }
+            }
+        });
+
+        function generarBarcode(codigo) {
+            try {
+                $("#barcode").show();
+                JsBarcode("#barcode", codigo, {
+                    format: "EAN13",
+                    width: 3,
+                });
+                $("#texto_infocodigobarra").hide();
+            } catch (e) {
+                let mensaje = 'El codigo de barra ingresado no es valido'
+                console.error('El codigo de barra no es valido: ' + e);
+                $("#barcode").hide();
+                $("#texto_infocodigobarra").show();
+                showMenssage('error', mensaje, true);
+            }
         }
-    }
 
-    function playBeep() {
-        let audio = document.getElementById("audio_beep");
-        audio.play();
-    }
-    var cleave = new Cleave('.input-number', {
-        numeral: true,
-        numeralThousandsGroupStyle: 'thousand'
-    });
+        function verificar(codigo) {
+            var codigo = document.getElementById("codigo_barra").value;
+            return getDataProduct(codigo);
+        }
+
+        function getDataProduct(codigo) {
+            var producto = {
+                "id": 0,
+                "codigo_barra": codigo,
+                "nombre": 'test',
+                "precio": 0,
+                "stock": 1,
+                "stockmin": 0,
+                "stockmax": 0,
+                "fecha_creacion": null,
+                "prioridadid": 0,
+                "categoriaid": 0,
+                "rutaImg": 'test'
+            };
+            $.post('@Url.Action("addExistencias", "Producto")', producto, function (data) {
+                if (data.codigobarra != '') {
+                    console.log('data.codigobarra !=', data.codigobarra);
+                    if (data.codigobarra !== sessionStorage.codigobarrainit) {
+                        console.log('data.codigobarra == sessionStorage.codigobarrainit ELSE', data.codigobarra.length, sessionStorage.codigobarrainit.length);
+                        let mensaje = 'El codigo de barra esta siendo usado por otro producto, ¿Quieres abrir el agregador de existencias?'
+                        showMenssage('warning', mensaje, false);
+                        sessionStorage.codigo = data.codigobarra;
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    console.log('data.codigobarra != ELSE');
+                    let mensaje = 'El codigo no esta siendo utilizado por otro producto';
+                    showMenssage('success', mensaje, true);
+                    let inputs = [{ nombre: 'codigo_barra' },{ nombre: 'nombre' }, { nombre: 'categoriaId' }, { nombre: 'precio' },
+                        { nombre: 'stock' }, { nombre: 'stockmin' }, { nombre: 'stockmax' }, { nombre: 'prioridadId' }]
+                    for (let i = 0; i < inputs.length; i++) {
+                        let input = document.getElementById(inputs[i].nombre);
+                        if (i != 0) {
+                            input.disabled = false;
+                        } else {
+                            let btn_verificar = document.getElementById('btnVerificar');
+                            btn_verificar.disabled = true;
+                            input.disabled = true;
+                        }
+                    }
+                    return false;
+                }
+            });
+        }
+
+        function verificarOpcion(opcion) {
+            if (opcion) {
+                $('#coreModal').modal('hide');
+                var myCollapse = document.getElementById('addExistenciasPanel');
+                var bsCollapse = new bootstrap.Collapse(myCollapse, {
+                    hide: true,
+                });
+                $('#codigoAdd').val(sessionStorage.codigo);
+                sessionStorage.clear();
+            }
+        }
+
+        function playBeep() {
+            let audio = document.getElementById("audio_beep");
+            audio.play();
+        }
+        var cleave = new Cleave('.input-number', {
+            numeral: true,
+            numeralThousandsGroupStyle: 'thousand'
+        });
 </script>
-}

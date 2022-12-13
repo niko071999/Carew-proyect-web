@@ -19,6 +19,8 @@ form_opencaja.addEventListener('submit', function (e) {
     }).then((result) => {
         if (result.isConfirmed) {
             form_opencaja.submit();
+        } else {
+            e.stopImmediatePropagation();
         }
     });
 })

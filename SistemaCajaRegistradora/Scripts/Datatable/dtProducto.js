@@ -48,7 +48,9 @@ function generarTabla1() {
         if (count == lengh) {
             count = 0;
         }
-
+        //console.log(list_smin);
+        //console.log('Minimo: ' + smn);
+        //console.log('Stock: ' + data[6]);
         if (check) {
             if (smn > data[6]) {
                 if ((isNaN(min) && isNaN(max)) ||
@@ -113,7 +115,7 @@ function generarTabla1() {
             {
                 data: 'codigobarra',
                 render: function (data) {
-                    return `<a href="javascript:void(0);" onclick="descargarBarcode(${data})" data-bs-toggle="tooltip" title="Descargar codigo de barra">
+                    return `<a href="javascript:void(0);" onclick="descargarBarcode('${data}')" data-bs-toggle="tooltip" title="Descargar codigo de barra">
                                 <canvas id="${data}_barcode" class="barcode mx-auto d-block"
                                         jsbarcode-format="ean13" jsbarcode-value="${data}"
                                         style="width: 100%; min-width: 100px; min-height: 50px; height: 80px;">
@@ -145,7 +147,7 @@ function generarTabla1() {
                         .display(data);
                     return type === 'export' ?
                         data.toString().replace(/[$.]/g, '') :
-                        number
+                        number;
                 }
             },
             {
@@ -164,7 +166,7 @@ function generarTabla1() {
                 data: 'stockmin',
                 render: function (data) {
                     smin = data;
-                    list_smin.push(smin);
+                    list_smin.push(data);
                     return data;
                 },
                 visible: false,
@@ -344,6 +346,12 @@ function generarTabla1() {
     $("#text_viewstockmin").change(function () {
         table.draw();
     });
+    //table.on('xhr.dt', function (e, settings, json, xhr) {
+    //    console.log(json.data);
+    //    for (var i = 0, ien = json.aaData.length; i < ien; i++) {
+            
+    //    }
+    //})
     //Evento escucha cuando la se activa el metodo de exportacion
     table.on('buttons-processing', function (e, indicator) {
         if (indicator) {

@@ -70,7 +70,7 @@
         ],
         responsive: true,
         dom: 'Brtp',
-        lengthMenu: [6],
+        lengthMenu: [8],
         ajax: {
             'url': '/Venta/getVentaDiaria',
             'type': 'GET',

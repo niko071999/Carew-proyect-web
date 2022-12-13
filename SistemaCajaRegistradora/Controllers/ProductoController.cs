@@ -1,6 +1,4 @@
-﻿using Firebase.Storage;
-using Firebase.Auth;
-using SistemaCajaRegistradora.Filters;
+﻿using SistemaCajaRegistradora.Filters;
 using SistemaCajaRegistradora.Models;
 using SistemaCajaRegistradora.Models.ViewModels;
 using System;
@@ -8,11 +6,8 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Web;
-using System.Web.Helpers;
 using System.Web.Mvc;
-using System.Threading;
 using System.Transactions;
 
 namespace SistemaCajaRegistradora.Controllers
@@ -39,6 +34,7 @@ namespace SistemaCajaRegistradora.Controllers
             var result = db.Productos.Include(p => p.Categoria)
                                     .Include(p => p.Prioridade)
                                     .Include(p => p.Imagen)
+                                    .OrderBy(p => p.nombre)
                                     .ToArray();
 
             List<vmProducto> productos = new List<vmProducto>();
