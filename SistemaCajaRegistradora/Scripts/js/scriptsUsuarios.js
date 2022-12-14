@@ -83,14 +83,16 @@ function formsEditar(urlEditarForms, id) {
     });
 }
 function editarUsuario(urlEditar) {
-    var idusuario = $('#id').val()
+    var idusuario = $('#id').val();
     var nombre = $('#inputname').val();
     var apellido = $('#inputapellido').val();
     var nombreUsuario = $('#nombreUsuario').val();
     var clave = $('#clave').val();
     var rolid = $('#rolid').val();
-    var rutaImg = $('#rutaImg').val();
+    var imagenid = $('#imagenid').val();
     var solrespass = $('#solrespass').val();
+    var fecha_creacion = $('#fecha_creacion').val();
+    var conectado = $('#conectado').val();
 
     let isValidCampo = true;
     isValidCampo = validarCampos(nombre, apellido, nombreUsuario, clave);
@@ -102,10 +104,11 @@ function editarUsuario(urlEditar) {
             "apellido": apellido,
             "nombreUsuario": nombreUsuario,
             "clave": clave,
-            "rutaImg": rutaImg,
+            "imagenid": imagenid,
             "rolid": rolid,
+            "conectado": conectado,
             "solrespass": solrespass,
-            "fecha_creacion": null,
+            "fecha_creacion": fecha_creacion,
             "fecha_modifiacion": null
         }
         $.post(urlEditar + '/', usuario, function (data) {

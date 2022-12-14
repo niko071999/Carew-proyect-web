@@ -8,13 +8,8 @@ using System.Data.Entity;
 using System.Text.RegularExpressions;
 using System.Text;
 using SistemaCajaRegistradora.Filters;
-using System.Security.Claims;
-using System.Threading;
-using System.Web.WebPages;
 using System.Transactions;
-using System.Web.Helpers;
 using SistemaCajaRegistradora.Models.ViewModels;
-using System.Collections;
 
 namespace SistemaCajaRegistradora.Controllers
 {
@@ -108,6 +103,9 @@ namespace SistemaCajaRegistradora.Controllers
         [Autorizacion(idoperacion: 15)]
         public JsonResult editarUsuario(Usuario usuario)
         {
+            if (usuario.conectado == null)
+                usuario.conectado = true;
+
             usuario.fecha_modificacion = DateTime.UtcNow;
             db.Entry(usuario).State = EntityState.Modified;
             int n = db.SaveChanges();

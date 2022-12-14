@@ -27,7 +27,6 @@
                                 style="width: 80px; min-width: 50px; min-height: 50px; height: 80px;" />
                             </a>`
                 },
-                visible: false,
                 searchable: false,
                 orderable: false
             },

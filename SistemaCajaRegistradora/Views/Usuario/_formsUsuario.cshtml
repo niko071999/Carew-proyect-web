@@ -25,6 +25,7 @@
                 @Html.HiddenFor(model => model.rolid)
                 @Html.HiddenFor(model => model.fecha_creacion)
                 @Html.HiddenFor(model => model.fecha_modificacion)
+                @Html.HiddenFor(model => model.conectado)
                 <div class="col-6">
                     <label id="text_nombre" class="form-label">Nombre</label>
                     @Html.TextBoxFor(model => model.nombre, new
@@ -46,7 +47,6 @@
                    })
                 </div>
                 <div class="col-6">
-                    @Html.HiddenFor(model => model.id)
                     <label id="text_nombreUsuario" class="form-label">Nombre de usuario</label>
                     @Html.TextBoxFor(model => model.nombreUsuario, new
                    {
