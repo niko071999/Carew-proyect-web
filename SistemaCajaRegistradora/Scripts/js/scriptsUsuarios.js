@@ -264,6 +264,43 @@ function subirImagenU(urlSubirIMG) {
         }
     );    
 }
+function restablecerImagenU(url) {
+    const swal = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-success',
+            cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+    });
+    swal.fire({
+        title: 'Restablecer Imagen',
+        text: '¿Seguro de restablecer la imagen a la predeterminada?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Si',
+        cancelButtonText: 'No',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post(url, function (data) {
+                switch (data.status) {
+                    case 'error':
+                        showMenssage('error', data.mensaje, true);
+                        break;
+                    case 'success':
+                        eliminarImagenStorageU(data.nameFileOld);
+                        sessionStorage.clear();
+                        sessionStorage.mensaje = data.mensaje;
+                        location = location.href;
+                        break;
+                    default:
+                        alert('ERROR INNESPERADO!');
+                }
+            });
+        }
+        return;
+    });
+}
 function eliminarImagenStorageU(namefile) {
     if (storageRef == undefined) {
         storageRef = firebase.storage().ref();
@@ -445,7 +482,7 @@ const showMenssage = (type, mensaje, toast) => {
                 verificarOpcion(true)
             }
             return;
-        })
+        });
     }
     console.log('Type not found')
 }

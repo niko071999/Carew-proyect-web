@@ -473,6 +473,43 @@ function subirImagenP(url) {
         }
     );
 }
+function restablecerImagenP(url) {
+    const swal = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-success',
+            cancelButton: 'btn btn-danger'
+        },
+        buttonsStyling: false
+    });
+    swal.fire({
+        title: 'Restablecer Imagen',
+        text: '¿Seguro de restablecer la imagen a la predeterminada?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Si',
+        cancelButtonText: 'No',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post(url, function (data) {
+                switch (data.status) {
+                    case 'error':
+                        showMenssage('error', data.mensaje, true);
+                        break;
+                    case 'success':
+                        eliminarImagenStorageP(data.nameFileOld);
+                        sessionStorage.clear();
+                        sessionStorage.mensaje = data.mensaje;
+                        location = location.href;
+                        break;
+                    default:
+                        alert('ERROR INNESPERADO!');
+                }
+            });
+        }
+        return;
+    });
+}
 function eliminarImagenStorageP(namefile) {
     if (storageRef == undefined) {
         storageRef = firebase.storage().ref();

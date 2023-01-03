@@ -117,49 +117,45 @@ namespace SistemaCajaRegistradora.Controllers
                 string line = string.Empty;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    if (!string.IsNullOrEmpty(row))
-                    {
-                        int idPrioridad = 0;
-                        int idCategoria = 0;
+                    int idPrioridad = 0;
+                    int idCategoria = 0;
                     if (row_count > 0)
-                        {
+                    {
                         var producto = line.Split(';');
-                            bool checkCod = verificarCodigoBarra(codigosProd, producto[0]);
-                            if (!checkCod)//Si no existe el codigo de barra, se sigue como tal el proceso
+                        bool checkCod = verificarCodigoBarra(codigosProd, producto[0]);
+                        if (!checkCod)//Si no existe el codigo de barra, se sigue como tal el proceso
+                        {
+                            if (isNumber(producto))
                             {
-                                if (isNumber(producto))
+                                idPrioridad = obtenerPrioridadId(producto);
+                                idCategoria = obtenerCategoriaId(producto);
+                                Producto p = new Producto()
                                 {
-                                    idPrioridad = obtenerPrioridadId(producto);
-                                    idCategoria = obtenerCategoriaId(producto);
-
-                                    Producto p = new Producto()
-                                    {
-                                        codigo_barra = producto[0].ToString(),
-                                        nombre = producto[1].ToString(),
-                                        precio = Convert.ToInt32(producto[2]),
-                                        stock = Convert.ToInt32(producto[3]),
-                                        stockmin = Convert.ToInt32(producto[4]),
-                                        stockmax = Convert.ToInt32(producto[5]),
-                                        prioridadid = idPrioridad,
-                                        categoriaid = idCategoria,
-                                        imagenid = 1,
-                                        fecha_creacion = DateTime.Now,
-                                        fecha_modificacion = DateTime.Now
-                                    };
-                                    db.Productos.Add(p);
-                                }
-                                else
-                                {
-                                errorProd.Add(producto[0] + " - " + producto[1] + "\n");
-                                }
+                                    codigo_barra = producto[0].ToString(),
+                                    nombre = producto[1].ToString(),
+                                    precio = Convert.ToInt32(producto[2]),
+                                    stock = Convert.ToInt32(producto[3]),
+                                    stockmin = Convert.ToInt32(producto[4]),
+                                    stockmax = Convert.ToInt32(producto[5]),
+                                    prioridadid = idPrioridad,
+                                    categoriaid = idCategoria,
+                                    imagenid = 1,
+                                    fecha_creacion = DateTime.Now,
+                                    fecha_modificacion = DateTime.Now
+                                };
+                                db.Productos.Add(p);
                             }
                             else
                             {
-                            prodRepetidos.Add(producto[0] + " - " + producto[1] + "\n");
-                            }                           
+                                errorProd.Add(producto[0] + " - " + producto[1] + "\n");
+                            }
                         }
-                    row_count++;
+                        else
+                        {
+                            prodRepetidos.Add(producto[0] + " - " + producto[1] + "\n");
+                        }
                     }
+                    row_count++;
                 }
                 n = db.SaveChanges();
                 if (n == 0)
@@ -237,6 +233,35 @@ namespace SistemaCajaRegistradora.Controllers
             Session["idProducto"] = id;
             var producto = db.Productos.Where(p=>p.id==id).FirstOrDefault();
             return PartialView("_formsImagen", producto);
+        }
+
+        [HttpPost]
+        [ActionName("restablecerImagen")]
+        public JsonResult restablecerImagen()
+        {
+            int n = 0;
+            int id = (int)Session["idProducto"];
+            var producto = db.Productos.Include(p => p.Imagen).FirstOrDefault(p => p.id == id);
+            if (producto == null)
+            {
+                return Json(new
+                {
+                    n,
+                    status = "error",
+                    mensaje = "El dato es incorrecto"
+                }, JsonRequestBehavior.AllowGet);
+            }
+            string nameFileOld = producto.Imagen.nombre;
+            producto.imagenid = 1;
+            db.Entry(producto).State = EntityState.Modified;
+            n = db.SaveChanges();
+            return Json(new
+            {
+                n,
+                nameFileOld,
+                status = "success",
+                mensaje = "Se ha restablecido la imagen"
+            }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -494,8 +519,6 @@ namespace SistemaCajaRegistradora.Controllers
             db.SaveChanges();
             return categoria.id;
         }
-
-
     }
 }
 

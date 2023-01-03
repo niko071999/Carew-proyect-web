@@ -103,9 +103,11 @@ namespace SistemaCajaRegistradora.Controllers
         [Autorizacion(idoperacion: 15)]
         public JsonResult editarUsuario(Usuario usuario)
         {
-            if (usuario.conectado == null)
+            Usuario u = (Usuario)Session["User"];
+            if (usuario.id == u.id)
+            {
                 usuario.conectado = true;
-
+            }
             usuario.fecha_modificacion = DateTime.UtcNow;
             db.Entry(usuario).State = EntityState.Modified;
             int n = db.SaveChanges();
@@ -280,6 +282,35 @@ namespace SistemaCajaRegistradora.Controllers
                     }
                 }
             }
+        }
+
+        [HttpPost]
+        [ActionName("restablecerImagen")]
+        public JsonResult restablecerImagen()
+        {
+            int n = 0;
+            int id = (int)Session["idUser"];
+            var usuario = db.Usuarios.Include(u => u.Imagen).FirstOrDefault(u => u.id == id);
+            if (usuario == null)
+            {
+                return Json(new
+                {
+                    n,
+                    status = "error",
+                    mensaje = "El dato es incorrecto"
+                }, JsonRequestBehavior.AllowGet);
+            }
+            string nameFileOld = usuario.Imagen.nombre;
+            usuario.imagenid = 2;
+            db.Entry(usuario).State = EntityState.Modified;
+            n = db.SaveChanges();
+            return Json(new
+            {
+                n,
+                nameFileOld,
+                status = "success",
+                mensaje = "Se ha restablecido la imagen"
+            }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
