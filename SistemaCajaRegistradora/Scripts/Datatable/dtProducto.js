@@ -48,9 +48,6 @@ function generarTabla1() {
         if (count == lengh) {
             count = 0;
         }
-        //console.log(list_smin);
-        //console.log('Minimo: ' + smn);
-        //console.log('Stock: ' + data[6]);
         if (check) {
             if (smn > data[6]) {
                 if ((isNaN(min) && isNaN(max)) ||
@@ -341,17 +338,11 @@ function generarTabla1() {
     });
     // Event listener to the two range filtering inputs to redraw on input
     $('#text_preciomin, #text_preciomax').keyup(function () {
-        table.draw();
+        table.order(3,'asc').draw();
     });
     $("#text_viewstockmin").change(function () {
-        table.draw();
+        table.order(3,'asc').draw();
     });
-    //table.on('xhr.dt', function (e, settings, json, xhr) {
-    //    console.log(json.data);
-    //    for (var i = 0, ien = json.aaData.length; i < ien; i++) {
-            
-    //    }
-    //})
     //Evento escucha cuando la se activa el metodo de exportacion
     table.on('buttons-processing', function (e, indicator) {
         if (indicator) {

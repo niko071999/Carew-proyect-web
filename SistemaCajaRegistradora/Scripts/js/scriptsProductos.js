@@ -134,7 +134,10 @@ function drawList() {
                     <button type="button" class="btn-close" aria-label="Close" onclick="quitarItem(${lista[i].codigobarra})"></button>
                 </li>`
         );
-        $('#codigoAdd').val('');
+        let check = $("#clean_codigo").prop('checked') ? true : false;
+        if (check) {
+            $('#codigoAdd').val('');
+        }
         $('#codigoAdd').focus();
         $('#stockProd').val(1);
     }
@@ -614,62 +617,62 @@ function cargarProdsFile(urlLoadProds) {
         () => {
             // Upload completed successfully, now we can get the download URL
             uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-    var dataForm = new FormData();
+                var dataForm = new FormData();
                 dataForm.append('downloadURL', downloadURL);
-    $.ajax({
-        url: urlLoadProds,
-        type: 'POST',
-        data: dataForm,
-        contentType: false,
-        processData: false,
-        success: function (data) {
+                $.ajax({
+                    url: urlLoadProds,
+                    type: 'POST',
+                    data: dataForm,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
                         eliminarDocumentoStorage(nameFile);
-            if (data.errorProd.length > 0 || data.prodRepetidos.length > 0) {
-                for (var i = 0; i < data.errorProd.length; i++) {
-                    msgErrorProd = msgErrorProd + data.errorProd[i] + '\n';
-                }
-                for (var i = 0; i < data.prodRepetidos.length; i++) {
-                    msgProdRep = msgProdRep + data.prodRepetidos[i] + '\n';
-                }
-                Swal.fire({
-                    title: 'Hubieron errores con los siguientes productos',
-                    text: msgErrorProd+msgProdRep,
-                    icon: 'info',
-                    confirmButtonColor: '#3085d6',
-                    confirmButtonText: 'Esta bien',
-                    width: 900
-                }).then(() => {
-                    switch (data.status) {
-                        case 'success':
-                            sessionStorage.clear();
-                            sessionStorage.mensaje = data.msg;
-                            location = location.href;
-                            break;
-                        case 'error':
-                            showMenssage('error', data.msg, true);
-                        default:
-                    }
+                        if (data.errorProd.length > 0 || data.prodRepetidos.length > 0) {
+                            for (var i = 0; i < data.errorProd.length; i++) {
+                                msgErrorProd = msgErrorProd + data.errorProd[i] + '\n';
+                            }
+                            for (var i = 0; i < data.prodRepetidos.length; i++) {
+                                msgProdRep = msgProdRep + data.prodRepetidos[i] + '\n';
+                            }
+                            Swal.fire({
+                                title: 'Hubieron errores con los siguientes productos',
+                                text: msgErrorProd+msgProdRep,
+                                icon: 'info',
+                                confirmButtonColor: '#3085d6',
+                                confirmButtonText: 'Esta bien',
+                                width: 900
+                            }).then(() => {
+                                switch (data.status) {
+                                    case 'success':
+                                        sessionStorage.clear();
+                                        sessionStorage.mensaje = data.msg;
+                                        location = location.href;
+                                        break;
+                                    case 'error':
+                                        showMenssage('error', data.msg, true);
+                                    default:
+                                }
+                            });
+                        } else {
+                            switch (data.status) {
+                                case 'success':
+                                    sessionStorage.clear();
+                                    sessionStorage.mensaje = data.msg;
+                                    location = location.href;
+                                    break;
+                                case 'error':
+                                    showMenssage('error', data.msg, true);
+                                default:
+                            }
+                        }
+                    },
+                    error: function (data) {
+                        data.mensaje = "Error: La imagen no se a cambiado o no se a subido al servidor";
+                        showMenssage('error', mensaje, true);
+                    },
                 });
-            } else {
-                switch (data.status) {
-                    case 'success':
-                        sessionStorage.clear();
-                        sessionStorage.mensaje = data.msg;
-                        location = location.href;
-                        break;
-                    case 'error':
-                        showMenssage('error', data.msg, true);
-                    default:
-                }
-            }
-        },
-        error: function (data) {
-            data.mensaje = "Error: La imagen no se a cambiado o no se a subido al servidor";
-            showMenssage('error', mensaje, true);
-        },
-    });
             });
-}
+        }
     );
 }
 
