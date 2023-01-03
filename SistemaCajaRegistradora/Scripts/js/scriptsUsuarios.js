@@ -55,7 +55,8 @@ function AgregarUsuario(urlAgregar) {
             "rolid": null,
             "solrespass": solrespass,
             "fecha_creacion": null,
-            "fecha_modifiacion": null
+            "fecha_modifiacion": null,
+            "conectado": false
         }
         $.post(urlAgregar + '/', usuario, function (data) {
             if (data > 0) {
@@ -109,7 +110,8 @@ function editarUsuario(urlEditar) {
             "conectado": conectado,
             "solrespass": solrespass,
             "fecha_creacion": fecha_creacion,
-            "fecha_modifiacion": null
+            "fecha_modifiacion": null,
+            "conectado": false
         }
         $.post(urlEditar + '/', usuario, function (data) {
             if (data > 0) {

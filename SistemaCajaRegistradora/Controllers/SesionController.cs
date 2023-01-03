@@ -89,7 +89,7 @@ namespace SistemaCajaRegistradora.Controllers
                     return View();
                 }
                 Session["User"] = usuario;
-                if (!(bool)usuario.conectado)
+                if (!(bool)usuario.conectado || usuario.conectado == null)
                 {
                     //Cambiamos la variable conectado a true
                     usuario.conectado = true;

@@ -30,7 +30,7 @@ namespace SistemaCajaRegistradora.Models
         public Nullable<bool> solrespass { get; set; }
         public Nullable<System.DateTime> fecha_creacion { get; set; }
         public Nullable<System.DateTime> fecha_modificacion { get; set; }
-        public Nullable<bool> conectado { get; set; }
+        public bool conectado { get; set; }
     
         public virtual Imagen Imagen { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

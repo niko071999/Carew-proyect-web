@@ -128,7 +128,7 @@
           <Property Name="solrespass" Type="bit" />
           <Property Name="fecha_creacion" Type="datetime" />
           <Property Name="fecha_modificacion" Type="datetime" />
-          <Property Name="conectado" Type="bit" />
+          <Property Name="conectado" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="Ventas">
           <Key>
@@ -536,7 +536,7 @@
           <Property Name="solrespass" Type="Boolean" />
           <Property Name="fecha_creacion" Type="DateTime" Precision="3" />
           <Property Name="fecha_modificacion" Type="DateTime" Precision="3" />
-          <Property Name="conectado" Type="Boolean" />
+          <Property Name="conectado" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Imagen" Relationship="Self.FK_Usuarios_Imagen" FromRole="Usuarios" ToRole="Imagen" />
           <NavigationProperty Name="MovimientosCajas" Relationship="Self.FK_MovimientosCajas_Usuarios" FromRole="Usuarios" ToRole="MovimientosCajas" />
           <NavigationProperty Name="Role" Relationship="Self.FK_Usuarios_Roles" FromRole="Usuarios" ToRole="Roles" />
