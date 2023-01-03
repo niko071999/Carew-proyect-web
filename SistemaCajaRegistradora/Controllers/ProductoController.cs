@@ -9,6 +9,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Transactions;
+using System.Net;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 
 namespace SistemaCajaRegistradora.Controllers
 {
@@ -98,7 +100,7 @@ namespace SistemaCajaRegistradora.Controllers
 
         [HttpPost]
         [ActionName("SubirProductosCSV")]
-        public JsonResult SubirProductosCSV(HttpPostedFileBase csv)
+        public JsonResult SubirProductosCSV(string downloadURL)
         {
             List<string> errorProd = new List<string>();
             List<string> prodRepetidos = new List<string>();
@@ -106,20 +108,22 @@ namespace SistemaCajaRegistradora.Controllers
             var codigosProd = db.Productos.Select(p => p.codigo_barra).ToArray();
 
             int n = 0;
-            int i = 0;
-            if (csv != null)
+            int row_count = 0;
+            if (!string.IsNullOrEmpty(downloadURL))
             {
-                string filepath = configDirectory(csv);
-                string csvData = System.IO.File.ReadAllText(filepath);
-                foreach (string row in csvData.Split('\n'))
+                WebClient client = new WebClient();
+                string csvData = client.DownloadString(downloadURL);
+                StringReader reader = new StringReader(csvData);
+                string line = string.Empty;
+                while ((line = reader.ReadLine()) != null)
                 {
                     if (!string.IsNullOrEmpty(row))
                     {
                         int idPrioridad = 0;
                         int idCategoria = 0;
-                        if (i!=0)
+                    if (row_count > 0)
                         {
-                            var producto = row.Split(';');
+                        var producto = line.Split(';');
                             bool checkCod = verificarCodigoBarra(codigosProd, producto[0]);
                             if (!checkCod)//Si no existe el codigo de barra, se sigue como tal el proceso
                             {
@@ -146,15 +150,15 @@ namespace SistemaCajaRegistradora.Controllers
                                 }
                                 else
                                 {
-                                    errorProd.Add(producto[0]+" - "+ producto[1]+"\n");
+                                errorProd.Add(producto[0] + " - " + producto[1] + "\n");
                                 }
                             }
                             else
                             {
-                                prodRepetidos.Add(producto[0] + " - "+ producto[1]+"\n");
+                            prodRepetidos.Add(producto[0] + " - " + producto[1] + "\n");
                             }                           
                         }
-                        i++;
+                    row_count++;
                     }
                 }
                 n = db.SaveChanges();

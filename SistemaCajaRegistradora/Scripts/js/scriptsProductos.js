@@ -487,6 +487,20 @@ function eliminarImagenStorageP(namefile) {
         showMenssage('error', mensaje, true);
     });
 }
+function eliminarDocumentoStorage(namefile) {
+    if (storageRef == undefined) {
+        storageRef = firebase.storage().ref();
+    }
+    var docsRef = storageRef.child('documento');
+    var docRef = docsRef.child(namefile);
+    docRef.delete().then(() => {
+        console.log('documento eliminado');
+    }).catch((error) => {
+        console.error(error);
+        let mensaje = 'Ocurrio un error al eliminar el documento';
+        showMenssage('error', mensaje, true);
+    });
+}
 function formsEliminar(urlFormsEliminar, id) {
     $.get(urlFormsEliminar + '/' + id, function (data) {
         abrirModal(data);
@@ -521,12 +535,50 @@ function cargarProdsForms(url) {
     });
 }
 function cargarProdsFile(urlLoadProds) {
-    var inputArchivoId = document.getElementById('idArchivo');
-    var archivo = inputArchivoId.files[0];
+    let inputArchivoId = document.getElementById('idArchivo');
+    let archivo = inputArchivoId.files[0];
+    let nameFile = Date.now().toString() + '_docsvTEMP';
+
+    // Create a root reference
+    storageRef = firebase.storage().ref();
+
+    // Create a reference
+    var uploadTask = storageRef.child('documento')
+        .child(nameFile)
+        .put(archivo);
+
+    uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
+        (snapshot) => {
+            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log('Upload is ' + progress + '% done');
+            console.log(snapshot.state);
+            switch (snapshot.state) {
+                case firebase.storage.TaskState.PAUSED: // or 'paused'
+                    console.log('Upload is paused');
+                    break;
+                case firebase.storage.TaskState.RUNNING: // or 'running'
+                    console.log('Upload is running');
+                    break;
+            }
+        },
+        (error) => {
+            switch (error.code) {
+                case 'storage/canceled':
+                    alert('Se ha cancelado la subida del documento');
+                    console.error('La carga a sido cancelada');
+                    break;
+                case 'storage/unknown':
+                    alert('Ha ocurrido un error desconocido');
+                    console.error('A ocurrido un error desconocido');
+                    break;
+            }
+        },
+        () => {
+            // Upload completed successfully, now we can get the download URL
+            uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
     var dataForm = new FormData();
-    dataForm.append("csv", archivo);
-    let msgErrorProd = "Productos con errores en sus datos:\n";
-    let msgProdRep = "Productos con su codigo de barra ya registrados en la base de datos:\n"; 
+                dataForm.append('downloadURL', downloadURL);
     $.ajax({
         url: urlLoadProds,
         type: 'POST',
@@ -534,7 +586,7 @@ function cargarProdsFile(urlLoadProds) {
         contentType: false,
         processData: false,
         success: function (data) {
-            console.log(data);
+                        eliminarDocumentoStorage(nameFile);
             if (data.errorProd.length > 0 || data.prodRepetidos.length > 0) {
                 for (var i = 0; i < data.errorProd.length; i++) {
                     msgErrorProd = msgErrorProd + data.errorProd[i] + '\n';
@@ -579,6 +631,9 @@ function cargarProdsFile(urlLoadProds) {
             showMenssage('error', mensaje, true);
         },
     });
+            });
+}
+    );
 }
 
 const validarCamposPro = (codigo_barra, nombre, prioridadid, categoriaid) => {
