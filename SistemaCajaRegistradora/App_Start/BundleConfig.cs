@@ -82,7 +82,7 @@ namespace SistemaCajaRegistradora
                         "~/Scripts/Datatable/Exports/buttons.html5.min.js",
                         "~/Scripts/Datatable/Exports/buttons.print.min.jss"));
 
-            //BundleTable.EnableOptimizations = true;
+            BundleTable.EnableOptimizations = false;
 
         }
     }
