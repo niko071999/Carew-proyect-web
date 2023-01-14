@@ -60,9 +60,5 @@
 <script type="text/javascript">
     $("td.precio").each(function () { $(this).html(parseFloat($(this).text()).toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })); });
     $("td.numero").each(function () { $(this).html(parseFloat($(this).text()).toLocaleString('es-CL')); });
-    $("#btn_print").click(function () {
-        console.log('imprimiendo...')
-        $(".modal-body").printThis();
-    });
 </script>
 }
