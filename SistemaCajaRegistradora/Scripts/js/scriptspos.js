@@ -45,7 +45,6 @@ $("#btn_print").click(function () {
 
 function imprimirLastSales() {
     $.get('/Venta/ultimaVenta', function (data) {
-        console.log(data);
         let msg = '';
         if (data.data == 0) {
             msg = data.msg;
@@ -54,8 +53,8 @@ function imprimirLastSales() {
             let idventa = data.data;
             msg = data.msg;
             showMenssage('success', msg, true);
-            console.log(data);
             $.get('/Venta/viewBoletaVenta/' + idventa, function (data) {
+                sessionStorage.print = true;
                 abrirModal(data);
             });
         }
@@ -125,7 +124,6 @@ function finalizarVenta() {
                 let idventa = data.idventa;
                 msg = data.msg;
                 showMenssage('success', msg, true);
-                console.log(data);
                 $.get('/Venta/viewBoletaVenta/' + idventa, function (data) {
                     sessionStorage.print = true;
                     abrirModal(data);
@@ -133,14 +131,6 @@ function finalizarVenta() {
             }
         },
         error: function (data) {
-            console.log(data);
-        }
-    });
-}
-
-function getMiVentas() {
-    $.get('/Venta/getMiVentas/', function (data) {
-        if (data != null) {
             console.log(data);
         }
     });
@@ -304,7 +294,6 @@ function drawTable() {
     totalvuelto = totalPagado - precioPagar;
     $("#cantidadTotalProd").html(cantidadtotalprod);
     $("#precioTotalPagar").html(precioPagar);
-    //$("#totalPagado").html(totalpagado);
     if (totalvuelto >= 0) {
         $("#totalVuelto").html(totalvuelto);
     } else {
