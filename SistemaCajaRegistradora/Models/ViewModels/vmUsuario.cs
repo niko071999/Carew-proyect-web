@@ -14,6 +14,15 @@ namespace SistemaCajaRegistradora.Models.ViewModels
         public string rol { get; set; }
         public bool? stateConexion { get; set; }
         public bool? solrespass { get; set; }
+        
+        public vmUsuario()
+        {
+        }
 
+        public vmUsuario(int id, string nombreCajero)
+        {
+            this.id = id;
+            this.nombreCajero = nombreCajero;
+        }
     }
 }
