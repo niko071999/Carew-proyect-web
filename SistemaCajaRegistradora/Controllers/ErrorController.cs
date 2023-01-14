@@ -9,13 +9,7 @@ namespace SistemaCajaRegistradora.Controllers
     public class ErrorController : Controller
     {
         // GET: Error
-        public ActionResult ErrorAutorizacion()
-        {
-            return View();
-        }
-        public ActionResult Error404()
-        {
-            return View();
-        }
+        public ActionResult ErrorAutorizacion() => View();
+        public ActionResult Error404() => View();
     }
 }

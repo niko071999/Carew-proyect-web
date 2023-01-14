@@ -19,51 +19,47 @@ namespace SistemaCajaRegistradora.Controllers
         {
             try
             {
-                var contextUsuarios = db.Usuarios.Include(u => u.Role);
-                var usuarios = contextUsuarios.ToArray();
+                var contextUsuarios = db.Usuarios.Include(u => u.Role).ToArray();
+                var usuarios = contextUsuarios;
                 //Verificar si existen usuarios en el sistema
                 if (usuarios.Length == 0)
                 {
                     //Si no existen enviar a la vista de bienvenida y creacion de usuarios administrador
                     return RedirectToAction("AgregarUsuarioAdmin");
                 }
-                if (Session["User"] != null)
+                if (Session["User"] == null)
                 {
-                    Usuario user = (Usuario)Session["User"];
-                    //CAMBIAR ATRIBUTO CONECTADO A TRUE
-                    var usuario = contextUsuarios.Where(u => u.id == user.id).FirstOrDefault();
-                    if (!(bool)usuario.conectado)
-                    {
-                        usuario.conectado = true;
-                        db.Entry(usuario).State = EntityState.Modified;
-                        db.SaveChanges();
-                    }
-
-                    if (user.rolid == 1)
-                    {
-                        if (usuario != null)
-                        {
-                            return RedirectToAction("Index", "Home");
-                        }
-                    }
-                    else if (user.rolid == 2)
-                    {
-                        if (usuario != null)
-                        {
-                            return RedirectToAction("POS", "Venta");
-                        }
-                    }
-                    else
-                    {
-                        return Content("Error, Rol de id no existe o el usuario no existe");
-                    }
+                    return View();
                 }
-                return View();
+                Usuario user = (Usuario)Session["User"];
+                //CAMBIAR ATRIBUTO CONECTADO A TRUE
+                var usuario = contextUsuarios.FirstOrDefault(u => u.id == user.id);
+                if (!usuario.conectado)
+                {
+                    usuario.conectado = true;
+                    db.Entry(usuario).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+
+                string msgError = "Error, Rol de id no existe o el usuario no existe";
+                switch (user.rolid)
+                {
+                    case 1:
+                        if (usuario == null) return Content(msgError);
+                        return RedirectToAction("Index", "Home");
+                    case 2:
+                        if (usuario == null) return Content(msgError);
+                        return RedirectToAction("POS", "Venta");
+                    default:
+                        Session["User"] = null;
+                        ViewBag.Error = "Hubo un error al validar el rol del usuario";
+                        return RedirectToAction("Login", "Sesion");
+                }
             }
             catch (Exception)
             {
+                return View();
             }
-            return View();
         }
 
         [HttpPost]
@@ -71,9 +67,7 @@ namespace SistemaCajaRegistradora.Controllers
         public ActionResult Login(string user, string clave)
         {
             user = user.Trim();
-            clave = clave.Trim();
-            clave = Encrypt.GetSHA256(clave);
-
+            clave = Encrypt.GetSHA256(clave.Trim());
             try
             {
                 var usuario = db.Usuarios.Include(u => u.Imagen).Where(u => u.nombreUsuario == user && u.clave == clave).FirstOrDefault();
@@ -89,7 +83,7 @@ namespace SistemaCajaRegistradora.Controllers
                     return View();
                 }
                 Session["User"] = usuario;
-                if (!(bool)usuario.conectado || usuario.conectado == null)
+                if (!usuario.conectado)
                 {
                     //Cambiamos la variable conectado a true
                     usuario.conectado = true;
@@ -98,19 +92,18 @@ namespace SistemaCajaRegistradora.Controllers
                 }
 
                 //Reedireccionamiento de los usuarios a los diferentes modulos
-                if (usuario.rolid == 1)
+                switch (usuario.rolid)
                 {
-                    return RedirectToAction("Index", "Home");
+                    case 1:
+                        return RedirectToAction("Index", "Home");
+                    case 2:
+                        return RedirectToAction("POS", "Venta");
+                    default:
+                        Session["User"] = null;
+                        ViewBag.Error = "Hubo un error al validar el rol del usuario";
+                        return RedirectToAction("Login", "Sesion");
                 }
-                else if (usuario.rolid == 2)    
-                {
-                    return RedirectToAction("POS", "Venta");
-                }
-                else
-                {
-                    return Content("Error, Rol de id no existe");
-                }
-                
+
             }
             catch (Exception ex)
             {
@@ -121,10 +114,7 @@ namespace SistemaCajaRegistradora.Controllers
 
         [HttpGet]
         [ActionName("AgregarUsuarioAdmin")]
-        public ActionResult AgregarUsuarioAdmin()
-        {
-            return View();
-        }
+        public ActionResult AgregarUsuarioAdmin() => View();
 
         [HttpGet]
         [ActionName("SignOut")]
@@ -133,9 +123,8 @@ namespace SistemaCajaRegistradora.Controllers
             try
             {
                 var user = (Usuario)Session["User"];
-                var contextUsuarios = db.Usuarios.Include(u => u.Role);
-                var usuario = contextUsuarios.Where(u => u.id == user.id).FirstOrDefault();
-                if (usuario != null && (bool)usuario.conectado)
+                var usuario = db.Usuarios.Include(u => u.Role).FirstOrDefault(u => u.id == user.id);
+                if (usuario != null && usuario.conectado)
                 {
                     //Cambiamos la variable conectado a false
                     usuario.conectado = false;
@@ -157,43 +146,32 @@ namespace SistemaCajaRegistradora.Controllers
 
         [HttpGet]
         [ActionName("SolicitarResPass")]
-        public ActionResult SolicitarResPass()
-        {
-            return View();
-        }
+        public ActionResult SolicitarResPass() => View();
 
         [HttpPost]
         [ActionName("SolicitarResPass")]
         public ActionResult SolicitarResPass(string user)
         {
             user = user.Trim();
-            if (user != "")
-            {
-                var usuario = db.Usuarios.Where(u => u.nombreUsuario == user).FirstOrDefault();
-                if (usuario != null)
-                {
-                    if (usuario.rolid != 1)
-                    {
-                        int n = 0; 
-                        usuario.solrespass = true;
-                        db.Entry(usuario).State = EntityState.Modified;
-                        n = db.SaveChanges();
-                        TempData["Success"] = "Se solicito al administrador restablecimiento de contraseña";
-                        return RedirectToAction("Login","Sesion");
-                    }
-                    else
-                    {
-                        ViewBag.Error = "El usuario es un administrador";
-                        return View();
-                    }
-                }
-            }
-            else
+            if (user == "")
             {
                 ViewBag.Error = "El campo de texto esta vacio";
                 return View();
             }
-            return View();
+            var usuario = db.Usuarios.FirstOrDefault(u => u.nombreUsuario == user);
+            if (usuario == null) return View();
+
+            if (usuario.rolid == 1)
+            {
+                ViewBag.Error = "El usuario es un administrador";
+                return View();
+            }
+
+            usuario.solrespass = true;
+            db.Entry(usuario).State = EntityState.Modified;
+            db.SaveChanges();
+            TempData["Success"] = "Se solicito al administrador restablecimiento de contraseña";
+            return RedirectToAction("Login", "Sesion");
         }
 
         //Metodo para agregar el usuario administrador del sistema
@@ -223,48 +201,44 @@ namespace SistemaCajaRegistradora.Controllers
             };
             db.Usuarios.Add(usuario);
             int n = db.SaveChanges();
-            
-            if (n > 0)
-            {
-                Session["User"] = usuario;
-                return RedirectToAction("Index", "Home");
-            }
-            else
+            if (n == 0)
             {
                 ViewBag.Error = "Ocurrio un error al guardar el usuario, intentelo de nuevo o mas tarde";
-                return View();
+                return View();                
             }
+            Session["User"] = usuario;
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]
         [ActionName("verificarSession")]
         public JsonResult verificarSession(string user)
         {
-            var usuario = db.Usuarios.Where(u => u.nombreUsuario.Equals(user)).FirstOrDefault();
-            if (usuario != null)
+            var usuario = db.Usuarios.FirstOrDefault(u => u.nombreUsuario.Equals(user));
+            if (usuario == null)
             {
-                if (usuario.conectado == true)
+                return Json(new
                 {
-                    usuario.conectado = false;
-                    db.Entry(usuario).State = EntityState.Modified;
-                    db.SaveChanges();
+                    data = "error"
+                }, JsonRequestBehavior.AllowGet);
+            }
 
-                    return Json(new
-                    {
-                        data = "success"
-                    }, JsonRequestBehavior.AllowGet);
-                }
+            if (usuario.conectado == true)
+            {
+                usuario.conectado = false;
+                db.Entry(usuario).State = EntityState.Modified;
+                db.SaveChanges();
 
                 return Json(new
                 {
-                    data = "not change"
-                },JsonRequestBehavior.AllowGet);
+                    data = "success"
+                }, JsonRequestBehavior.AllowGet);
             }
-            
+
             return Json(new
             {
-                data = "error"
-            }, JsonRequestBehavior.AllowGet); 
+                data = "not change"
+            }, JsonRequestBehavior.AllowGet);
         }
     }
 }

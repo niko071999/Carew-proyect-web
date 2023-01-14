@@ -1,13 +1,12 @@
-﻿using Firebase.Auth;
-using SistemaCajaRegistradora.Models;
+﻿using SistemaCajaRegistradora.Models;
 using SistemaCajaRegistradora.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Transactions;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.WebPages;
 
 namespace SistemaCajaRegistradora.Controllers
 {
@@ -21,21 +20,11 @@ namespace SistemaCajaRegistradora.Controllers
         {
             try
             {
-                List<vmUsuario> cajeros = new List<vmUsuario>();
-                var userArray = db.Usuarios.ToArray();
-                foreach (var item in userArray)
+                List<vmUsuario> cajeros = db.Usuarios.Select(x => new vmUsuario()
                 {
-                    cajeros.Add(new vmUsuario()
-                    {
-                        id = item.id,
-                        nombreCajero = item.nombre.Trim() + " " + item.apellido,
-                        nombreUsuario = string.Empty,
-                        rol = string.Empty,
-                        rutaImg = string.Empty,
-                        solrespass = false,
-                        stateConexion = false
-                    });
-                }
+                    id = x.id,
+                    nombreCajero = x.nombre.Trim() + " " + x.apellido.Trim()
+                }).ToList();
 
                 ViewBag.cajerosid = new SelectList(cajeros, "id", "nombreCajero");
                 return View();
@@ -51,27 +40,24 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("getMovCaja")]
         public JsonResult getMovCaja(int? id)
         {
-            List<vmMovimientosCaja> mcList = new List<vmMovimientosCaja>();
-            var movimientos = db.MovimientosCajas.Include(mc => mc.Caja).Where(mc => mc.cajeroid == id).ToArray();
-            foreach (var movimiento in movimientos)
-            {
-                vmMovimientosCaja mc = new vmMovimientosCaja()
+            vmMovimientosCaja[] mcList = db.MovimientosCajas.Include(mc => mc.Caja)
+                .Where(mc => mc.cajeroid == id)
+                .Select(mc => new vmMovimientosCaja()
                 {
-                    id = movimiento.id,
-                    diferencia = movimiento.diferencia_caja,
-                    fecha_apertura = movimiento.fecha_apertura,
-                    fecha_cierre = movimiento.fecha_cierre,
-                    monto_apertura = movimiento.monto_apertura,
-                    num_caja = movimiento.Caja.num_caja,
-                    total_real_efectivo = movimiento.total_caja_real_efectivo,
-                    total_real_transferencia = movimiento.total_caja_real_transferencia,
-                    total_venta_diaria = movimiento.total_venta_diaria
-                };
-                mcList.Add(mc);
-            }
+                    id = mc.id,
+                    diferencia = mc.diferencia_caja,
+                    fecha_apertura = mc.fecha_apertura,
+                    fecha_cierre = mc.fecha_cierre,
+                    monto_apertura = mc.monto_apertura,
+                    num_caja = mc.Caja.num_caja,
+                    total_real_efectivo = mc.total_caja_real_efectivo,
+                    total_real_transferencia = mc.total_caja_real_transferencia,
+                    total_venta_diaria = mc.total_venta_diaria
+                })
+                .ToArray();
             return Json(new
             {
-                movimientos = mcList.ToArray()
+                movimientos = mcList
             }, JsonRequestBehavior.AllowGet);
         }
 
@@ -81,8 +67,8 @@ namespace SistemaCajaRegistradora.Controllers
         {
             Usuario user = (Usuario)Session["User"];
             var lastMC = db.MovimientosCajas.Include(mc => mc.Usuario)
-                                    .Where(mc => mc.cajeroid == user.id)
-                                    .OrderByDescending(mc => mc.fecha_apertura).FirstOrDefault();
+                                    .OrderByDescending(mc => mc.fecha_apertura)
+                                    .FirstOrDefault(mc => mc.cajeroid == user.id);
             if (lastMC == null) return Json(null, JsonRequestBehavior.AllowGet);
             return Json(lastMC.fecha_apertura.AddDays(1).ToString("MM-dd-yyyy HH:mm:ss"), JsonRequestBehavior.AllowGet);
         }
@@ -94,7 +80,9 @@ namespace SistemaCajaRegistradora.Controllers
             try
             {
                 Usuario user = (Usuario)Session["User"];
-                var cajero = db.Usuarios.Where(u => u.id == user.id).FirstOrDefault();
+                var cajero = db.Usuarios.FirstOrDefault(u => u.id == user.id);
+                if (cajero == null) throw new Exception("No existe el cajero");
+
                 string nombreCajero = cajero.nombre.Trim() + " " + cajero.apellido.Trim();
                 var cajas = db.Cajas.ToList();
                 ViewBag.cajero = nombreCajero;
@@ -103,7 +91,7 @@ namespace SistemaCajaRegistradora.Controllers
             }
             catch (Exception)
             {
-                return View();
+                return RedirectToAction("AbrirCaja");
             }
             
         }
@@ -113,67 +101,93 @@ namespace SistemaCajaRegistradora.Controllers
         public ActionResult AbrirCaja(DateTime fecha, string monto, int cajas)
         {
             //Verificar valores
-            if (fecha == null && monto.IsEmpty())
-            {
-                return RedirectToAction("AbrirCaja");
-            }
-            if (!verificarCajaUso(cajas))
-            {
-                if (verificarAperturaCaja())
-                {
-                    Usuario user = (Usuario)Session["User"];
-                    monto = monto.Replace(".", "");
-                    int montoapertura = Convert.ToInt32(monto);
-
-                    MovimientosCaja mc = new MovimientosCaja()
-                    {
-                        fecha_apertura = fecha,
-                        monto_apertura = montoapertura,
-                        cajaid = cajas,
-                        cajeroid = user.id
-                    };
-
-                    db.MovimientosCajas.Add(mc);
-                    int n = db.SaveChanges();
-                    if (n == 0)
-                    {
-                        return RedirectToAction("AbrirCaja");
-                    }
-                }
-            }
-            else
+            if (fecha == null && string.IsNullOrEmpty(monto)) return RedirectToAction("AbrirCaja");
+            // Obtener usuario actual
+            Usuario user = (Usuario)Session["User"];
+            //Verifico si la caja esta en uso
+            if (verificarCajaUso(cajas))
             {
                 TempData["msgError"] = "La caja seleccionada esta siendo utilizada por otro cajero";
                 return RedirectToAction("AbrirCaja");
             }
+            //Verifico si se debe realizar apertura de caja
+            if (!verificarAperturaCaja())
+            {
+                return RedirectToAction("POS", "Venta");
+            }
+            using (TransactionScope scope = new TransactionScope())
+            {
+                using (ModelData db1 = new ModelData())
+                {
+                    try
+                    {
+                        //Convierto el monto a entero, remplazando los puntos a vacio
+                        int montoapertura = Convert.ToInt32(monto.Replace(".", ""));
 
-            return RedirectToAction("POS", "Venta");
+                        MovimientosCaja mc = new MovimientosCaja()
+                        {
+                            fecha_apertura = fecha,
+                            monto_apertura = montoapertura,
+                            cajaid = cajas,
+                            cajeroid = user.id
+                        };
+                        db.MovimientosCajas.Add(mc);
+                        int n = db.SaveChanges();
+                        //Si no se guardaron los cambios, lo mando a la vista nuevamente
+                        if (n == 0)
+                            throw new Exception("No se guardo ningun cambio, asegurese de que los datos ingresados son correctos");
+                        //Transaccion completada
+                        scope.Complete();
+
+                        return RedirectToAction("POS", "Venta");
+                    }
+                    catch (Exception e)
+                    {
+                        TempData["msgError"] = e == null ? 
+                            "Ha ocurrido un error inesperado, asegurese de que los datos ingresados son correctos"
+                            :e.ToString();
+                        return RedirectToAction("AbrirCaja");
+                    }
+                }
+            }
+
         }
 
         [HttpGet]
         [ActionName("CerrarCaja")]
         public ActionResult CerrarCaja()
         {
-            int totalVentasDia = 0;
             DateTime lastDate = DateTime.Now;
             Usuario user = (Usuario)Session["User"];
-
-            var cajero = db.Usuarios.Where(u => u.id == user.id).FirstOrDefault();
-            string nombreCajero = cajero.nombre.Trim() + " " + cajero.apellido.Trim();
-            ViewBag.cajero = nombreCajero;
-
-            var lastMC = db.MovimientosCajas.Include(mc => mc.Usuario)
-                                    .Where(mc => mc.cajeroid == user.id)
-                                    .OrderByDescending(mc => mc.fecha_apertura).FirstOrDefault();
-            var ventaDia = db.Ventas.Where(v => v.MovimientosCaja.cajeroid == user.id).ToArray();
-
-            foreach (var item in ventaDia.ToArray())
+            //Se consigue los datos del cajero y ultimo movimiento de caja
+            var cajero_mc_data = db.Usuarios.Include(u => u.MovimientosCajas)
+                .Where(u => u.id == user.id)
+                .Select(u => new
+                    {
+                        nombreCajero = u.nombre.Trim() + " " + u.apellido.Trim(),
+                        lastMC = u.MovimientosCajas.OrderByDescending(mc => mc.fecha_apertura)
+                                .FirstOrDefault()
+                    })
+                .FirstOrDefault();
+            //Se verifica si existen los datos del usuario
+            if (cajero_mc_data == null || string.IsNullOrEmpty(cajero_mc_data.nombreCajero))
             {
-                if (item.fecha_creacion.Ticks >= lastMC.fecha_apertura.Ticks && item.fecha_creacion.Ticks <= lastDate.Ticks)
-                {
-                    totalVentasDia += item.total_venta;
-                }
+                TempData["msgError"] = "No existe ningun cajero, asegurese que este iniciado de sesion antes de realizar el proceso, o reinicie el sistema";
+                return RedirectToAction("POS", "Venta");
             }
+
+            var lastMC = cajero_mc_data.lastMC;
+
+            //Calcular el total de venta
+            int totalVentasDia = db.Ventas.Include(v => v.MovimientosCaja)
+                .Any(v =>
+                    v.MovimientosCaja.cajeroid == user.id
+                    && v.fecha_creacion >= lastMC.fecha_apertura
+                    && v.fecha_creacion <= lastDate)
+                ? db.Ventas.Where(v =>
+                    v.MovimientosCaja.cajeroid == user.id
+                    && v.fecha_creacion >= lastMC.fecha_apertura
+                    && v.fecha_creacion <= lastDate).Sum(v => v.total_venta) : 0;
 
             if (totalVentasDia == 0)
             {
@@ -189,7 +203,7 @@ namespace SistemaCajaRegistradora.Controllers
                 fecha_cc = lastDate,
                 fecha_ac = lastMC.fecha_apertura
             };
-
+            ViewBag.cajero = cajero_mc_data.nombreCajero;
             return View(cc);
         }
 
@@ -198,11 +212,10 @@ namespace SistemaCajaRegistradora.Controllers
         public ActionResult CerrarCaja(DateTime fecha_cc, int total, int montoRealEfectivo,
                                     int montoRealTransferencia, int diferencia)
         {
-
             Usuario user = (Usuario)Session["User"];
             var lastMC = db.MovimientosCajas.Include(mc => mc.Usuario)
-                                    .Where(mc => mc.cajeroid == user.id)
-                                    .OrderByDescending(mc => mc.fecha_apertura).FirstOrDefault();
+                .OrderByDescending(mc => mc.fecha_apertura)
+                .FirstOrDefault(mc => mc.cajeroid == user.id);
 
             if (lastMC.fecha_cierre == null)
             {
@@ -214,16 +227,13 @@ namespace SistemaCajaRegistradora.Controllers
 
                 db.Entry(lastMC).State = EntityState.Modified;
                 int n = db.SaveChanges();
-
                 if (n != 0)
                 {
                     return RedirectToAction("POS", "Venta");
                 }
                 return View();
             }
-
-            return RedirectToAction("POS","Venta");
-
+            return RedirectToAction("POS", "Venta");
         }
 
         private bool verificarCajaUso(int cajas)
@@ -234,16 +244,7 @@ namespace SistemaCajaRegistradora.Controllers
             {
                 return false;
             }
-
-            foreach (var mc in movimientosCajas)
-            {
-                if (mc.cajaid == cajas)
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return movimientosCajas.Select(mc => mc.cajaid == cajas).SingleOrDefault();
         }
 
         private bool verificarAperturaCaja()
@@ -251,39 +252,17 @@ namespace SistemaCajaRegistradora.Controllers
             DateTime datetime = DateTime.Now;
             var usuario = (Usuario)Session["User"];
             var contextMCUser = db.MovimientosCajas.Include(mc => mc.Usuario)
-                                    .Where(mc => mc.cajeroid == usuario.id)
-                                    .OrderByDescending(mc => mc.fecha_apertura);
-
+                                    .OrderByDescending(mc => mc.fecha_apertura)
+                                    .FirstOrDefault(mc => mc.cajeroid == usuario.id);
             //Verificar si no existen movimientos de caja del cajero
-            if (contextMCUser.FirstOrDefault() == null)
-            {
-                return true;
-            }
+            if (contextMCUser == null) return true;
 
-            var contextMCDate = contextMCUser.FirstOrDefault();
+            var contextMCDate = contextMCUser;
 
-            //Revisar si la fecha no es la de hoy
-            if (contextMCDate.fecha_apertura.Ticks != datetime.Ticks)
-            {
-                //Reviso si es que no ha realizado cierre de caja
-                if (contextMCDate.fecha_cierre == null)
-                {
-                    return false;
-                }
-                return true;
-            }
+            //Revisar si la fecha no es la de hoy y si es que no ha realizado cierre de caja
+            if (contextMCDate.fecha_apertura != datetime) return contextMCDate.fecha_cierre != null;
 
-            if (contextMCDate.fecha_apertura.Ticks == datetime.Ticks)
-            {
-                return false;
-            }
-
-            if (contextMCDate.fecha_cierre == null)
-            {
-                return true;
-            }
-
-            return false;
+            return contextMCDate.fecha_cierre != null;
         }
     }
 }

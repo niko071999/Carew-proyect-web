@@ -19,7 +19,6 @@ namespace SistemaCajaRegistradora.Controllers
         public ActionResult Listar()
         {
             ViewData["CategoriasLength"] = db.Categorias.ToArray().Length;
-            //var categorias = db.Categorias;
             return View();
         }
 
@@ -29,7 +28,6 @@ namespace SistemaCajaRegistradora.Controllers
         {
             db.Configuration.LazyLoadingEnabled = false;
             var result = db.Categorias.ToArray();
-            
             return Json(new
             {
                 data = result
@@ -37,11 +35,9 @@ namespace SistemaCajaRegistradora.Controllers
         }
         [HttpGet]
         [ActionName("AgregarForms")]
-        [Autorizacion(idoperacion:9)]
-        public PartialViewResult AgregarForms()
-        {
-            return PartialView("_formsCategoria");
-        }
+        [Autorizacion(idoperacion: 9)]
+        public PartialViewResult AgregarForms() => PartialView("_formsCategoria");
+
         [HttpPost]
         [ActionName("AgregarCategoria")]
         [Autorizacion(idoperacion:9)]
@@ -57,8 +53,11 @@ namespace SistemaCajaRegistradora.Controllers
         public PartialViewResult formsEditar(int? id)
         {
             var categoria = db.Categorias.Find(id);
-            categoria.nombre = categoria.nombre.Trim();
-            categoria.descripcion = categoria.descripcion.Trim();
+            if (categoria != null)
+            {
+                categoria.nombre = categoria.nombre.Trim();
+                categoria.descripcion = categoria.descripcion.Trim();
+            }
             return PartialView("_formsCategoria", categoria);
         }
         [HttpPost]
@@ -76,7 +75,7 @@ namespace SistemaCajaRegistradora.Controllers
         public PartialViewResult formsEliminar(int? id)
         {
             var categoria = db.Categorias.Find(id);
-            categoria.nombre.Trim();
+            if (categoria != null) categoria.nombre.Trim();
             return PartialView("_formsEliminar", categoria);
         }
         [HttpPost]
@@ -84,16 +83,12 @@ namespace SistemaCajaRegistradora.Controllers
         [Autorizacion(idoperacion: 11)]
         public JsonResult eliminarCategoria(int? id)
         {
-            int n = 0;
             var categoria = db.Categorias.Find(id);
-            try
+            int n = 0;
+            if (categoria != null)
             {
                 db.Categorias.Remove(categoria);
                 n = db.SaveChanges();
-            }
-            catch (Exception)
-            {
-                return Json(n, JsonRequestBehavior.AllowGet);
             }
             return Json(n, JsonRequestBehavior.AllowGet);
         }

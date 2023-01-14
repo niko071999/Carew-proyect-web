@@ -33,32 +33,24 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult getProductos()
         {
             db.Configuration.LazyLoadingEnabled = false;
-            var result = db.Productos.Include(p => p.Categoria)
-                                    .Include(p => p.Prioridade)
-                                    .Include(p => p.Imagen)
-                                    .OrderBy(p => p.nombre)
-                                    .ToArray();
-
-            List<vmProducto> productos = new List<vmProducto>();
-
-            foreach (var item in result)
-            {
-                vmProducto producto = new vmProducto
+            List<vmProducto> productos = db.Productos.Include(p => p.Categoria)
+                .Include(p => p.Prioridade)
+                .Include(p => p.Imagen)
+                .OrderBy(p => p.nombre)
+                .Select(p => new vmProducto()
                 {
-                    id = item.id,
-                    codigobarra = item.codigo_barra.Trim().ToString(),
-                    nombre = item.nombre.Trim(),
-                    categoria = item.Categoria.nombre.Trim(),
-                    prioridad = item.Prioridade.prioridad.Trim(),
-                    rutaimg = item.Imagen.ruta.Trim(),
-                    precio = (int)item.precio,
-                    stock = (int)item.stock,
-                    stockmin = (int)item.stockmin,
-                    stockmax = (int)item.stockmax,
-                    fechacreacion = item.fecha_creacion
-                };
-                productos.Add(producto);
-            }
+                    id = p.id,
+                    codigobarra = p.codigo_barra.Trim().ToString(),
+                    nombre = p.nombre.Trim(),
+                    categoria = p.Categoria.nombre.Trim(),
+                    prioridad = p.Prioridade.prioridad.Trim(),
+                    rutaimg = p.Imagen.ruta.Trim(),
+                    precio = (int)p.precio,
+                    stock = (int)p.stock,
+                    stockmin = (int)p.stockmin,
+                    stockmax = (int)p.stockmax,
+                    fechacreacion = p.fecha_creacion
+                }).ToList();
 
             return Json(new
             {
@@ -182,17 +174,7 @@ namespace SistemaCajaRegistradora.Controllers
             }, JsonRequestBehavior.AllowGet);
         }
 
-        private bool verificarCodigoBarra(string[] codigosProd, string producto)
-        {
-            foreach (string codigo in codigosProd)
-            {
-                if (codigo.Equals(producto))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+        private bool verificarCodigoBarra(string[] codigosProd, string producto) => codigosProd.Any(x => x.Equals(producto, StringComparison.OrdinalIgnoreCase));
 
         [HttpGet]
         [ActionName("formsEditar")]
@@ -200,7 +182,7 @@ namespace SistemaCajaRegistradora.Controllers
         public PartialViewResult formsEditar(int? id)
         {   
             var producto = db.Productos.Include(p => p.Categoria)
-                .Include(p => p.Prioridade).Include(p => p.Imagen).Where(p => p.id == id).FirstOrDefault();
+                .Include(p => p.Prioridade).Include(p => p.Imagen).FirstOrDefault(p => p.id == id);
             producto.codigo_barra = producto.codigo_barra.Trim();
             producto.nombre = producto.nombre.Trim();
             producto.Imagen.ruta = producto.Imagen.ruta.Trim();
@@ -231,7 +213,7 @@ namespace SistemaCajaRegistradora.Controllers
         public PartialViewResult formsImagen(int? id)
         {
             Session["idProducto"] = id;
-            var producto = db.Productos.Where(p=>p.id==id).FirstOrDefault();
+            var producto = db.Productos.FirstOrDefault(p => p.id == id);
             return PartialView("_formsImagen", producto);
         }
 
@@ -271,70 +253,68 @@ namespace SistemaCajaRegistradora.Controllers
         {
             using (TransactionScope scope = new TransactionScope())
             {
-                using (ModelData db1 = new ModelData())
+                string msgSuccess = "Imagen subida correctamente";
+                string msgError = "Error de subida de archivo";
+                try
                 {
-                    string msgSuccess = "Imagen subida correctamente";
-                    string msgError = "Error de subida de archivo";
-                    try
+                    if (downloadURL.Equals(string.Empty) && nameFile.Equals(string.Empty))
+                        throw new Exception(msgError);
+
+                    Imagen img = new Imagen()
                     {
-                        if (downloadURL.Equals(string.Empty) && nameFile.Equals(string.Empty))
-                            throw new Exception(msgError);
+                        nombre = nameFile,
+                        ruta = downloadURL,
+                    };
 
-                        Imagen img = new Imagen()
-                        {
-                            nombre = nameFile,
-                            ruta = downloadURL,
-                        };
+                    db.Imagens.Add(img);
+                    int n = db.SaveChanges();
 
-                        db1.Imagens.Add(img);
-                        int n = db1.SaveChanges();
+                    if (n == 0)
+                        throw new Exception(msgError);
 
-                        if (n == 0)
-                            throw new Exception(msgError);
+                    int idProducto = (int)Session["idProducto"];
 
-                        int idProducto = (int)Session["idProducto"];
+                    var producto = db.Productos.Find(idProducto);
 
-                        var producto = db1.Productos.Find(idProducto);
+                    string nombreImg = producto.Imagen.nombre;
+                    long idimg = producto.imagenid;
 
-                        string nombreImg = producto.Imagen.nombre;
-                        long idimg = producto.imagenid;
-                        
-                        producto.imagenid = img.id;
-                        producto.fecha_modificacion = DateTime.Now;
-                        db1.Entry(producto).State = EntityState.Modified;
-                        n = db1.SaveChanges();
-                        if (n == 0)
-                            throw new Exception(msgError);
+                    producto.imagenid = img.id;
+                    producto.fecha_modificacion = DateTime.Now;
+                    db.Entry(producto).State = EntityState.Modified;
+                    n = db.SaveChanges();
+                    if (n == 0)
+                        throw new Exception(msgError);
 
-                        //Borrar registro de la otra imagen
-                        if (idimg != 1)
-                        {
-                            var imagen = db1.Imagens.Find(idimg);
-                            db1.Imagens.Remove(imagen);
-                            db1.SaveChanges();
-                        }
-
+                    //Borrar registro de la otra imagen
+                    if (idimg == 1)
+                    {
                         scope.Complete();
-
-                        return Json(new 
-                        { 
-                            status = "success", 
-                            mensaje = msgSuccess,
-                            idimg,
-                            nombreImg
-                        }, 
-                            JsonRequestBehavior.AllowGet);
                     }
-                    catch (Exception)
+                    var imagen = db.Imagens.Find(idimg);
+                    if (imagen != null)
                     {
-                        return Json(new
-                        {
-                            status = "error",
-                            msg = msgError,
-                            idimg = 0,
-                            nombreImg = ""
-                        }, JsonRequestBehavior.AllowGet);
+                        db.Imagens.Remove(imagen);
+                        db.SaveChanges();
                     }
+                    return Json(new
+                    {
+                        status = "success",
+                        mensaje = msgSuccess,
+                        idimg,
+                        nombreImg
+                    },
+                        JsonRequestBehavior.AllowGet);
+                }
+                catch (Exception)
+                {
+                    return Json(new
+                    {
+                        status = "error",
+                        msg = msgError,
+                        idimg = 0,
+                        nombreImg = ""
+                    }, JsonRequestBehavior.AllowGet);
                 }
             }            
         }
@@ -345,7 +325,7 @@ namespace SistemaCajaRegistradora.Controllers
         public PartialViewResult formsEliminar (int? id)
         {
             var producto = db.Productos.Include(p=>p.Categoria)
-                .Include(p=>p.Prioridade).Where(p=>p.id == id).FirstOrDefault();
+                .Include(p=>p.Prioridade).FirstOrDefault(p => p.id == id);
             producto.nombre.Trim();
             return PartialView("_formsEliminar",producto);
         }
@@ -361,20 +341,25 @@ namespace SistemaCajaRegistradora.Controllers
             try
             {
                 var producto = db.Productos.Find(id);
-                nameFile = producto.Imagen.nombre.Trim();
-                long idimg = producto.imagenid;
-                var imagen = db.Imagens.Find(idimg);
-                db.Productos.Remove(producto);
-                if (idimg!=1)
+                if (producto == null)
                 {
-                    db.Imagens.Remove(imagen);
+                    return Json(new
+                    {
+                        n,
+                        nameFile,
+                        idimg = 0
+                    }, JsonRequestBehavior.AllowGet);
                 }
+                nameFile = producto.Imagen.nombre.Trim();
+                var imagen = db.Imagens.Find(producto.imagenid);
+                db.Productos.Remove(producto);
+                if (producto.imagenid != 1) db.Imagens.Remove(imagen);
                 n = db.SaveChanges();
                 return Json(new
                 {
                     n,
                     nameFile,
-                    idimg
+                    producto.imagenid
                 }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception)
@@ -394,31 +379,30 @@ namespace SistemaCajaRegistradora.Controllers
         [Autorizacion(idoperacion: 7)]
         public JsonResult addExistencias(vmAddExistenciaProduct producto)
         {
-            if (producto != null)
+            if (producto == null)
             {
-                string codigo = producto.codigo_barra;
-                var prod = db.Productos.Where(p => p.codigo_barra.Equals(codigo)).FirstOrDefault();
-                if (prod != null)
+                return Json(new
                 {
-                    
-                    return Json(new
-                    {
-                        prod.id,
-                        codigobarra = prod.codigo_barra.Trim(),
-                        nombre = prod.nombre.Trim(),
-                        newstock = producto.stock,
-                        oldStock = prod.stock,
-                    }, JsonRequestBehavior.AllowGet);
-                }
-                else
-                {
-                    return Json(new
-                    {
-                        codigobarra = "",
-                    }, JsonRequestBehavior.AllowGet);
-                }
+                    codigobarra = "",
+                }, JsonRequestBehavior.AllowGet);
             }
-            return null;
+            string codigo = producto.codigo_barra;
+            var prod = db.Productos.FirstOrDefault(p => p.codigo_barra.Equals(codigo));
+            if (prod == null)
+            {
+                return Json(new
+                {
+                    codigobarra = "",
+                }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new
+            {
+                prod.id,
+                codigobarra = prod.codigo_barra.Trim(),
+                nombre = prod.nombre.Trim(),
+                newstock = producto.stock,
+                oldStock = prod.stock,
+            }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -427,20 +411,14 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult aplicarExistencias(vmAddExistenciaProduct producto)
         {
             int n = 0;
-            var resulProducto = db.Productos.Include(p => p.Categoria).Include(p => p.Prioridade).Include(p=>p.Imagen)
-                .Where(p => p.codigo_barra == producto.codigo_barra).FirstOrDefault();
-            if (resulProducto!=null)
-            {
-                resulProducto.stock += producto.stock;
-                resulProducto.fecha_modificacion = DateTime.Now;
-                db.Entry(resulProducto).State = EntityState.Modified;
-                n = db.SaveChanges();
-                return Json(n,JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                return Json(n, JsonRequestBehavior.AllowGet); ;
-            }
+            var resulProducto = db.Productos.FirstOrDefault(p => p.codigo_barra == producto.codigo_barra);
+            if (resulProducto==null) return Json(n, JsonRequestBehavior.AllowGet);
+            
+            resulProducto.stock += producto.stock;
+            resulProducto.fecha_modificacion = DateTime.Now;
+            db.Entry(resulProducto).State = EntityState.Modified;
+            n = db.SaveChanges();
+            return Json(n, JsonRequestBehavior.AllowGet);
         }
 
         private void validarValoresNull(Producto producto)
@@ -461,18 +439,6 @@ namespace SistemaCajaRegistradora.Controllers
             {
                 producto.stockmax = 0;
             }
-        }
-
-        private string configDirectory(HttpPostedFileBase csv)
-        {
-            string path = Server.MapPath("~/Content/DocumentsCSV/");
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-            string filepath = path + Path.GetFileName(csv.FileName);
-            csv.SaveAs(filepath);
-            return filepath;
         }
 
         private bool isNumber(string[] producto)
@@ -500,24 +466,18 @@ namespace SistemaCajaRegistradora.Controllers
 
         private int obtenerCategoriaId(string[] producto)
         {
-            string cat = producto[7].ToString();
-            var categorias = db.Categorias.ToArray();
-            foreach (var c in categorias)
+            string categoria = producto[7].ToString()
+                .Replace("\r", string.Empty);
+            var categorias = db.Categorias.ToDictionary(c => c.nombre.Trim().ToUpper(),
+                c => c);
+            if (categorias.TryGetValue(categoria.ToUpper(), out Categoria cat)) return cat.id;
+            Categoria newCategoria = new Categoria()
             {
-                string newValue = cat.Replace("\r", string.Empty).ToUpper();
-                string oldValue = c.nombre.Trim().ToUpper();
-                if (oldValue.Equals(newValue))
-                {
-                    return c.id;
-                }
-            }
-            Categoria categoria = new Categoria()
-            {
-                nombre = cat,
+                nombre = categoria,
             };
-            db.Categorias.Add(categoria);
+            db.Categorias.Add(newCategoria);
             db.SaveChanges();
-            return categoria.id;
+            return newCategoria.id;
         }
     }
 }

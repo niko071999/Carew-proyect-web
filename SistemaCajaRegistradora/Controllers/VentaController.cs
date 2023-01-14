@@ -28,23 +28,18 @@ namespace SistemaCajaRegistradora.Controllers
         public JsonResult getVentas()
         {
             db.Configuration.LazyLoadingEnabled = false;
-            var result = db.Ventas.Include(v => v.MetodoPago).Include(v => v.MovimientosCaja.Usuario).ToArray();
-            List<vmVenta> ventas = new List<vmVenta>();
 
-            foreach (var item in result)
-            {
-                vmVenta venta = new vmVenta
+            List<vmVenta> ventas = db.Ventas.Include(v => v.MetodoPago)
+                .Include(v => v.MovimientosCaja.Usuario)
+                .Select(v => new vmVenta()
                 {
-                    id = item.id,
-                    cajero = item.MovimientosCaja.Usuario.nombre.Trim() + " " + item.MovimientosCaja.Usuario.apellido.Trim(),
-                    metodoPago = item.MetodoPago.metodo_pago.Trim(),
-                    numboleta = item.num_boleta,
-                    totalVenta = item.total_venta,
-                    fecha = item.fecha_creacion
-                };
-                ventas.Add(venta);
-            }
-
+                    id = v.id,
+                    cajero = v.MovimientosCaja.Usuario.nombre.Trim() + " " + v.MovimientosCaja.Usuario.apellido.Trim(),
+                    metodoPago = v.MetodoPago.metodo_pago.Trim(),
+                    numboleta = v.num_boleta,
+                    totalVenta = v.total_venta,
+                    fecha = v.fecha_creacion
+                }).ToList();
             return Json(new
             {
                 data = ventas
@@ -56,18 +51,13 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("getMoreDetail")]
         public PartialViewResult getMoreDetail(long? id)
         {
-            if (id != null)
-            {
-                var detailVentas = db.DetalleVentas
+            if (id == null) return PartialView(null);
+
+            var detailVentas = db.DetalleVentas
                                     .Include(vp => vp.Producto)
                                     .Include(vp => vp.Venta.MovimientosCaja.Usuario)
-                                    .Where(vp => vp.ventaid == id);
-                return PartialView("_detailVenta", detailVentas.ToList());
-            }
-            else
-            {
-                return PartialView(null);
-            }
+                                    .Where(vp => vp.ventaid == id).ToList();
+            return PartialView("_detailVenta", detailVentas);
         }
 
         [HttpGet]
@@ -90,22 +80,22 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("ultimaVenta")]
         public JsonResult ultimaVenta()
         {
+            string msgError = "No existe ninguna venta asociada al cajero";
+            string msgSuccess = "Ultima venta imprimiendo...";
+            
             Usuario user = (Usuario)Session["User"];
             var result = db.Ventas.Include(v => v.MetodoPago)
                                 .Include(v => v.MovimientosCaja)
-                                .Where(v => v.MovimientosCaja.cajeroid == user.id)
                                 .OrderByDescending(v => v.fecha_creacion)
-                                .FirstOrDefault();
+                                .FirstOrDefault(v => v.MovimientosCaja.cajeroid == user.id);
             if (result == null)
             {
-                string msgError = "No existe ninguna venta asociada al cajero";
                 return Json(new
                 {
                     data = 0,
                     msg = msgError
                 }, JsonRequestBehavior.AllowGet);
             }
-            string msgSuccess = "Ultima venta imprimiendo...";
             return Json(new
             {
                 data = result.id,
@@ -113,86 +103,47 @@ namespace SistemaCajaRegistradora.Controllers
             }, JsonRequestBehavior.AllowGet);
         }
 
-        [HttpGet]
-        [ActionName("getMiVentas")]
-        public JsonResult getMiVentas()
-        {
-            Usuario user = (Usuario)Session["User"];
-
-            var result = db.Ventas.Include(v => v.MetodoPago).Include(v => v.MovimientosCaja).Where(v => v.MovimientosCaja.cajeroid == user.id).ToArray();
-
-            List<vmVenta> ventas = new List<vmVenta>();
-
-            foreach (var item in result)
-            {
-                vmVenta venta = new vmVenta
-                {
-                    id = item.id,
-                    cajero = item.MovimientosCaja.Usuario.nombre.Trim() + " " + item.MovimientosCaja.Usuario.apellido.Trim(),
-                    metodoPago = item.MetodoPago.metodo_pago.Trim(),
-                    totalVenta = item.total_venta,
-                    fecha = item.fecha_creacion
-                };
-
-                ventas.Add(venta);
-            }
-
-            return Json(new
-            {
-                data = ventas
-            }, JsonRequestBehavior.AllowGet);
-        }
-
         [HttpPost]
         [ActionName("cargarProducto")]
         public JsonResult cargarProducto(Producto producto)
         {
-            if (producto != null)
-            {
-                string codigo = producto.codigo_barra;
-                var prod = db.Productos.Where(p => p.codigo_barra.Equals(codigo)).FirstOrDefault();
-                if (prod != null)
-                {
-                    if (prod.stock >= producto.stock)
-                    {
-                        return Json(new
-                        {
-                            prod.id,
-                            codigobarra = prod.codigo_barra.Trim(),
-                            nombre = prod.nombre.Trim(),
-                            precio = prod.precio,
-                            cantidadmax = prod.stock,
-                            cantidad = producto.stock,
-                            preciototal = 0,
-                        }, JsonRequestBehavior.AllowGet);
-                    }
-                    else
-                    {
-                        return Json(new
-                        {
-                            codigobarra = "",
-                            mensaje = "Stock insuficiente",
-                        }, JsonRequestBehavior.AllowGet);
-                    }
-                }
-                else
-                {
-                    return Json(new
-                    {
-                        codigobarra = "",
-                        mensaje = "No existe ningun producto asociado a este codigo de barra",
-                    }, JsonRequestBehavior.AllowGet);
-                }
-            }
-            else
+            if (producto == null)
             {
                 return Json(new
                 {
                     codigobarra = "",
-                    mensaje = "Existio un error de conexion, reinicie la pagina",
+                    mensaje = "Existe un error de conexion, reinicie la página",
                 }, JsonRequestBehavior.AllowGet);
             }
-
+            string codigo = producto.codigo_barra;
+            int stock = (int)producto.stock;
+            var prod = db.Productos.FirstOrDefault(p => p.codigo_barra.Equals(codigo));
+            if (prod == null)
+            {
+                return Json(new
+                {
+                    codigobarra = "",
+                    mensaje = "No existe ningún producto asociado a este código de barra",
+                }, JsonRequestBehavior.AllowGet);
+            }
+            if (prod.stock <= stock)
+            {
+                return Json(new
+                {
+                    codigobarra = "",
+                    mensaje = "Stock insuficiente",
+                }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new
+            {
+                prod.id,
+                codigobarra = prod.codigo_barra.Trim(),
+                nombre = prod.nombre.Trim(),
+                prod.precio,
+                cantidadmax = prod.stock,
+                cantidad = producto.stock,
+                preciototal = 0,
+            }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -209,86 +160,77 @@ namespace SistemaCajaRegistradora.Controllers
             }
             using (TransactionScope scope = new TransactionScope())
             {
-                using (ModelData db1 = new ModelData())
+                string msgError = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina";
+                string msgErrorMC = "Al parecer no existe ningun movimiento de caja o no se ha cerrado aun correctamente";
+                string msgSuccess = "Venta creada correctamente";
+                int n = 0;
+                try
                 {
-                    string msgError = "Ocurrio un error inesperado, intentelo nuevamente o reinicie la pagina";
-                    string msgErrorMC = "Al parecer no existe ningun movimiento de caja o no se ha cerrado aun correctamente";
-                    string msgSuccess = "Venta creada correctamente";
-                    try
+                    //Se verifica si no viene vacio el objeto
+                    if (ventaDetalle == null)
                     {
-                        if (ventaDetalle != null)
-                        {
-                            Usuario user = (Usuario)Session["User"];
-                            long length = db.Ventas.ToArray().Length + 1;
-
-                            //Buscar el ultimo movimiento de caja
-                            var lastMC = db.MovimientosCajas.Include(mc => mc.Usuario)
-                                    .Where(mc => mc.cajeroid == user.id)
-                                    .OrderByDescending(mc => mc.fecha_apertura).FirstOrDefault();
-
-                            if (lastMC == null)
-                            {
-                                throw new Exception(msgErrorMC);
-                            }
-
-                            //Insercion de los datos de la venta a la base de datos
-                            ventaDetalle.venta.fecha_creacion = DateTime.Now;
-                            ventaDetalle.venta.movimientocajaid = lastMC.id;
-                            ventaDetalle.venta.num_boleta = numeroBoleta + length; //Generar el num de la boleta
-                            db.Ventas.Add(ventaDetalle.venta);
-                            int n = db.SaveChanges();
-                            //Si ocurre un error realizar un rollback
-                            if (n == 0)
-                            {
-                                throw new Exception(msgError);
-                            }
-
-                            //Insercion de los datos del detalle a la base de datos
-                            long idVenta = ventaDetalle.venta.id;
-                            for (int i = 0; i < ventaDetalle.dV.Count; i++)
-                            {
-                                ventaDetalle.dV[i].ventaid = idVenta;
-                                db.DetalleVentas.Add(ventaDetalle.dV[i]);
-                                int stockProd = ventaDetalle.dV[i].total_cantidad_producto;
-                                int idprod = ventaDetalle.dV[i].productoid;
-
-                                //var producto = db.Productos.Find(idprod);
-                                //producto.stock = producto.stock - stockProd;
-                                //db.Entry(producto).State = EntityState.Modified;
-                            }
-                            n = db.SaveChanges();
-                            
-                            //throw new Exception(msgError);//EXCEPCION
-                                                        
-                            if (n == 0)
-                            {
-                                throw new Exception(msgError);
-                            }
-
-                            scope.Complete();//transaction commit 
-
-                            //Proceso finalizado correctamente
-                            return Json(new
-                            {
-                                data = "OK",
-                                msg = msgSuccess,
-                                idventa = ventaDetalle.venta.id
-                            }, JsonRequestBehavior.AllowGet);
-                        }
-                        else
-                        {
-                            throw new Exception(msgError);
-                        }
+                        throw new Exception(msgError);
                     }
-                    catch (Exception)
+                    Usuario user = (Usuario)Session["User"];
+                    var ventas_mc_data = db.Ventas.Include(v => v.MovimientosCaja).ToArray();
+
+                    //Se verifica si no esta vacio
+                    long length = ventas_mc_data.Length + 1;
+                    if (length == 0)
                     {
-                        return Json(new
-                        {
-                            data = "",
-                            msg = msgError,
-                            idventa = 0
-                        }, JsonRequestBehavior.AllowGet);
+                        throw new Exception(msgErrorMC);
                     }
+
+                    //Buscar el ultimo movimiento de caja del cajero
+                    var lastMC = ventas_mc_data
+                        .OrderByDescending(v => v.MovimientosCaja.fecha_apertura)
+                        .FirstOrDefault(v => v.MovimientosCaja.cajeroid == user.id).MovimientosCaja;
+
+                    //Insercion de los datos de la venta a la base de datos
+                    ventaDetalle.venta.fecha_creacion = DateTime.Now;
+                    ventaDetalle.venta.movimientocajaid = lastMC.id;
+                    ventaDetalle.venta.num_boleta = numeroBoleta + length; //Generar el num de la boleta
+                    db.Ventas.Add(ventaDetalle.venta);
+
+                    //Insercion de los datos del detalle a la base de datos
+                    long idVenta = ventaDetalle.venta.id;
+                    for (int i = 0; i < ventaDetalle.dV.Count; i++)
+                    {
+                        ventaDetalle.dV[i].ventaid = idVenta;
+                        db.DetalleVentas.Add(ventaDetalle.dV[i]);
+                        int stockProd = ventaDetalle.dV[i].total_cantidad_producto;
+                        int idprod = ventaDetalle.dV[i].productoid;
+
+                        //Se modifica las existencias de los productos afectados en la venta
+                        var producto = db.Productos.Find(idprod);
+                        producto.stock = producto.stock - stockProd;
+                        db.Entry(producto).State = EntityState.Modified;
+                    }
+                    n = db.SaveChanges();
+                    //Si ocurre un error al guardar los cambios, realizar un rollback
+                    if (n == 0)
+                    {
+                        throw new Exception(msgError);
+                    }
+
+                    scope.Complete();
+
+                    //Proceso finalizado correctamente
+                    return Json(new
+                    {
+                        data = "OK",
+                        msg = msgSuccess,
+                        idventa = ventaDetalle.venta.id
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                catch (Exception)
+                {
+                    return Json(new
+                    {
+                        data = "",
+                        msg = msgError,
+                        idventa = 0
+                    }, JsonRequestBehavior.AllowGet);
                 }
             }
         }
@@ -302,26 +244,19 @@ namespace SistemaCajaRegistradora.Controllers
                 if (id == 0)
                 {
                     long ventaid = (long)Session["ventaid"];
-                    var detailVentas = db.DetalleVentas
+                    var detailVentas_noid = db.DetalleVentas
                                             .Include(vp => vp.Producto)
                                             .Include(vp => vp.Venta)
                                             .Where(vp => vp.ventaid == ventaid).ToList();
-                    return PartialView("_boletaVenta", detailVentas);
+                    return PartialView("_boletaVenta", detailVentas_noid);
                 }
-                else
-                {
-                    var detailVentas = db.DetalleVentas
+                var detailVentas_id = db.DetalleVentas
                                         .Include(vp => vp.Producto)
                                         .Include(vp => vp.Venta)
-                                        .Where(vp => vp.ventaid == id);
-                    return PartialView("_boletaVenta", detailVentas.ToList());
-                }
-
+                                        .Where(vp => vp.ventaid == id).ToList();
+                return PartialView("_boletaVenta", detailVentas_id);
             }
-            else
-            {
-                return PartialView(null);
-            }
+            return PartialView(null);
 
         }
 
@@ -335,64 +270,40 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("getVentaDiaria")]
         public JsonResult getVentaDiaria()
         {
-            double totalventadiaria = 0;
             int totalventadiariaAnterior = 0;
-            int count = 0;
-            DateTime fechaOld = new DateTime();
+
+            Dictionary<DateTime, double> rvdDicc = new Dictionary<DateTime, double>();
+            var ventas = db.Ventas.ToArray();
+
+            foreach (var venta in ventas)
+            {
+                if (rvdDicc.ContainsKey(venta.fecha_creacion.Date))
+                {
+                    rvdDicc[venta.fecha_creacion.Date] += venta.total_venta;
+                }
+                else
+                {
+                    rvdDicc.Add(venta.fecha_creacion.Date, venta.total_venta);
+                }
+            }
 
             List<vmReporteVentaDiaria> rvdList = new List<vmReporteVentaDiaria>();
-            var ventas = db.Ventas.ToArray();
-            string fechaAux = ventas.First().fecha_creacion.ToShortDateString();
-            foreach (var venta in ventas)
+            foreach (var venta in rvdDicc)
             {
                 vmReporteVentaDiaria rvd; //Reporte Venta Diaria
                 double crecimiento;
                 double porcentaje;
-                if (fechaAux.Equals(venta.fecha_creacion.ToShortDateString()))
+                crecimiento = venta.Value - totalventadiariaAnterior;
+                porcentaje = (crecimiento / venta.Value) * 100;
+                rvd = new vmReporteVentaDiaria()
                 {
-                    totalventadiaria += venta.total_venta;
-                    fechaOld = venta.fecha_creacion;
-                    if (ventas.Last().fecha_creacion.Equals(venta.fecha_creacion))
-                    {
-                        crecimiento = totalventadiaria - totalventadiariaAnterior;
-                        porcentaje = (crecimiento / totalventadiaria) * 100;
-                        if (count > 0)
-                        {
-                            rvd = new vmReporteVentaDiaria()
-                            {
-                                fecha = fechaOld,
-                                totalventa = Convert.ToInt32(totalventadiaria),
-                                crecimiento = Convert.ToInt32(crecimiento),
-                                porcentajeCrecimiento = porcentaje
-                            };
-                            rvdList.Add(rvd);
-                            totalventadiariaAnterior = Convert.ToInt32(totalventadiaria);
-                            totalventadiaria = 0;
-                        }
-                    }
-                }
-                else
-                {
-                    crecimiento = totalventadiaria - totalventadiariaAnterior;
-                    porcentaje = (crecimiento / totalventadiaria) * 100;
-                    if (count > 0)
-                    {
-                        rvd = new vmReporteVentaDiaria()
-                        {
-                            fecha = fechaOld,
-                            totalventa = Convert.ToInt32(totalventadiaria),
-                            crecimiento = Convert.ToInt32(crecimiento),
-                            porcentajeCrecimiento = porcentaje
-                        };
-                        rvdList.Add(rvd);
-                        totalventadiariaAnterior = Convert.ToInt32(totalventadiaria);
-                        totalventadiaria = 0;
-                    }
-                    fechaOld = venta.fecha_creacion;
-                    fechaAux = venta.fecha_creacion.ToShortDateString();
-                    totalventadiaria += venta.total_venta;
-                }
-                count++;
+                    fecha = venta.Key,
+                    totalventa = Convert.ToInt32(venta.Value),
+                    crecimiento = Convert.ToInt32(crecimiento),
+                    porcentajeCrecimiento = porcentaje
+                };
+                rvdList.Add(rvd);
+                totalventadiariaAnterior = Convert.ToInt32(venta.Value);
             }
             return Json(new
             {
@@ -410,41 +321,31 @@ namespace SistemaCajaRegistradora.Controllers
         [ActionName("getProductosVendidos")]
         public JsonResult getProductosVendidos()
         {
-            int count_pv = 0;
-            Nullable<int> precioOld = 0;
-            string codebarOld = string.Empty;
-            string nombreProdOld = string.Empty;
-            string rutaImgOld = string.Empty;
-            List<vmReporteProductosVendidos> rpvList = new List<vmReporteProductosVendidos>();
             vmReporteProductosVendidos rpv;
-            var detallesventas = db.DetalleVentas.Include(dv => dv.Producto.Imagen).OrderBy(dv => dv.productoid).ToArray();
-            string codebar = detallesventas.First().Producto.codigo_barra.Trim();
+            Dictionary<int, vmReporteProductosVendidos> productoVendidosDicc = new Dictionary<int, vmReporteProductosVendidos>();
+            var detallesventas = db.DetalleVentas.Include(dv => dv.Producto.Imagen)
+                .OrderBy(dv => dv.productoid)
+                .ToArray();
             foreach (var dv in detallesventas)
             {
-                if (codebar.Equals(dv.Producto.codigo_barra.Trim()))
+                if (productoVendidosDicc.TryGetValue(dv.productoid, out rpv))
                 {
-                    count_pv += dv.total_cantidad_producto;
-                    codebarOld = dv.Producto.codigo_barra.Trim();
-                    nombreProdOld = dv.Producto.nombre.Trim();
-                    rutaImgOld = dv.Producto.Imagen.ruta.Trim();
-                    precioOld = dv.Producto.precio;
+                    rpv.cantidad_vendido += dv.total_cantidad_producto;
                 }
                 else
                 {
                     rpv = new vmReporteProductosVendidos()
                     {
-                        codigobarra = codebarOld,
-                        nombre_producto = nombreProdOld,
-                        ruta_imagen = rutaImgOld,
-                        precio = precioOld,
-                        cantidad_vendido = count_pv
+                        codigobarra = dv.Producto.codigo_barra.Trim(),
+                        nombre_producto = dv.Producto.nombre.Trim(),
+                        ruta_imagen = dv.Producto.Imagen.ruta.Trim(),
+                        precio = dv.Producto.precio,
+                        cantidad_vendido = dv.total_cantidad_producto
                     };
-                    rpvList.Add(rpv);
-                    count_pv = 0;
-                    count_pv += dv.total_cantidad_producto; 
+                    productoVendidosDicc.Add(dv.productoid, rpv);
                 }
-                codebar = dv.Producto.codigo_barra.Trim();                
             }
+            List<vmReporteProductosVendidos> rpvList = productoVendidosDicc.Values.ToList();
             return Json(new
             {
                 data = rpvList.ToArray()
@@ -456,51 +357,28 @@ namespace SistemaCajaRegistradora.Controllers
             DateTime datetime = DateTime.Now;
             var usuario = (Usuario)Session["User"];
             var contextMCUser = db.MovimientosCajas.Include(mc => mc.Usuario)
-                                    .Where(mc => mc.cajeroid == usuario.id)
-                                    .OrderByDescending(mc => mc.fecha_apertura);
-            
+                                    .OrderByDescending(mc => mc.fecha_apertura)
+                                    .FirstOrDefault(mc => mc.cajeroid == usuario.id);
             //Verificar si no existen movimientos de caja del cajero
-            if (contextMCUser.FirstOrDefault() == null)
-            {
-                return true;
-            }
+            if (contextMCUser == null) return true;
 
-            var contextMCDate = contextMCUser.FirstOrDefault();
+            var contextMCDate = contextMCUser;
 
-            //Revisar si la fecha no es la de hoy
-            if (contextMCDate.fecha_apertura.Ticks != datetime.Ticks)
-            {
-                //Reviso si es que no ha realizado cierre de caja
-                if (contextMCDate.fecha_cierre == null)
-                {
-                    return false;
-                }
-                return true;
-            }
+            //Revisar si la fecha no es la de hoy y si es que no ha realizado cierre de caja
+            if (contextMCDate.fecha_apertura != datetime) return contextMCDate.fecha_cierre != null;
 
-            if (contextMCDate.fecha_apertura.Ticks == datetime.Ticks)
-            {
-                return false;
-            }
-
-            if (contextMCDate.fecha_cierre == null)
-            {
-                return true;
-            }
-
-            return false;
+            return contextMCDate.fecha_cierre != null;
         }
 
         private bool verificarCierreCaja()
         {
             DateTime hoy = DateTime.Now;
             var usuario = (Usuario)Session["User"];
-            var contextMCUser = db.MovimientosCajas.Where(mc => mc.cajeroid == usuario.id)
-                                    .OrderByDescending(mc => mc.fecha_apertura);
+            var mov = db.MovimientosCajas
+                .OrderByDescending(mc => mc.fecha_apertura)
+                .FirstOrDefault(mc => mc.cajeroid == usuario.id);
 
-            var mov = contextMCUser.FirstOrDefault();
-            if (mov == null) 
-                return false;
+            if (mov == null) return false;
 
             return hoy >= mov.fecha_apertura.AddDays(1);
         }
