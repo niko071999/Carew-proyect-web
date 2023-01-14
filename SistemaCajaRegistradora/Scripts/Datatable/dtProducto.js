@@ -23,12 +23,14 @@ function generarTabla1() {
     //Ordenar dependiendo del contexto del dato (Ordenando de acuerdo a la prioridad)
     $.fn.dataTable.ext.type.order['prioridad-pre'] = function (d) {
         switch (d) {
-            case 'Baja':
+            case `<span class="badge bg-secondary">Baja</span>`:
                 return 1;
-            case 'Medio':
+            case `<span class="badge bg-warning">Medio</span>`:
                 return 2;
-            case 'Alta':
+            case `<span class="badge bg-danger">Alta</span>`:
                 return 3;
+            case `<span class="badge bg-primary">Prioridad no encontrada!!</span>`:
+                return 4;
         }
     };
     //Customizacion del filtro para rango
@@ -182,7 +184,19 @@ function generarTabla1() {
                 data: 'prioridad',
                 render: function (data) {
                     prioridad = data;
-                    return data;
+                    switch (data) {
+                        case 'Baja':
+                            return `<span class="badge bg-secondary">${data}</span>`;
+                            break;
+                        case 'Medio':
+                            return `<span class="badge bg-warning">${data}</span>`;
+                            break;
+                        case 'Alta':
+                            return `<span class="badge bg-danger">${data}</span>`;
+                            break;
+                        default:
+                            ret `<span class="badge bg-primary">Prioridad no encontrada!!</span>`;
+                    }
                 },
                 type: 'prioridad'
             },
